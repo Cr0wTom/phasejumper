@@ -2,7 +2,7 @@
 
 PhaseJumper is a static web app. GitHub Pages serves the built files; everything — planning, airport lookup, calendar — runs in the browser. There is no server, database, account or telemetry, and nothing a traveler enters leaves their device.
 
-*As built through T06. Updated with each ticket.*
+*As built through T08. Updated with each ticket.*
 
 ## Repository
 
@@ -49,7 +49,10 @@ Testing: unit tests, fast-check property tests over 500 random trips, and eight 
 | `airports/` | Lazy-loads `airports.json` as its own chunk; search by IATA, city, name |
 | `storage/plans.ts` | IndexedDB via `idb-keyval`: `plan:<id>` → `{ id, input, result, engineVersion, createdAt }` |
 | `flags.json` | Build-time flags (§7.4) plus `legal.acceptanceGate` and `melatonin.optIn`, all off |
+| `components/PhaseMap/` | The phase map (§4): `layout.ts` turns a plan into rows of positioned bands (pure, unit-tested); `PhaseMap.tsx` draws them as SVG with the axis toggle, popovers and keyboard navigation |
 | `messages.ts` | Every user-facing string in the web app |
+
+The phase map draws one row per calendar date in the grid's zone. Destination and home hour scales sit on top, both shown by default and each switchable; the grid reads in the first one switched on. A "now" marker shows the current time on today's row while the plan is underway. Every block is placed by its own UTC instant and split at midnight and at clock changes, so DST days read correctly. Inside the grid there are only bands, glyphs and text; icons live in the legend. A test-only harness (`apps/web/harness/`, built by `vite.harness.config.ts`, never shipped) renders the golden fixtures for Playwright: screenshots at 390 and 1280 px, axe, keyboard, DST and narrow-screen checks.
 
 "Generate plan" validates the form, maps it to `PlanInput` (zones and coordinates from `airports.json`), runs `generatePlan` in the browser, saves the result to IndexedDB and opens `#/plan/<id>`. The melatonin toggle and the legal gate stay hidden until T12 turns their flags on.
 
