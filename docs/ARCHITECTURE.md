@@ -42,19 +42,22 @@ Testing: unit tests, fast-check property tests over 500 random trips, and eight 
 
 | Path | Role |
 |---|---|
-| `router.ts` | Hash routing: `#/trip[/<id>]` (new trip, or edit a saved one), `#/plan[/<id>]` (a plan, or the last opened), `#/today`, and share links `#p=<base64url PlanInput>`; anything else goes to `#/trip` |
+| `router.ts` | Hash routing: `#/` (Start), `#/settings`, `#/evidence`, `#/trip[/<id>]` (new trip, or edit a saved one), `#/plan[/<id>]` (a plan, or the last opened), `#/today`, and share links `#p=<base64url PlanInput>`; anything else goes to `#/` |
+| `routes/start/` + `exampleTrip.ts` | Start: a live phase map of a fixed example trip (PRG → SFO, planned on the device), Plan a trip, the plans saved on this device, footer |
+| `routes/settings/` | Settings: dark/light, export plans as JSON, import (`storage/importPlans.ts` checks every trip with the engine, a file with any bad trip imports nothing; `importAll.ts` rolls back partial saves), forget all trips (two-step confirmation), and the evidence page |
+| `components/Markdown.tsx` | Renders `docs/EVIDENCE.md` (bundled at build time) as React elements: headings, paragraphs, lists, bold, https links, rules; never injects HTML |
 | `routes/trip/` | Trip builder: You, Flights, Constraints; zod schema (`schema.ts`), form → `PlanInput` (`mapPlanInput.ts`) |
 | `routes/plan/` | Plan screen: decision header with the progress curve, share link and Edit trip, the phase map with a now marker, and the per-day detail list (icons allowed here); opening share links |
 | `routes/today/` + `today.ts` | Today: where you are and the local time, the current and next block with countdowns (recomputed every 30 s and on returning to the tab), today's ribbon |
-| `components/NavBar.tsx` | Plan · Today · New trip: bottom tab bar on phones, left rail from 768 px |
+| `components/NavBar.tsx` | Plan · Today · New trip · Settings: bottom tab bar on phones, left rail from 768 px |
 | `components/AirportCombobox.tsx` | WAI-ARIA combobox over the airport list (top 12 matches shown, full list searched) |
 | `airports/` | Lazy-loads `airports.json` as its own chunk; search by IATA, city, name |
-| `storage/plans.ts` | IndexedDB via `idb-keyval`: `plan:<id>` → `{ id, input, result, engineVersion, createdAt }`, plus the last opened plan id; plans from an older engine are rebuilt on open with a one-line notice |
+| `storage/plans.ts` | IndexedDB via `idb-keyval`: `plan:<id>` → `{ id, input, result, engineVersion, createdAt }`, plus the last opened plan id; listing, a JSON backup format (`phasejumper-plans`, version 1, inputs only) and forget-all; plans from an older engine are rebuilt on open with a one-line notice |
 | `storage/shareLink.ts` | Share links: the `PlanInput` (never the result) as base64url JSON in the URL fragment, never sent to the host; the recipient's browser regenerates the plan |
 | `flags.json` | Build-time flags (§7.4) plus `legal.acceptanceGate` and `melatonin.optIn`, all off |
 | `components/PhaseMap/` | The phase map (§4): `layout.ts` turns a plan into rows of positioned bands (pure, unit-tested); `PhaseMap.tsx` draws them as SVG with the axis toggle, popovers and keyboard navigation |
 | `styles/tokens.css` | The §5 design tokens: colors for dark (default) and light, radii and type scale; Geist and Geist Mono self-hosted from `public/fonts/` |
-| `theme.ts`, `components/AppHeader.tsx` | Dark/light switch in the app header; first visit follows the OS, the choice is remembered on this device (`localStorage`, optional) |
+| `theme.ts` | Dark/light, chosen in Settings; first visit follows the OS, the choice is remembered on this device (`localStorage`, optional) |
 | `icons.ts` | The fixed Lucide icon mapping (§5); never used inside the phase-map grid |
 | `components/UpdatePrompt.tsx` | "A new version is ready" bar; the app never reloads itself |
 | `messages.ts` | Every user-facing string in the web app |

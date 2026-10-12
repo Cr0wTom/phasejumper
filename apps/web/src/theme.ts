@@ -52,8 +52,7 @@ export function applyInitialTheme(): void {
   document.documentElement.dataset.theme = theme;
 }
 
-export function toggleTheme(): Theme {
-  const next: Theme = readTheme() === "dark" ? "light" : "dark";
+export function setTheme(next: Theme): Theme {
   document.documentElement.dataset.theme = next;
   try {
     localStorage.setItem(THEME_STORAGE_KEY, next);

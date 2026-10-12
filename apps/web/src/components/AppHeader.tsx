@@ -14,27 +14,16 @@
  * limitations under the License.
  */
 
-import { useState } from "react";
-import { Icon } from "../icons";
 import { messages } from "../messages";
-import { readTheme, toggleTheme, type Theme } from "../theme";
 
+// The theme switch lives in Settings (T13).
 export function AppHeader() {
-  const [theme, setTheme] = useState<Theme>(readTheme);
-
   return (
     <header className="pj-header">
       <div className="pj-header-bar">
-        <p className="pj-brand">{messages.title}</p>
-        <button
-          type="button"
-          className="pj-theme"
-          aria-pressed={theme === "dark"}
-          aria-label={messages.themeDark}
-          onClick={() => setTheme(toggleTheme())}
-        >
-          <Icon name={theme === "dark" ? "sleep" : "seekLight"} />
-        </button>
+        <a className="pj-brand" href="#/">
+          {messages.title}
+        </a>
       </div>
     </header>
   );

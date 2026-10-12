@@ -18,12 +18,18 @@ import { describe, expect, it } from "vitest";
 import { parseHash } from "../src/router";
 
 describe("parseHash", () => {
-  it("sends the root and unknown hashes to the trip screen", () => {
-    expect(parseHash("")).toBeNull();
-    expect(parseHash("#")).toBeNull();
-    expect(parseHash("#/")).toBeNull();
-    expect(parseHash("#/settings")).toBeNull();
+  it("sends the root to Start and unknown hashes nowhere (T13)", () => {
+    expect(parseHash("")).toEqual({ name: "start" });
+    expect(parseHash("#")).toEqual({ name: "start" });
+    expect(parseHash("#/")).toEqual({ name: "start" });
+    expect(parseHash("#/nowhere")).toBeNull();
     expect(parseHash("#/trip")).toEqual({ name: "trip" });
+  });
+
+  it("reads the settings and evidence routes (T13)", () => {
+    expect(parseHash("#/settings")).toEqual({ name: "settings" });
+    expect(parseHash("#/evidence")).toEqual({ name: "evidence" });
+    expect(parseHash("#/settings/x")).toBeNull();
   });
 
   it("reads a plan id", () => {

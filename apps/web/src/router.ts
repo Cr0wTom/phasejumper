@@ -22,6 +22,9 @@ import { useEffect, useState } from "react";
  * the host, so a shared plan is never logged.
  */
 export type Route =
+  | { name: "start" }
+  | { name: "settings" }
+  | { name: "evidence" }
   | { name: "trip"; editId?: string }
   | { name: "plan"; id?: string }
   | { name: "today" }
@@ -30,16 +33,18 @@ export type Route =
 const PLAN_HASH = /^\/plan(?:\/([^/]+))?$/;
 const TRIP_HASH = /^\/trip(?:\/([^/]+))?$/;
 
-/** Returns null for `#/`, empty, and unknown hashes. Those render as the trip form. */
+/** Returns null for unknown hashes, which go to the Start screen. */
 export function parseHash(hash: string): Route | null {
   const withoutHash = hash.startsWith("#") ? hash.slice(1) : hash;
   if (withoutHash.startsWith("p=")) {
     const payload = withoutHash.slice(2);
     return payload.length === 0 ? null : { name: "share", payload };
   }
-  if (withoutHash === "" || withoutHash === "/") return null;
+  if (withoutHash === "" || withoutHash === "/") return { name: "start" };
   const path = withoutHash.startsWith("/") ? withoutHash : `/${withoutHash}`;
   if (path === "/today") return { name: "today" };
+  if (path === "/settings") return { name: "settings" };
+  if (path === "/evidence") return { name: "evidence" };
   const plan = PLAN_HASH.exec(path);
   if (plan !== null) {
     const id = plan[1];
@@ -58,11 +63,11 @@ export function parseHash(hash: string): Route | null {
 }
 
 function initialRoute(): Route {
-  return parseHash(window.location.hash) ?? { name: "trip" };
+  return parseHash(window.location.hash) ?? { name: "start" };
 }
 
-function canonicalTripHash(): void {
-  const next = `${window.location.pathname}${window.location.search}#/trip`;
+function canonicalStartHash(): void {
+  const next = `${window.location.pathname}${window.location.search}#/`;
   const current = `${window.location.pathname}${window.location.search}${window.location.hash}`;
   if (current !== next) window.history.replaceState(null, "", next);
 }
@@ -74,8 +79,8 @@ export function useRoute(): Route {
     const apply = (): void => {
       const parsed = parseHash(window.location.hash);
       if (parsed === null) {
-        canonicalTripHash();
-        setRoute({ name: "trip" });
+        canonicalStartHash();
+        setRoute({ name: "start" });
         return;
       }
       setRoute(parsed);
