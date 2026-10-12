@@ -2,7 +2,7 @@
 
 PhaseJumper is a static web app. GitHub Pages serves the built files; everything — planning, airport lookup, calendar — runs in the browser. There is no server, database, account or telemetry, and nothing a traveler enters leaves their device.
 
-*As built through T07. Updated with each ticket.*
+*As built through T08 and the native date and time pickers. Updated with each ticket.*
 
 ## Repository
 

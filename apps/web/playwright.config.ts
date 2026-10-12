@@ -34,6 +34,8 @@ export default defineConfig({
       testIgnore: "phasemap/**",
       use: {
         ...devices["Desktop Chrome"],
+        // Native date/time fields take keyboard input in locale order.
+        locale: "en-GB",
         baseURL: "http://127.0.0.1:4173/phasejumper/",
       },
     },

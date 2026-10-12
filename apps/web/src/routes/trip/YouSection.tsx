@@ -42,7 +42,8 @@ export function YouSection({
         <TextField
           id={fieldDomId("habitualBedtime")}
           label={messages.bedtime}
-          hint={`${messages.bedtimeHint} ${messages.timeHint}`}
+          type="time"
+          hint={messages.bedtimeHint}
           value={form.habitualBedtime}
           error={errors.habitualBedtime}
           required
@@ -51,7 +52,8 @@ export function YouSection({
         <TextField
           id={fieldDomId("habitualWake")}
           label={messages.wake}
-          hint={`${messages.wakeHint} ${messages.timeHint}`}
+          type="time"
+          hint={messages.wakeHint}
           value={form.habitualWake}
           error={errors.habitualWake}
           required

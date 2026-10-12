@@ -94,7 +94,7 @@ export function ConstraintsSection({
                 <TextField
                   id={fieldDomId(`mustBeAwake.${index}.startDate`)}
                   label={messages.startDate}
-                  hint={messages.dateHint}
+                  type="date"
                   value={event.startDate}
                   error={errors[`mustBeAwake.${index}.startDate`]}
                   required
@@ -103,7 +103,7 @@ export function ConstraintsSection({
                 <TextField
                   id={fieldDomId(`mustBeAwake.${index}.startTime`)}
                   label={messages.startTime}
-                  hint={messages.timeHint}
+                  type="time"
                   value={event.startTime}
                   error={errors[`mustBeAwake.${index}.startTime`]}
                   required
@@ -112,7 +112,7 @@ export function ConstraintsSection({
                 <TextField
                   id={fieldDomId(`mustBeAwake.${index}.endDate`)}
                   label={messages.endDate}
-                  hint={messages.dateHint}
+                  type="date"
                   value={event.endDate}
                   error={errors[`mustBeAwake.${index}.endDate`]}
                   required
@@ -121,7 +121,7 @@ export function ConstraintsSection({
                 <TextField
                   id={fieldDomId(`mustBeAwake.${index}.endTime`)}
                   label={messages.endTime}
-                  hint={messages.timeHint}
+                  type="time"
                   value={event.endTime}
                   error={errors[`mustBeAwake.${index}.endTime`]}
                   required
@@ -173,7 +173,7 @@ export function ConstraintsSection({
                 <TextField
                   id={fieldDomId(`noWorkoutWindows.${index}.startDate`)}
                   label={messages.startDate}
-                  hint={messages.dateHint}
+                  type="date"
                   value={window.startDate}
                   error={errors[`noWorkoutWindows.${index}.startDate`]}
                   required
@@ -182,7 +182,7 @@ export function ConstraintsSection({
                 <TextField
                   id={fieldDomId(`noWorkoutWindows.${index}.startTime`)}
                   label={messages.startTime}
-                  hint={messages.timeHint}
+                  type="time"
                   value={window.startTime}
                   error={errors[`noWorkoutWindows.${index}.startTime`]}
                   required
@@ -191,7 +191,7 @@ export function ConstraintsSection({
                 <TextField
                   id={fieldDomId(`noWorkoutWindows.${index}.endDate`)}
                   label={messages.endDate}
-                  hint={messages.dateHint}
+                  type="date"
                   value={window.endDate}
                   error={errors[`noWorkoutWindows.${index}.endDate`]}
                   required
@@ -200,7 +200,7 @@ export function ConstraintsSection({
                 <TextField
                   id={fieldDomId(`noWorkoutWindows.${index}.endTime`)}
                   label={messages.endTime}
-                  hint={messages.timeHint}
+                  type="time"
                   value={window.endTime}
                   error={errors[`noWorkoutWindows.${index}.endTime`]}
                   required
