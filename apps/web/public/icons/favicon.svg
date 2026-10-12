@@ -1,0 +1,13 @@
+<!-- PhaseJumper ribbon mark. Copyright 2026 PhaseJumper contributors. Apache-2.0. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="112" fill="#0B0B0D"/>
+  <g>
+    <rect x="96" y="150" width="320" height="52" rx="26" fill="#26262B"/>
+    <rect x="96" y="230" width="320" height="52" rx="26" fill="#26262B"/>
+    <rect x="96" y="310" width="320" height="52" rx="26" fill="#26262B"/>
+    <rect x="96" y="150" width="150" height="52" rx="26" fill="#6C7BFF"/>
+    <rect x="176" y="230" width="150" height="52" rx="26" fill="#6C7BFF"/>
+    <rect x="266" y="310" width="150" height="52" rx="26" fill="#6C7BFF"/>
+    <circle cx="356" cy="176" r="18" fill="#F6B73C"/>
+  </g>
+</svg>

@@ -15,9 +15,11 @@
     "@phasejumper/engine": "workspace:*",
     "@phasejumper/itinerary": "workspace:*",
     "idb-keyval": "6.3.0",
+    "lucide-react": "1.55.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "temporal-polyfill": "1.0.5",
+    "workbox-window": "7.4.1",
     "zod": "4.6.5"
   },
   "devDependencies": {
@@ -28,6 +30,7 @@
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "@vitejs/plugin-react": "5.2.0",
+    "lighthouse": "12.8.2",
     "tailwindcss": "4.3.3",
     "typescript": "catalog:",
     "vite": "6.4.4",

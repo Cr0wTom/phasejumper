@@ -16,6 +16,9 @@
 
 export const messages = {
   title: "PhaseJumper",
+  themeDark: "Dark theme",
+  updateReady: "A new version is ready.",
+  updateReload: "Reload",
   tripHeading: "Plan a trip",
   youHeading: "You",
   flightsHeading: "Flights",
