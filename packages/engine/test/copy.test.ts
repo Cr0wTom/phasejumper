@@ -16,9 +16,11 @@
 
 import { describe, expect, it } from "vitest";
 import {
+  ADVICE_CODES,
   DROP_CODES,
   REASON_CODES,
   WARNING_CODES,
+  adviceCopy,
   droppedCopy,
   explanationCopy,
   reasonCopy,
@@ -33,6 +35,7 @@ const all = [
   ...REASON_CODES.map(reasonCopy),
   ...WARNING_CODES.map(warningCopy),
   ...DROP_CODES.map(droppedCopy),
+  ...ADVICE_CODES.map(adviceCopy),
   explanationCopy.lightTouch(1),
   explanationCopy.shortTrip({ tripDays: 2, shiftDays: 5 }),
   explanationCopy.shortTrip({ tripDays: 2, shiftDays: 1 }),

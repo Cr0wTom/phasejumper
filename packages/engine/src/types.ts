@@ -45,6 +45,11 @@ export interface Traveler {
   preAdjustDays: PreAdjustDays;
 }
 
+export interface LatLon {
+  lat: number;
+  lon: number;
+}
+
 export interface FlightLeg {
   /** IATA. */
   departureAirport: string;
@@ -58,6 +63,9 @@ export interface FlightLeg {
   departureTz: string;
   /** IANA zone, resolved by the app. */
   arrivalTz: string;
+  /** Airport coordinates, filled by the app from airports.json; used for daylight (§2.7). */
+  departureLatLon?: LatLon;
+  arrivalLatLon?: LatLon;
   flightNumber?: string;
   /** V2. */
   cabinLightingKnown?: boolean;
@@ -75,6 +83,7 @@ export interface Itinerary {
   tripDays?: number;
 }
 
+/** start/end are ISO local date-times ("2027-01-16T09:00") in tz. */
 export interface Constraints {
   mustBeAwake?: Array<{
     start: string;
@@ -112,7 +121,15 @@ export type BlockKind =
   | "CAFFEINE_OK"
   | "CAFFEINE_STOP"
   | "MEAL"
-  | "WIND_DOWN";
+  | "WIND_DOWN"
+  // Feasibility pass (§2.7) and arrival-day layers.
+  | "SLEEP_INFLIGHT"
+  | "LIGHT_INFLIGHT_WINDOW"
+  | "SEEK_LIGHT_ARTIFICIAL"
+  | "NAP"
+  | "NSDR"
+  | "EXERCISE_OPTIONAL_WALK"
+  | "CAFFEINE_LATE_OK";
 
 /** Reference ids from spec §1.1; "none" for comfort layers without a cited source. */
 export type SourceRef =
@@ -150,6 +167,14 @@ export const REASON_CODES = [
   "CAFFEINE_STOP",
   "MEAL",
   "WIND_DOWN",
+  "SLEEP_INFLIGHT",
+  "LIGHT_INFLIGHT",
+  "AVOID_LIGHT_INFLIGHT",
+  "SEEK_LIGHT_ARTIFICIAL",
+  "NAP_SHORT_SLEEP",
+  "NSDR",
+  "EXERCISE_OPTIONAL_WALK",
+  "CAFFEINE_LATE_OK",
 ] as const;
 
 export type ReasonCode = (typeof REASON_CODES)[number];
@@ -171,6 +196,10 @@ export interface Block {
 export const WARNING_CODES = [
   "PHASE_ESTIMATE_UNCERTAIN",
   "LIGHT_BLOCK_SHIFTED",
+  "SHORT_SLEEP_DAY",
+  "MELATONIN_MOVED",
+  "WEAK_DAY",
+  "DAYLIGHT_UNKNOWN",
 ] as const;
 
 export type WarningCode = (typeof WARNING_CODES)[number];
@@ -192,9 +221,14 @@ export interface PlanDay {
   misalignmentBefore: number;
   /** Same, after this day's shift. */
   misalignmentAfter: number;
+  /** Forecast shift for this day: planned rate, halved on a WEAK_DAY, plus the exercise bonus (§2.8). */
   effectiveShiftHours: number;
-  flags: string[];
+  flags: DayFlag[];
 }
+
+export const DAY_FLAGS = ["FLIGHT_DAY", "SHORT_SLEEP_DAY", "WEAK_DAY"] as const;
+
+export type DayFlag = (typeof DAY_FLAGS)[number];
 
 export type DecisionDirection = Direction | "none" | "short-trip";
 

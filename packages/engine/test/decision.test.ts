@@ -125,9 +125,15 @@ describe("decision", () => {
 
   it("forceDirection overrides the choice and says so", () => {
     const { decision } = generatePlan(prgSyd(), { forceDirection: "advance" });
-    expect(decision).toMatchObject({ direction: "advance", chosenDays: 9 });
+    // 9 days by formula; the second flight day is a WEAK_DAY (light falls
+    // in the air), which adds a day (§2.7 rule 5).
+    expect(decision).toMatchObject({
+      direction: "advance",
+      daysAdvance: 9,
+      chosenDays: 10,
+    });
     expect(decision.explanation).toBe(
-      "You chose to move your clock 9 h earlier over 9 days.",
+      "You chose to move your clock 9 h earlier over 10 days.",
     );
   });
 

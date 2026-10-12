@@ -28,6 +28,7 @@ import type {
   DecisionDirection,
   Direction,
   EngineOptions,
+  LatLon,
   PlanInput,
   Traveler,
 } from "./types";
@@ -221,6 +222,15 @@ function localInstant(
   }
 }
 
+function validLatLon(p: LatLon): boolean {
+  return (
+    Number.isFinite(p.lat) &&
+    Number.isFinite(p.lon) &&
+    Math.abs(p.lat) <= 90 &&
+    Math.abs(p.lon) <= 180
+  );
+}
+
 function positiveFinite(value: number | undefined): boolean {
   return value === undefined || (Number.isFinite(value) && value > 0);
 }
@@ -298,8 +308,39 @@ export function validatePlanInput(input: PlanInput): ValidationResult {
     ) {
       issues.push(`${at} departs before the previous leg arrives`);
     }
+    for (const [field, value] of [
+      ["departureLatLon", leg.departureLatLon],
+      ["arrivalLatLon", leg.arrivalLatLon],
+    ] as const) {
+      if (value !== undefined && !validLatLon(value)) {
+        issues.push(`${at}.${field} is not a valid latitude/longitude`);
+      }
+    }
     previousArrival = arr;
   });
+
+  const c = input.constraints;
+  const windows = [
+    ...(c?.mustBeAwake ?? []).map(
+      (w, i) => [`constraints.mustBeAwake[${i}]`, w] as const,
+    ),
+    ...(c?.noWorkoutWindows ?? []).map(
+      (w, i) => [`constraints.noWorkoutWindows[${i}]`, w] as const,
+    ),
+  ];
+  for (const [at, w] of windows) {
+    if (!validZone(w.tz)) {
+      issues.push(`${at}.tz is not an IANA zone`);
+      continue;
+    }
+    const start = localInstant(w.start, w.tz);
+    const end = localInstant(w.end, w.tz);
+    if (start === undefined || end === undefined) {
+      issues.push(`${at} start/end must be local date-times`);
+    } else if (Temporal.Instant.compare(end, start) <= 0) {
+      issues.push(`${at} ends before it starts`);
+    }
+  }
 
   try {
     Temporal.Instant.from(input.now);

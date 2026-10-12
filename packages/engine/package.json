@@ -1,6 +1,6 @@
 {
   "name": "@phasejumper/engine",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "exports": {
@@ -16,6 +16,7 @@
     "vitest": "catalog:"
   },
   "dependencies": {
+    "suncalc": "2.0.2",
     "temporal-polyfill": "1.0.5"
   }
 }

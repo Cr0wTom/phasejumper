@@ -15,8 +15,10 @@
  */
 
 export {
+  ADVICE_CODES,
   DROP_CODES,
   MELATONIN_REASON,
+  adviceCopy,
   droppedCopy,
   explanationCopy,
   reasonCopy,
@@ -28,5 +30,5 @@ export {
   type ValidationResult,
 } from "./phase";
 export { ENGINE_VERSION, generatePlan } from "./schedule";
-export { REASON_CODES, WARNING_CODES } from "./types";
+export { DAY_FLAGS, REASON_CODES, WARNING_CODES } from "./types";
 export type * from "./types";
