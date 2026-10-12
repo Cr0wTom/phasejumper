@@ -28,7 +28,7 @@ import {
 } from "react";
 import { Temporal } from "temporal-polyfill";
 import { phaseMapMessages as m } from "../../messages";
-import { ICON_SIZE_RIBBON, Icon, type IconName } from "../../icons";
+import { ICON_SIZE_RIBBON, Icon, KIND_ICON, type IconName } from "../../icons";
 import { focusRing } from "../../ui";
 import {
   axisZone,
@@ -62,19 +62,6 @@ const FG = "var(--fg)";
 const MUTED = "var(--fg-muted)";
 const SURFACE = "var(--surface)";
 const LINE = "var(--line)";
-/** Legend icons (§5 mapping). Icons live in the legend only, never in the grid (§11.1). */
-const LEGEND_ICON: Partial<Record<BlockKind, IconName>> = {
-  SLEEP: "sleep",
-  SEEK_LIGHT: "seekLight",
-  AVOID_LIGHT: "avoidLight",
-  EXERCISE_GOOD: "exercise",
-  EXERCISE_AVOID: "exercise",
-  CAFFEINE_OK: "caffeine",
-  CAFFEINE_STOP: "caffeine",
-  MELATONIN_WINDOW: "melatonin",
-  MEAL: "meal",
-  WIND_DOWN: "windDown",
-};
 
 /** Keeps legend rows aligned when an item has no icon. */
 function LegendIcon({ name }: { name: IconName | undefined }) {
@@ -174,11 +161,17 @@ export function PhaseMap({
   input,
   result,
   now,
+  onlyDate,
+  compact = false,
 }: {
   input: PlanInput;
   result: PlanResult;
   /** Current instant (ISO), read by the app on load; marks "Now" on the grid. */
   now?: string;
+  /** Show only this date's row (YYYY-MM-DD in the grid's zone), e.g. on Today. */
+  onlyDate?: string;
+  /** No title, scale switches or legend: a single ribbon inside another screen. */
+  compact?: boolean;
 }) {
   // Both scales show by default; the grid reads in the first one switched on.
   const [scales, setScales] = useState<Record<Axis, boolean>>({
@@ -210,10 +203,12 @@ export function PhaseMap({
     return () => observer.disconnect();
   }, []);
 
-  const rows = useMemo(
-    () => layoutPlan(input, result, axis),
-    [input, result, axis],
-  );
+  const rows = useMemo(() => {
+    const all = layoutPlan(input, result, axis);
+    return onlyDate === undefined
+      ? all
+      : all.filter((r) => r.date === onlyDate);
+  }, [input, result, axis, onlyDate]);
   const g = geometry(width, shownScales.length);
   const height = g.header + rows.length * g.rowH;
   const zone = axisZone(axis, input);
@@ -309,39 +304,47 @@ export function PhaseMap({
 
   return (
     <section aria-labelledby={headingId} className="flex flex-col gap-3">
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
+      <div
+        className={
+          compact
+            ? "sr-only"
+            : "flex flex-wrap items-baseline justify-between gap-2"
+        }
+      >
         <h2 id={headingId} className="text-17 font-medium leading-display">
           {m.title}
         </h2>
-        <div
-          role="group"
-          aria-label={m.axisLabel}
-          className="flex flex-wrap gap-1"
-        >
-          {(["destination", "home"] as const).map((a) => {
-            const on = scales[a];
-            const last =
-              on && !scales[a === "destination" ? "home" : "destination"];
-            return (
-              <button
-                key={a}
-                type="button"
-                aria-pressed={on}
-                disabled={last}
-                title={last ? m.lastScale : undefined}
-                onClick={() => {
-                  setOpen(null);
-                  setScales((cur) => ({ ...cur, [a]: !cur[a] }));
-                }}
-                className={`rounded-control border px-2 py-1 text-13 leading-body ${
-                  on ? "border-fg bg-fg text-bg" : "border-line text-fg"
-                } ${focusRing}`}
-              >
-                {m.scale(m.axis[a], offsetLabel(axisZone(a, input), refUtc))}
-              </button>
-            );
-          })}
-        </div>
+        {compact ? null : (
+          <div
+            role="group"
+            aria-label={m.axisLabel}
+            className="flex flex-wrap gap-1"
+          >
+            {(["destination", "home"] as const).map((a) => {
+              const on = scales[a];
+              const last =
+                on && !scales[a === "destination" ? "home" : "destination"];
+              return (
+                <button
+                  key={a}
+                  type="button"
+                  aria-pressed={on}
+                  disabled={last}
+                  title={last ? m.lastScale : undefined}
+                  onClick={() => {
+                    setOpen(null);
+                    setScales((cur) => ({ ...cur, [a]: !cur[a] }));
+                  }}
+                  className={`rounded-control border px-2 py-1 text-13 leading-body ${
+                    on ? "border-fg bg-fg text-bg" : "border-line text-fg"
+                  } ${focusRing}`}
+                >
+                  {m.scale(m.axis[a], offsetLabel(axisZone(a, input), refUtc))}
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       <div ref={containerRef} className="relative w-full">
@@ -678,7 +681,7 @@ export function PhaseMap({
         )}
       </div>
 
-      <div>
+      <div className={compact ? "hidden" : undefined}>
         <h3 className="text-13 font-medium leading-body">{m.legend}</h3>
         <ul className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-13 leading-body text-fg-muted">
           {(
@@ -749,7 +752,7 @@ export function PhaseMap({
             ] as const
           ).map(([k, shape]) => (
             <li key={k} className="flex items-center gap-1">
-              <LegendIcon name={LEGEND_ICON[k]} />
+              <LegendIcon name={KIND_ICON[k]} />
               <svg width="14" height="10" aria-hidden="true">
                 {shape}
               </svg>

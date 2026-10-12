@@ -31,4 +31,12 @@ describe("parseHash", () => {
     expect(parseHash("#/plan/a%2Fb")).toEqual({ name: "plan", id: "a/b" });
     expect(parseHash("#/plan/")).toBeNull();
   });
+
+  it("reads the plan, today, edit and share routes (T09)", () => {
+    expect(parseHash("#/plan")).toEqual({ name: "plan" });
+    expect(parseHash("#/today")).toEqual({ name: "today" });
+    expect(parseHash("#/trip/abc")).toEqual({ name: "trip", editId: "abc" });
+    expect(parseHash("#p=eyJ9")).toEqual({ name: "share", payload: "eyJ9" });
+    expect(parseHash("#p=")).toBeNull();
+  });
 });

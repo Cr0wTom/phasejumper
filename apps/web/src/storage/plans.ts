@@ -61,3 +61,65 @@ export async function loadPlan(id: string): Promise<StoredPlan | undefined> {
   if (!isStoredPlan(value)) return undefined;
   return value;
 }
+
+const LAST_PLAN_KEY = "meta:lastPlan";
+
+/** Remembers which plan Plan and Today show on this device. */
+export async function setLastPlanId(id: string): Promise<void> {
+  await set(LAST_PLAN_KEY, id);
+}
+
+export async function getLastPlanId(): Promise<string | undefined> {
+  const value: unknown = await get<unknown>(LAST_PLAN_KEY);
+  return typeof value === "string" && value.length > 0 ? value : undefined;
+}
+
+export type OpenedPlan =
+  | { status: "ready"; plan: StoredPlan; regenerated: boolean }
+  | { status: "missing" }
+  | { status: "failed"; reason: string };
+
+/**
+ * Loads a plan and marks it last opened. If it was made by a different
+ * engine version it is regenerated from its input and saved (§3.3).
+ */
+export async function openPlan(
+  id: string,
+  engine: {
+    version: string;
+    generate: (input: StoredPlan["input"]) => StoredPlan["result"];
+  },
+): Promise<OpenedPlan> {
+  let stored: StoredPlan | undefined;
+  try {
+    stored = await loadPlan(id);
+  } catch (error) {
+    return { status: "failed", reason: errorText(error) };
+  }
+  if (stored === undefined) return { status: "missing" };
+  let plan = stored;
+  let regenerated = false;
+  if (stored.engineVersion !== engine.version) {
+    try {
+      plan = {
+        ...stored,
+        result: engine.generate(stored.input),
+        engineVersion: engine.version,
+      };
+      await savePlan(plan);
+      regenerated = true;
+    } catch (error) {
+      return { status: "failed", reason: errorText(error) };
+    }
+  }
+  try {
+    await setLastPlanId(id);
+  } catch {
+    // The plan still shows; only the "last opened" pointer is not saved.
+  }
+  return { status: "ready", plan, regenerated };
+}
+
+function errorText(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}

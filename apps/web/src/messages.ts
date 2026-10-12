@@ -118,21 +118,14 @@ export const messages = {
     "This browser could not save the plan on this device. Allow site data for this site, then choose Generate plan again.",
   unexpectedFailure:
     "The plan could not be built. Check the flights and times, then choose Generate plan again.",
-  planHeading: "Your plan",
-  planSummary: "Plan summary",
-  planLoading: "Loading this plan.",
-  planMissing:
-    "This plan could not be opened on this device. It may be missing, or this browser may be blocking site data. Go back to the trip form and generate the plan again.",
-  planBack: "Back to the trip form",
-  planDays: (count: number): string =>
-    count === 1 ? "1 day in this plan." : `${count} days in this plan.`,
-  planComingLater: "The full plan view is coming in a later update.",
   footer:
     "General wellness information, not medical advice. You use PhaseJumper at your own risk.",
   legalGateTitle: "Before you generate a plan",
   legalGateBody:
     "Confirm you want to generate a plan. The full acceptance step arrives in a later update.",
   legalGateContinue: "Continue",
+  editMissing:
+    "That plan could not be opened for editing. Fill in the trip below, or open the plan again.",
 } as const;
 
 /** Phase map (§4). Kept separate from the trip form strings. */
@@ -190,4 +183,68 @@ export const phaseMapMessages = {
     WIND_DOWN: "Wind down",
     NSDR: "Rest",
   },
+} as const;
+
+/** Plan and Today screens, and navigation (T09). */
+export const planMessages = {
+  nav: {
+    label: "Main",
+    plan: "Plan",
+    today: "Today",
+    newTrip: "New trip",
+  },
+  planHeading: "Your plan",
+  loading: "Loading this plan.",
+  noPlan: "There is no plan on this device yet.",
+  makePlan: "Plan a trip",
+  missing:
+    "This plan could not be opened on this device. It may be missing, or this browser may be blocking site data. Go back to the trip form and generate the plan again.",
+  failed: (reason: string): string =>
+    `This plan could not be opened: ${reason}. Reload the page and try again.`,
+  regenerated:
+    "This plan was rebuilt with the current version of the planner, so some times may have changed.",
+  progressTitle: "How far your body clock is from destination time",
+  progressAxis: (hours: string): string => `${hours} h off`,
+  progressDay: (day: number, hours: string): string =>
+    `Day ${day}: ${hours} hours off before, then the plan shifts it.`,
+  share: "Share link",
+  shareCopied:
+    "Link copied. Anyone with it sees this plan; it never passes through a server.",
+  shareManual: "Copy this link to share the plan:",
+  editTrip: "Edit trip",
+  warningsHeading: "Things to know",
+  dayHeading: (date: string, index: number): string =>
+    `Day ${index + 1}, ${date}`,
+  timeRange: (from: string, to: string, zone: string): string =>
+    `${from}–${to} (${zone})`,
+  timePoint: (at: string, zone: string): string => `${at} (${zone})`,
+  adviceHeading: "On the plane",
+  droppedHeading: "Left out today",
+  shareOpening: "Opening the shared plan.",
+  shareUnreadable:
+    "This share link is damaged or incomplete. Ask for the link again, or plan the trip yourself.",
+  shareTooLarge:
+    "This share link is too long to be a plan. Ask for the link again.",
+  shareInvalid:
+    "This share link does not describe a trip the planner can use. Ask for the link again.",
+  todayHeading: "Today",
+  nowAt: (time: string, zone: string): string =>
+    `It's ${time} where you are (${zone}).`,
+  current: "Now",
+  next: "Next",
+  until: (time: string): string => `until ${time}`,
+  inMinutes: (text: string): string => `in ${text}`,
+  endsIn: (text: string): string => `ends in ${text}`,
+  duration: (minutes: number): string => {
+    if (minutes < 60) return minutes === 1 ? "1 min" : `${minutes} min`;
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    return m === 0 ? `${h} h` : `${h} h ${m} min`;
+  },
+  nothingNow: "Nothing scheduled right now.",
+  nothingNext: "Nothing else is planned.",
+  before: (date: string): string => `Your plan starts on ${date}.`,
+  after:
+    "Your plan is complete. Your body clock should be on destination time.",
+  viewPlan: "See the full plan",
 } as const;

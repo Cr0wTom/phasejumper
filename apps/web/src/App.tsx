@@ -15,8 +15,11 @@
  */
 
 import { AppHeader } from "./components/AppHeader";
+import { NavBar } from "./components/NavBar";
 import { UpdatePrompt } from "./components/UpdatePrompt";
-import { PlanPlaceholder } from "./routes/plan/PlanPlaceholder";
+import { PlanScreen } from "./routes/plan/PlanScreen";
+import { ShareOpen } from "./routes/plan/ShareOpen";
+import { TodayScreen } from "./routes/today/TodayScreen";
 import { TripBuilder } from "./routes/trip/TripBuilder";
 import { useRoute } from "./router";
 
@@ -25,12 +28,19 @@ export function App() {
   return (
     <div className="pj-shell">
       <AppHeader />
-      <div className="pj-page">
-        {route.name === "plan" ? (
-          <PlanPlaceholder id={route.id} />
-        ) : (
-          <TripBuilder />
-        )}
+      <div className="pj-body">
+        <NavBar route={route} />
+        <div className="pj-page">
+          {route.name === "plan" ? (
+            <PlanScreen id={route.id} />
+          ) : route.name === "today" ? (
+            <TodayScreen />
+          ) : route.name === "share" ? (
+            <ShareOpen payload={route.payload} />
+          ) : (
+            <TripBuilder key={route.editId ?? "new"} editId={route.editId} />
+          )}
+        </div>
       </div>
       <UpdatePrompt />
     </div>
