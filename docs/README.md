@@ -2,7 +2,6 @@
 
 | Document | What it covers |
 |---|---|
-| [SPEC.md](SPEC.md) | The build spec: engine model, product, architecture, tickets, legal design |
 | [ENGINE.md](ENGINE.md) | How a plan is built, every model constant with its source, prior art, golden fixtures |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | The repository and runtime as built, updated with each ticket |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Ticket protocol, checks, the snapshot rule, banned words |

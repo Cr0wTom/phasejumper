@@ -15,6 +15,7 @@
  */
 
 import { describe, expect, it } from "vitest";
+import { bannedCopyPattern } from "../../../scripts/banned-terms";
 import {
   ADVICE_CODES,
   DROP_CODES,
@@ -27,9 +28,9 @@ import {
   warningCopy,
 } from "../src/index";
 
-// §11.4 list, checked here for engine copy until the repo-wide check (T12).
-const BANNED =
-  /treat|cure|diagnos|prescri|therap|disorder|patient|dose|dosage|\bmg\b|notification|reminder|guarantee|clinically proven|medical-grade/i;
+// §11.4 list (health words + encoded third-party terms), checked here for
+// engine copy until the repo-wide copy check (T12).
+const BANNED = bannedCopyPattern();
 
 const all = [
   ...REASON_CODES.map(reasonCopy),

@@ -15,11 +15,12 @@
  */
 
 import { describe, expect, it } from "vitest";
+import { bannedCopyPattern } from "../../../scripts/banned-terms";
 import flags from "../src/flags.json";
 import { messages } from "../src/messages";
 
-const BANNED =
-  /treat|cure|diagnos|prescri|therap|disorder|patient|dose|dosage|\bmg\b|notification|reminder|guarantee|clinically proven|medical-grade/i;
+// §11.4 health words + encoded third-party terms (scripts/banned-terms.ts).
+const BANNED = bannedCopyPattern();
 
 function stringsIn(value: unknown): string[] {
   if (typeof value === "string") return [value];

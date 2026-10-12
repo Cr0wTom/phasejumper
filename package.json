@@ -13,7 +13,8 @@
     "test": "pnpm --filter \"./packages/*\" --filter \"./apps/*\" test",
     "build": "pnpm --filter @phasejumper/web build",
     "dev": "pnpm --filter @phasejumper/web dev",
-    "test:e2e": "pnpm --filter @phasejumper/web test:e2e"
+    "test:e2e": "pnpm --filter @phasejumper/web test:e2e",
+    "check:terms": "node scripts/check-terms.ts"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

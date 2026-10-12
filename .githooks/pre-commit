@@ -1,0 +1,3 @@
+#!/bin/sh
+# Blocks commits that mention third-party names or marks (docs/CONTRIBUTING.md).
+exec node scripts/check-terms.ts

@@ -37,11 +37,19 @@ A change that alters engine output also bumps `ENGINE_VERSION`.
 
 ## Words we don't use
 
-PhaseJumper is general wellness information, not medical advice, and never a prescription. User-facing text (UI, engine copy, README, terms and privacy) must not contain these words; CI will enforce the list:
+PhaseJumper is general wellness information, not medical advice, and never a prescription. User-facing text (UI, engine copy, README, terms and privacy) must not contain these words:
 
 > treat, treatment, cure, diagnos-, prescri-, therapy, therapeutic, disorder, patient, dose, dosage, mg, notification, reminder, guarantee, clinically proven, medical-grade
 
-Melatonin appears only as a timing window for people who say they already use it — never an amount or a product. Don't mention other jet-lag apps anywhere in the project.
+Melatonin appears only as a timing window for people who say they already use it — never an amount or a product.
+
+Third-party product names and trademarks must not appear anywhere in the repository. The list lives, encoded, in `scripts/banned-terms.ts`; `node scripts/check-terms.ts` enforces it in CI and as a pre-commit hook. Enable the hook once per clone:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+Planning notes and internal documents are never committed.
 
 ## Licence
 
