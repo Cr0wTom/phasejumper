@@ -52,8 +52,6 @@ export const messages = {
   arrivalTime: "Arrival time",
   flightNumber: "Flight number",
   flightNumberHint: "Optional.",
-  dateHint: "YYYY-MM-DD",
-  timeHint: "HH:MM",
   localTimesHint: "Times are local to each airport.",
   pasteLabel: "Confirmation text",
   readFlights: "Read flights",
@@ -95,8 +93,8 @@ export const messages = {
   airportShowing: (count: number): string =>
     `Showing ${count} matching airports.`,
   chooseAirport: "Choose an airport from the list.",
-  timeInvalid: "Enter a time as HH:MM.",
-  dateInvalid: "Enter a date as YYYY-MM-DD.",
+  timeInvalid: "Choose a time.",
+  dateInvalid: "Choose a date.",
   timesSame: "Bedtime and wake time are the same. Enter two different times.",
   sleepNeedInvalid:
     "Enter the hours of sleep you need as a number greater than 0 and less than 24.",

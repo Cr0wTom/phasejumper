@@ -129,13 +129,15 @@ test("completes the form with the keyboard only", async ({ page }) => {
   await chooseAirport(page, messages.fromAirport, "PRG");
   await chooseAirport(page, messages.toAirport, "JFK");
   await tabUntil(page, messages.departureDate);
-  await page.keyboard.type("2027-01-18");
+  // Native pickers take keyboard input segment by segment, in the browser's
+  // locale (en-GB in playwright.config.ts): dd mm yyyy, then hh mm.
+  await page.keyboard.type("18012027");
   await tabUntil(page, messages.departureTime);
-  await page.keyboard.type("10:00");
+  await page.keyboard.type("1000");
   await tabUntil(page, messages.arrivalDate);
-  await page.keyboard.type("2027-01-18");
+  await page.keyboard.type("18012027");
   await tabUntil(page, messages.arrivalTime);
-  await page.keyboard.type("13:00");
+  await page.keyboard.type("1300");
   await tabUntil(page, messages.generate);
   await page.keyboard.press("Enter");
 
@@ -246,18 +248,40 @@ test("leaves the form unchanged when the paste has no flights", async ({
   await expect(page).toHaveURL(/#\/trip$/);
 });
 
-test("shows a field error for an invalid time", async ({ page }) => {
+test("uses native date and time pickers", async ({ page }) => {
+  await page.goto("#/trip");
+  await expect(labeled(page, messages.bedtime)).toHaveAttribute("type", "time");
+  await expect(labeled(page, messages.departureDate)).toHaveAttribute(
+    "type",
+    "date",
+  );
+  await expect(labeled(page, messages.departureTime)).toHaveAttribute(
+    "type",
+    "time",
+  );
+});
+
+test("shows a field error when arrival is before departure", async ({
+  page,
+}) => {
   await page.goto("#/trip");
   await expect(
-    page.getByRole("heading", { name: messages.tripHeading }),
-  ).toBeVisible();
-  await labeled(page, messages.bedtime).fill("25:99");
+    page.getByRole("combobox", { name: messages.fromAirport }),
+  ).toBeEnabled();
+  await labeled(page, messages.fromAirport).fill("PRG");
+  await page.getByRole("option", { name: /^PRG,/ }).click();
+  await labeled(page, messages.toAirport).fill("JFK");
+  await page.getByRole("option", { name: /^JFK,/ }).click();
+  await labeled(page, messages.departureDate).fill("2027-01-18");
+  await labeled(page, messages.departureTime).fill("10:00");
+  await labeled(page, messages.arrivalDate).fill("2027-01-18");
+  await labeled(page, messages.arrivalTime).fill("03:00");
   await page.getByRole("button", { name: messages.generate }).click();
 
-  const bedtime = labeled(page, messages.bedtime);
-  await expect(bedtime).toHaveAttribute("aria-invalid", "true");
-  await expect(page.locator("#field-habitualBedtime-error")).toHaveText(
-    messages.timeInvalid,
+  const arrival = labeled(page, messages.arrivalTime);
+  await expect(arrival).toHaveAttribute("aria-invalid", "true");
+  await expect(page.locator("#field-legs-0-arrivalTime-error")).toHaveText(
+    messages.arrivalBeforeDeparture,
   );
   await expect(page).toHaveURL(/#\/trip$/);
 });
