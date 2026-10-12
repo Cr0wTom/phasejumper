@@ -16,7 +16,6 @@
 
 export const messages = {
   title: "PhaseJumper",
-  themeDark: "Dark theme",
   updateReady: "A new version is ready.",
   updateReload: "Reload",
   tripHeading: "Plan a trip",
@@ -192,6 +191,7 @@ export const planMessages = {
     plan: "Plan",
     today: "Today",
     newTrip: "New trip",
+    settings: "Settings",
   },
   planHeading: "Your plan",
   loading: "Loading this plan.",
@@ -247,4 +247,64 @@ export const planMessages = {
   after:
     "Your plan is complete. Your body clock should be on destination time.",
   viewPlan: "See the full plan",
+} as const;
+
+/** Start, Settings and the evidence page (T13). */
+export const startMessages = {
+  heading: "Arrive on local time",
+  lede: "PhaseJumper turns your flights and usual sleep into a day-by-day plan for light, sleep and caffeine. Everything stays on this device.",
+  exampleHeading: "Example: Prague to San Francisco",
+  planTrip: "Plan a trip",
+  savedHeading: "Open a saved plan",
+  savedLoading: "Looking for saved plans on this device.",
+  savedNone: "No plans are saved on this device yet.",
+  savedFailed:
+    "Saved plans could not be read. This browser may be blocking site data for this site.",
+  savedTrip: (from: string, to: string, date: string): string =>
+    `${from} to ${to}, ${date}`,
+  evidenceLink: "The research behind your plan",
+} as const;
+
+export const settingsMessages = {
+  heading: "Settings",
+  themeHeading: "Appearance",
+  themeDark: "Dark",
+  themeLight: "Light",
+  dataHeading: "Your data",
+  dataLede:
+    "Plans are stored only in this browser. Export them to keep a copy or move them to another device.",
+  exportButton: "Export plans (JSON)",
+  exportEmpty: "There are no plans on this device to export.",
+  exportFailed:
+    "Plans could not be read for export. This browser may be blocking site data for this site.",
+  exportDone: (count: number): string =>
+    count === 1 ? "Exported 1 plan." : `Exported ${count} plans.`,
+  importLabel: "Import plans (JSON)",
+  importHint:
+    "Choose a file exported from PhaseJumper, or a single trip in the same format as a share link.",
+  importDone: (count: number): string =>
+    count === 1 ? "Imported 1 plan." : `Imported ${count} plans.`,
+  importTooLarge:
+    "This file is larger than 2 MB, so it cannot be a PhaseJumper export. Choose the file you exported from Settings.",
+  importNotJson:
+    "This file is not valid JSON. Choose the .json file you exported from Settings, without editing it.",
+  importNotPlans:
+    "This file is JSON, but it does not contain PhaseJumper plans. Choose the file you exported from Settings.",
+  importInvalid: (detail: string): string =>
+    `Nothing was imported: ${detail}. Fix that trip in the file, or export it again.`,
+  importFailed:
+    "The plans in this file are valid, but this browser could not save them. Allow site data for this site, then try again.",
+  forgetButton: "Forget all trips",
+  forgetConfirm:
+    "This deletes every plan saved in this browser. It cannot be undone. Export first if you want a copy.",
+  forgetYes: "Yes, forget all trips",
+  forgetCancel: "Cancel",
+  forgetDone: "All trips were deleted from this device.",
+  forgetFailed:
+    "Trips could not be deleted. This browser may be blocking site data for this site. Reload and try again.",
+  aboutHeading: "About",
+  evidenceLink: "The research behind your plan",
+  licence:
+    "PhaseJumper is open source under the Apache License 2.0. The evidence page is licensed under CC BY 4.0.",
+  backToSettings: "Back to Settings",
 } as const;

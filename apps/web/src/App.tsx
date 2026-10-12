@@ -19,6 +19,9 @@ import { NavBar } from "./components/NavBar";
 import { UpdatePrompt } from "./components/UpdatePrompt";
 import { PlanScreen } from "./routes/plan/PlanScreen";
 import { ShareOpen } from "./routes/plan/ShareOpen";
+import { EvidenceScreen } from "./routes/settings/EvidenceScreen";
+import { SettingsScreen } from "./routes/settings/SettingsScreen";
+import { StartScreen } from "./routes/start/StartScreen";
 import { TodayScreen } from "./routes/today/TodayScreen";
 import { TripBuilder } from "./routes/trip/TripBuilder";
 import { useRoute } from "./router";
@@ -31,7 +34,13 @@ export function App() {
       <div className="pj-body">
         <NavBar route={route} />
         <div className="pj-page">
-          {route.name === "plan" ? (
+          {route.name === "start" ? (
+            <StartScreen />
+          ) : route.name === "settings" ? (
+            <SettingsScreen />
+          ) : route.name === "evidence" ? (
+            <EvidenceScreen />
+          ) : route.name === "plan" ? (
             <PlanScreen id={route.id} />
           ) : route.name === "today" ? (
             <TodayScreen />

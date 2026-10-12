@@ -15,7 +15,7 @@
  */
 
 import type { PlanInput, PlanResult } from "@phasejumper/engine";
-import { get, set } from "idb-keyval";
+import { clear, del, get, keys, set } from "idb-keyval";
 
 export interface StoredPlan {
   id: string;
@@ -122,4 +122,43 @@ export async function openPlan(
 
 function errorText(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
+}
+
+/** Every saved plan on this device, newest first. Unreadable entries are skipped. */
+export async function listPlans(): Promise<StoredPlan[]> {
+  const ids = (await keys())
+    .filter((k): k is string => typeof k === "string" && k.startsWith("plan:"))
+    .map((k) => k.slice("plan:".length));
+  const plans = await Promise.all(ids.map((id) => loadPlan(id)));
+  return plans
+    .filter((p): p is StoredPlan => p !== undefined)
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
+export async function deletePlan(id: string): Promise<void> {
+  await del(planKey(id));
+}
+
+/** Deletes every plan and the last-opened pointer on this device. */
+export async function forgetAllPlans(): Promise<void> {
+  await clear();
+}
+
+/** Backup file format: inputs only; plans are regenerated on import (§3.3). */
+export interface PlansBackup {
+  format: "phasejumper-plans";
+  version: 1;
+  plans: Array<{ id: string; createdAt: string; input: StoredPlan["input"] }>;
+}
+
+export function backupOf(plans: readonly StoredPlan[]): PlansBackup {
+  return {
+    format: "phasejumper-plans",
+    version: 1,
+    plans: plans.map((p) => ({
+      id: p.id,
+      createdAt: p.createdAt,
+      input: p.input,
+    })),
+  };
 }

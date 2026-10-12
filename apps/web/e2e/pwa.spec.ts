@@ -22,7 +22,7 @@ import {
   precacheTotalBytes,
   precacheUrls,
 } from "../scripts/precache-budget";
-import { messages } from "../src/messages";
+import { messages, settingsMessages } from "../src/messages";
 import { THEME_STORAGE_KEY } from "../src/theme";
 
 const ORIGIN = "http://127.0.0.1:4173";
@@ -201,15 +201,15 @@ test("loading and searching stay on this origin", async ({ page }) => {
   expect(foreign).toEqual([]);
 });
 
-test("theme choice survives a reload", async ({ page }) => {
+test("theme choice in Settings survives a reload", async ({ page }) => {
   await page.emulateMedia({ colorScheme: "dark" });
-  await page.goto("#/trip");
-  const toggle = page.getByRole("button", { name: messages.themeDark });
+  await page.goto("#/settings");
+  const dark = page.getByRole("radio", { name: settingsMessages.themeDark });
+  const light = page.getByRole("radio", { name: settingsMessages.themeLight });
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-  await expect(toggle).toHaveAttribute("aria-pressed", "true");
-  await toggle.click();
+  await expect(dark).toBeChecked();
+  await light.check();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
-  await expect(toggle).toHaveAttribute("aria-pressed", "false");
   await expect
     .poll(() =>
       page.evaluate((key) => {
@@ -223,7 +223,7 @@ test("theme choice survives a reload", async ({ page }) => {
     .toBe("light");
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
-  await expect(toggle).toHaveAttribute("aria-pressed", "false");
+  await expect(light).toBeChecked();
 });
 
 test("first visit follows the device color scheme, otherwise dark", async ({
@@ -270,9 +270,9 @@ test("renders when storage is blocked", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: messages.tripHeading }),
   ).toBeVisible();
-  await expect(
-    page.getByRole("button", { name: messages.themeDark }),
-  ).toBeVisible();
+  await page.goto("#/settings");
+  await page.getByRole("radio", { name: settingsMessages.themeLight }).check();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
 });
 
 test("precache stays within 3 MiB", () => {

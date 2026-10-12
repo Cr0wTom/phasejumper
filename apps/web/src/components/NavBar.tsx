@@ -15,7 +15,7 @@
  */
 
 // Navigation (§5): a bottom tab bar on phones, a left rail from 768 px.
-// Plan, Today and New trip; Settings joins when it exists (T13).
+// Plan, Today, New trip and Settings.
 
 import { planMessages as m } from "../messages";
 import type { Route } from "../router";
@@ -24,10 +24,16 @@ const ITEMS = [
   { key: "plan", href: "#/plan", label: m.nav.plan },
   { key: "today", href: "#/today", label: m.nav.today },
   { key: "trip", href: "#/trip", label: m.nav.newTrip },
+  { key: "settings", href: "#/settings", label: m.nav.settings },
 ] as const;
 
 export function NavBar({ route }: { route: Route }) {
-  const active = route.name === "share" ? "plan" : route.name;
+  const active =
+    route.name === "share"
+      ? "plan"
+      : route.name === "evidence"
+        ? "settings"
+        : route.name;
   return (
     <nav aria-label={m.nav.label} className="pj-nav">
       <ul>
