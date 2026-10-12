@@ -74,11 +74,11 @@ export function ConstraintsSection({
             <section
               key={event.id}
               aria-labelledby={`event-${event.id}`}
-              className="flex flex-col gap-4 border-t border-[#26262B] pt-4"
+              className="flex flex-col gap-4 border-t border-line pt-4"
             >
               <h4
                 id={`event-${event.id}`}
-                className="text-[15px] font-medium leading-[1.45]"
+                className="text-15 font-medium leading-body"
               >
                 {messages.eventLegend(number)}
               </h4>
@@ -161,11 +161,11 @@ export function ConstraintsSection({
             <section
               key={window.id}
               aria-labelledby={`window-${window.id}`}
-              className="flex flex-col gap-4 border-t border-[#26262B] pt-4"
+              className="flex flex-col gap-4 border-t border-line pt-4"
             >
               <h4
                 id={`window-${window.id}`}
-                className="text-[15px] font-medium leading-[1.45]"
+                className="text-15 font-medium leading-body"
               >
                 {messages.windowLegend(number)}
               </h4>

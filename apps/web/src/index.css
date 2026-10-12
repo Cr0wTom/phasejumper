@@ -28,8 +28,7 @@ body {
   min-height: 100vh;
 }
 
-/* Geist stays on the app shell. The phase-map harness imports this file and
-   must keep its own font stack. */
+/* Geist and Geist Mono for the app shell (the phase-map harness uses it too). */
 .pj-shell {
   display: flex;
   min-height: 100vh;

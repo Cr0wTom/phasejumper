@@ -104,7 +104,7 @@ export function TextField({
           className={
             review === undefined
               ? controlClass
-              : `${controlClass} ring-1 ring-inset ring-[#F2F2F0]`
+              : `${controlClass} ring-1 ring-inset ring-fg`
           }
           value={value}
           onChange={(event) => onChange(event.target.value)}
@@ -172,7 +172,7 @@ export function CheckboxField({
   onChange: (checked: boolean) => void;
 }) {
   return (
-    <label className="flex items-center gap-2 text-[15px] leading-[1.45]">
+    <label className="flex items-center gap-2 text-15 leading-body">
       <input
         type="checkbox"
         className={checkClass}

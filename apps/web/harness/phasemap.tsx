@@ -16,7 +16,7 @@
 
 // Test-only page: renders a golden fixture in the phase map for Playwright.
 // Built by vite.harness.config.ts into dist-harness/; never part of the app.
-// URL: /harness/phasemap.html?fixture=<name>[&now=<ISO instant>]
+// URL: /harness/phasemap.html?fixture=<name>[&now=<ISO instant>][&theme=light]
 
 import { generatePlan, type PlanInput } from "@phasejumper/engine";
 import { StrictMode } from "react";
@@ -32,6 +32,9 @@ const inputs = import.meta.glob<PlanInput>(
 const params = new URLSearchParams(window.location.search);
 const name = params.get("fixture") ?? "";
 const now = params.get("now") ?? undefined;
+// Same theme mechanism as the app: data-theme on <html>.
+document.documentElement.dataset.theme =
+  params.get("theme") === "light" ? "light" : "dark";
 const input = Object.entries(inputs).find(([path]) =>
   path.endsWith(`/${name}.input.json`),
 )?.[1];
@@ -41,8 +44,8 @@ if (root === null) throw new Error("Root element #root is missing.");
 
 createRoot(root).render(
   <StrictMode>
-    <main className="mx-auto w-full max-w-[1040px] px-4 py-8 text-[#F2F2F0]">
-      <h1 className="mb-4 text-[22px] font-medium leading-[1.1]">{name}</h1>
+    <main className="pj-shell mx-auto w-full max-w-[1040px] px-4 py-8 text-fg">
+      <h1 className="mb-4 text-22 font-medium leading-display">{name}</h1>
       {input === undefined ? (
         <p role="alert">Unknown fixture: {name}</p>
       ) : (

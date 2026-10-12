@@ -325,7 +325,7 @@ export function TripBuilder() {
             ref={formAlertRef}
             tabIndex={-1}
             role="alert"
-            className="rounded-[10px] border border-[#FFB4B4] bg-[#141417] p-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F2F2F0]"
+            className="rounded-surface border border-danger bg-surface p-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fg"
           >
             <p>{formAlert.title}</p>
             {formAlert.issues.length === 0 ? null : (

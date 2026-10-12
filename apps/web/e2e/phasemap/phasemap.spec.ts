@@ -130,6 +130,33 @@ for (const fixture of FIXTURES) {
   });
 }
 
+// Light theme: the same accessibility bar, and two visual baselines.
+for (const fixture of FIXTURES) {
+  test(`${fixture} in the light theme has no axe violations`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto(`phasemap.html?fixture=${fixture}&theme=light`);
+    await expect(page.getByTestId("phase-map")).toBeVisible();
+    const results = await new AxeBuilder({ page }).analyze();
+    expect(results.violations.map((v) => `${v.id}: ${v.help}`)).toEqual([]);
+  });
+}
+
+for (const fixture of ["prg-sfo-delay", "nyc-lon-dst"] as const) {
+  test(`${fixture} in the light theme at 1280px`, async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto(`phasemap.html?fixture=${fixture}&theme=light`);
+    await expect(page.getByTestId("phase-map")).toBeVisible();
+    expect(await layoutProblems(page)).toEqual([]);
+    if (VISUAL) {
+      await expect(page.locator("main")).toHaveScreenshot(
+        `${fixture}-1280-light.png`,
+      );
+    }
+  });
+}
+
 test("DST fixture shows the right wall times on both time scales", async ({
   page,
 }) => {

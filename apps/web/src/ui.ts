@@ -15,33 +15,32 @@
  */
 
 export const focusRing =
-  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F2F2F0]";
+  "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fg";
 
 export const pageClass =
-  "mx-auto min-h-screen w-full max-w-[1040px] px-4 py-8 text-[15px] leading-[1.45] text-[#F2F2F0]";
+  "mx-auto min-h-screen w-full max-w-[1040px] px-4 py-8 text-15 leading-body text-fg";
 
 export const surfaceClass =
-  "flex flex-col gap-4 rounded-[10px] border border-[#26262B] bg-[#141417] p-4";
+  "flex flex-col gap-4 rounded-surface border border-line bg-surface p-4";
 
-export const labelClass =
-  "text-[13px] font-medium leading-[1.45] text-[#F2F2F0]";
+export const labelClass = "text-13 font-medium leading-body text-fg";
 
-export const hintClass = "text-[13px] leading-[1.45] text-[#8B8B93]";
+export const hintClass = "text-13 leading-body text-fg-muted";
 
-export const errorClass = "text-[13px] leading-[1.45] text-[#FFB4B4]";
+export const errorClass = "text-13 leading-body text-danger";
 
-export const controlClass = `w-full rounded-md border border-[#26262B] bg-[#0B0B0D] px-2 py-2 text-[15px] leading-[1.45] text-[#F2F2F0] ${focusRing}`;
+export const controlClass = `w-full rounded-control border border-line bg-bg px-2 py-2 text-15 leading-body text-fg ${focusRing}`;
 
-export const checkClass = `size-4 shrink-0 accent-[#F2F2F0] ${focusRing}`;
+export const checkClass = `size-4 shrink-0 accent-fg ${focusRing}`;
 
-export const buttonClass = `rounded-md border border-[#26262B] bg-[#0B0B0D] px-3 py-2 text-left text-[15px] leading-[1.45] text-[#F2F2F0] ${focusRing}`;
+export const buttonClass = `rounded-control border border-line bg-bg px-3 py-2 text-left text-15 leading-body text-fg ${focusRing}`;
 
-export const primaryButtonClass = `rounded-md bg-[#F2F2F0] px-4 py-2 text-[15px] font-medium leading-[1.45] text-[#17171A] disabled:bg-[#8B8B93] disabled:text-[#0B0B0D] ${focusRing}`;
+export const primaryButtonClass = `rounded-control bg-fg px-4 py-2 text-15 font-medium leading-body text-bg disabled:bg-fg-muted disabled:text-bg ${focusRing}`;
 
-export const h1Class = "text-[28px] font-semibold leading-[1.1]";
+export const h1Class = "text-28 font-semibold leading-display";
 
-export const h2Class = "text-[22px] font-medium leading-[1.1]";
+export const h2Class = "text-22 font-medium leading-display";
 
-export const h3Class = "text-[17px] font-medium leading-[1.1]";
+export const h3Class = "text-17 font-medium leading-display";
 
 export const linkClass = `underline ${focusRing}`;

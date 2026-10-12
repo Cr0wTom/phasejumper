@@ -125,7 +125,7 @@ export function FlightsSection({
           <section
             key={leg.id}
             aria-labelledby={`flight-${leg.id}`}
-            className="flex flex-col gap-4 border-t border-[#26262B] pt-4"
+            className="flex flex-col gap-4 border-t border-line pt-4"
           >
             <h3 id={`flight-${leg.id}`} className={h3Class}>
               {messages.flightLegend(number)}
