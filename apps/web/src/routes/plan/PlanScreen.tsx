@@ -17,9 +17,12 @@
 // The Plan screen (§3.1 #3): decision header with the progress curve, the
 // phase map, then the per-day detail.
 
-import { useState } from "react";
+import type { PlanInput } from "@phasejumper/engine";
+import { toIcs } from "@phasejumper/ical";
+import { useRef, useState } from "react";
 import { PhaseMap } from "../../components/PhaseMap/PhaseMap";
 import { messages, planMessages as m } from "../../messages";
+import { savePlan } from "../../storage/plans";
 import { shareUrl } from "../../storage/shareLink";
 import {
   buttonClass,
@@ -33,12 +36,45 @@ import { DayList } from "./DayList";
 import { ProgressCurve } from "./ProgressCurve";
 import { usePlan } from "./usePlan";
 
+function calendarFilename(input: PlanInput): string {
+  const legs = input.itinerary.legs;
+  const origin = legs[0]?.departureAirport.toLowerCase() ?? "";
+  const destination = legs.at(-1)?.arrivalAirport.toLowerCase() ?? "";
+  return `phasejumper-${origin}-${destination}.ics`;
+}
+
+function storedSequence(value: number | undefined): number {
+  return typeof value === "number" && Number.isInteger(value) && value >= 0
+    ? value
+    : 0;
+}
+
+function downloadBlob(contents: string, filename: string): void {
+  const url = URL.createObjectURL(
+    new Blob([contents], { type: "text/calendar" }),
+  );
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  // The browser reads the blob when the download starts.
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
 export function PlanScreen({ id }: { id?: string }) {
   const state = usePlan(id);
   const now = useNow();
   const [share, setShare] = useState<{ copied: boolean; url: string } | null>(
     null,
   );
+  const [downloadError, setDownloadError] = useState<{
+    id: string;
+    text: string;
+  } | null>(null);
+  const sequenceRef = useRef<{ id: string; sequence: number } | null>(null);
+  const saveChain = useRef(Promise.resolve());
 
   if (state.status === "loading") {
     return (
@@ -77,6 +113,14 @@ export function PlanScreen({ id }: { id?: string }) {
   const planWarnings = plan.result.warnings.filter(
     (w) => w.dayIndex === undefined,
   );
+  if (sequenceRef.current === null || sequenceRef.current.id !== plan.id) {
+    sequenceRef.current = {
+      id: plan.id,
+      sequence: storedSequence(plan.icsSequence),
+    };
+  }
+  const downloadErrorText =
+    downloadError?.id === plan.id ? downloadError.text : null;
 
   async function onShare(): Promise<void> {
     const url = shareUrl(plan.input);
@@ -87,6 +131,38 @@ export function PlanScreen({ id }: { id?: string }) {
       // No clipboard access (permissions, insecure context): show the link.
       setShare({ copied: false, url });
     }
+  }
+
+  function onDownload(): void {
+    const current = sequenceRef.current?.sequence ?? 0;
+    setDownloadError(null);
+    let ics: string;
+    try {
+      ics = toIcs({
+        planId: plan.id,
+        input: plan.input,
+        result: plan.result,
+        sequence: current,
+      });
+    } catch (error) {
+      setDownloadError({
+        id: plan.id,
+        text: m.downloadFailed(
+          error instanceof Error ? error.message : String(error),
+        ),
+      });
+      return;
+    }
+    downloadBlob(ics, calendarFilename(plan.input));
+    const next = current + 1;
+    sequenceRef.current = { id: plan.id, sequence: next };
+    const saved = { ...plan, icsSequence: next };
+    // Writes run in order so a second download cannot be overwritten by the first.
+    // A failed write shows nothing: the file is already on disk.
+    saveChain.current = saveChain.current
+      .catch(() => undefined)
+      .then(() => savePlan(saved))
+      .catch(() => undefined);
   }
 
   return (
@@ -110,6 +186,9 @@ export function PlanScreen({ id }: { id?: string }) {
           >
             {m.share}
           </button>
+          <button type="button" className={buttonClass} onClick={onDownload}>
+            {m.downloadCalendar}
+          </button>
           <a
             className={buttonClass}
             href={`#/trip/${encodeURIComponent(plan.id)}`}
@@ -131,6 +210,11 @@ export function PlanScreen({ id }: { id?: string }) {
               onFocus={(e) => e.currentTarget.select()}
             />
           </label>
+        )}
+        {downloadErrorText === null ? null : (
+          <p role="alert" className={errorClass}>
+            {downloadErrorText}
+          </p>
         )}
       </header>
 

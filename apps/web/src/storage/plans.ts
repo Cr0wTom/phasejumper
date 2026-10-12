@@ -23,6 +23,8 @@ export interface StoredPlan {
   result: PlanResult;
   engineVersion: string;
   createdAt: string;
+  /** Re-export counter for the calendar file. Absent means 0. */
+  icsSequence?: number;
 }
 
 export function planKey(id: string): string {
@@ -31,6 +33,10 @@ export function planKey(id: string): string {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function isIcsSequence(value: unknown): value is number {
+  return typeof value === "number" && Number.isInteger(value) && value >= 0;
 }
 
 function isStoredPlan(value: unknown): value is StoredPlan {
@@ -43,6 +49,10 @@ function isStoredPlan(value: unknown): value is StoredPlan {
   if (!isRecord(value.result.decision)) return false;
   if (typeof value.result.decision.explanation !== "string") return false;
   if (!Array.isArray(value.result.days)) return false;
+  // A damaged counter must not hide the plan. The next download starts at 0.
+  if ("icsSequence" in value && !isIcsSequence(value.icsSequence)) {
+    delete value.icsSequence;
+  }
   return true;
 }
 

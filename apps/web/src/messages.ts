@@ -208,6 +208,9 @@ export const planMessages = {
   progressDay: (day: number, hours: string): string =>
     `Day ${day}: ${hours} hours off before, then the plan shifts it.`,
   share: "Share link",
+  downloadCalendar: "Download calendar (.ics)",
+  downloadFailed: (reason: string): string =>
+    `The calendar file could not be created: ${reason}. Reload the page and try again.`,
   shareCopied:
     "Link copied. Anyone with it sees this plan; it never passes through a server.",
   shareManual: "Copy this link to share the plan:",
