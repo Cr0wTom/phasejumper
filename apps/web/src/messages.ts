@@ -133,3 +133,60 @@ export const messages = {
     "Confirm you want to generate a plan. The full acceptance step arrives in a later update.",
   legalGateContinue: "Continue",
 } as const;
+
+/** Phase map (§4). Kept separate from the trip form strings. */
+export const phaseMapMessages = {
+  title: "Phase map",
+  axisLabel: "Time scales",
+  axis: {
+    destination: "Destination time",
+    home: "Home time",
+  },
+  scaleShort: {
+    destination: "Dest.",
+    home: "Home",
+  },
+  scale: (name: string, offset: string): string => `${name} (${offset})`,
+  lastScale: "Keep at least one time scale on.",
+  now: (time: string): string => `Now, ${time}`,
+  rowLabel: (date: string, count: number): string =>
+    count === 1
+      ? `${date}, 1 item. Use the arrow keys to move between items.`
+      : `${date}, ${count} items. Use the arrow keys to move between items.`,
+  cbtMin: "Body clock low point",
+  target: "Where the body clock low point should land",
+  flight: (label: string): string =>
+    label === "" ? "Flight" : `Flight ${label}`,
+  itemLabel: (
+    kind: string,
+    from: string,
+    to: string,
+    point: boolean,
+  ): string => (point ? `${kind} at ${from}` : `${kind}, ${from} to ${to}`),
+  whyHere: "Why here?",
+  evidence: (grade: string, source: string): string =>
+    source === "none"
+      ? `Evidence grade ${grade}. A comfort layer with no single cited study.`
+      : `Evidence grade ${grade}, source ${source}.`,
+  close: "Close",
+  legend: "Legend",
+  kinds: {
+    SLEEP: "Sleep",
+    SLEEP_INFLIGHT: "Sleep on board",
+    NAP: "Nap",
+    SEEK_LIGHT: "Seek light",
+    SEEK_LIGHT_ARTIFICIAL: "Bright indoor light",
+    LIGHT_INFLIGHT_WINDOW: "Window light",
+    AVOID_LIGHT: "Keep it dim",
+    MELATONIN_WINDOW: "Melatonin window",
+    EXERCISE_GOOD: "Exercise",
+    EXERCISE_OPTIONAL_WALK: "Easy walk",
+    EXERCISE_AVOID: "No exercise",
+    CAFFEINE_OK: "Caffeine fits",
+    CAFFEINE_LATE_OK: "Late caffeine",
+    CAFFEINE_STOP: "Last caffeine",
+    MEAL: "Meal",
+    WIND_DOWN: "Wind down",
+    NSDR: "Rest",
+  },
+} as const;

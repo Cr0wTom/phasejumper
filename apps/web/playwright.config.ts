@@ -21,20 +21,43 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
-  use: {
-    baseURL: "http://127.0.0.1:4173/phasejumper/",
-    trace: "on-first-retry",
+  // Visual baselines are platform-free and generated on CI's Linux Chromium
+  // (docs/CONTRIBUTING.md); they are compared only on CI or with PW_VISUAL=1.
+  snapshotPathTemplate: "{testDir}/__screenshots__/{arg}{ext}",
+  expect: {
+    toHaveScreenshot: { animations: "disabled", maxDiffPixelRatio: 0 },
   },
+  use: { trace: "on-first-retry" },
   projects: [
     {
       name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
+      testIgnore: "phasemap/**",
+      use: {
+        ...devices["Desktop Chrome"],
+        baseURL: "http://127.0.0.1:4173/phasejumper/",
+      },
+    },
+    {
+      name: "phasemap",
+      testDir: "e2e/phasemap",
+      use: {
+        ...devices["Desktop Chrome"],
+        baseURL: "http://127.0.0.1:4175/harness/",
+      },
     },
   ],
-  webServer: {
-    command:
-      "pnpm build && pnpm exec vite preview --host 127.0.0.1 --port 4173 --strictPort",
-    url: "http://127.0.0.1:4173/phasejumper/",
-    timeout: 120_000,
-  },
+  webServer: [
+    {
+      command:
+        "pnpm build && pnpm exec vite preview --host 127.0.0.1 --port 4173 --strictPort",
+      url: "http://127.0.0.1:4173/phasejumper/",
+      timeout: 120_000,
+    },
+    {
+      command:
+        "pnpm exec vite build --config vite.harness.config.ts && pnpm exec vite preview --config vite.harness.config.ts --host 127.0.0.1 --port 4175 --strictPort",
+      url: "http://127.0.0.1:4175/harness/phasemap.html",
+      timeout: 120_000,
+    },
+  ],
 });

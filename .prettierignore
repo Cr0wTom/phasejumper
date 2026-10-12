@@ -1,6 +1,7 @@
 node_modules/
 dist/
 dev-dist/
+dist-harness/
 coverage/
 playwright-report/
 test-results/
