@@ -34,8 +34,11 @@ export default defineConfig({
       testIgnore: "phasemap/**",
       use: {
         ...devices["Desktop Chrome"],
-        // Native date/time fields take keyboard input in locale order.
+        // Native date/time fields take keyboard input in the BROWSER's UI
+        // language order, not the page locale: pin both, or Linux CI lays
+        // them out month-first with a 12 h clock.
         locale: "en-GB",
+        launchOptions: { args: ["--lang=en-GB"] },
         baseURL: "http://127.0.0.1:4173/phasejumper/",
       },
     },
