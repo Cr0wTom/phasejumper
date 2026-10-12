@@ -77,7 +77,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Install Chromium
-        run: pnpm --filter @phasejumper/web exec playwright install --with-deps chromium
+        run: pnpm --filter @phasejumper/web exec playwright install --with-deps chromium webkit
 
       - name: End-to-end tests
         run: pnpm test:e2e
