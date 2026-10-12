@@ -1,0 +1,72 @@
+{
+  "decision": {
+    "direction": "none",
+    "deltaHours": -1,
+    "daysAdvance": 23,
+    "daysDelay": 1,
+    "chosenDays": 0,
+    "targetCbtMinLocal": "04:30",
+    "explanation": "The time difference is 1 h, so there is no shift plan: sleep on local time."
+  },
+  "days": [
+    {
+      "date": "2027-01-16",
+      "localTzAtWake": "Europe/London",
+      "cbtMinUtc": "2027-01-16T04:30:00Z",
+      "blocks": [
+        {
+          "kind": "SLEEP",
+          "startUtc": "2027-01-15T23:00:00Z",
+          "endUtc": "2027-01-16T07:00:00Z",
+          "localTz": "Europe/London",
+          "reasonCode": "SLEEP_LOCAL_TIME",
+          "reason": "Sleep on local time; the time difference is too small to need a shift.",
+          "source": "R1",
+          "confidence": "A",
+          "movable": false
+        },
+        {
+          "kind": "CAFFEINE_OK",
+          "startUtc": "2027-01-16T07:00:00Z",
+          "endUtc": "2027-01-16T15:00:00Z",
+          "localTz": "Europe/London",
+          "reasonCode": "CAFFEINE_OK",
+          "reason": "Caffeine fits in this window.",
+          "source": "R10",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "CAFFEINE_STOP",
+          "startUtc": "2027-01-16T15:00:00Z",
+          "endUtc": "2027-01-16T15:05:00Z",
+          "localTz": "Europe/London",
+          "reasonCode": "CAFFEINE_STOP",
+          "reason": "Last caffeine here, so it does not keep you awake tonight.",
+          "source": "R11",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "WIND_DOWN",
+          "startUtc": "2027-01-16T22:45:00Z",
+          "endUtc": "2027-01-16T23:00:00Z",
+          "localTz": "Europe/London",
+          "reasonCode": "WIND_DOWN",
+          "reason": "Wind down here: dim the lights and slow down before sleep.",
+          "source": "none",
+          "confidence": "C",
+          "movable": true
+        }
+      ],
+      "misalignmentBefore": 1,
+      "misalignmentAfter": 1,
+      "effectiveShiftHours": 0,
+      "flags": []
+    }
+  ],
+  "staticAdvice": [],
+  "warnings": [],
+  "droppedBlocks": [],
+  "engineVersion": "0.2.0"
+}

@@ -23,7 +23,7 @@
 import { getPosition } from "suncalc";
 import { Temporal } from "temporal-polyfill";
 import type { AdviceCode, DropCode } from "./copy";
-import { NAP, WIND_DOWN } from "./prc";
+import { DAYLIGHT, FEASIBILITY, NAP, WIND_DOWN } from "./prc";
 import { instantAt } from "./phase";
 import {
   compare,
@@ -87,19 +87,14 @@ export interface FilterResult {
   daylightUnknown: boolean;
 }
 
-/** In-air sleep needed to call the night SLEEP_INFLIGHT (§2.7 rule 1). */
-const INFLIGHT_SLEEP_MINUTES = 4 * 60;
-/** Below this the day is a SHORT_SLEEP_DAY (§2.5 sleep window). */
-const SHORT_SLEEP_MINUTES = 5 * 60;
-/** Trimmed blocks shorter than this are dropped (§2.7 rule 4). */
-const MIN_BLOCK_MINUTES = 15;
-const WALK_MINUTES = 30;
-/** Arrival walk only if it ends this long before sleep (exercise sleep hygiene). */
-const WALK_BEFORE_SLEEP_MINUTES = 3 * 60;
-const NSDR_WINDOW = { from: "14:00", to: "18:00", afterArrivalMinutes: 60 };
-/** suncalc apparent altitude of the sun's centre at sunrise/sunset, degrees. */
-const SUN_UP_ALTITUDE_DEG = -0.35;
-const DAYLIGHT_SAMPLE_MINUTES = 5;
+const INFLIGHT_SLEEP_MINUTES = FEASIBILITY.inflightSleepHours * 60;
+const SHORT_SLEEP_MINUTES = FEASIBILITY.shortSleepHours * 60;
+const MIN_BLOCK_MINUTES = FEASIBILITY.minBlockMinutes;
+const WALK_MINUTES = FEASIBILITY.walkMinutes;
+const WALK_BEFORE_SLEEP_MINUTES = FEASIBILITY.walkBeforeSleepHours * 60;
+const NSDR_WINDOW = WIND_DOWN.nsdrWindow;
+const SUN_UP_ALTITUDE_DEG = DAYLIGHT.sunUpAltitudeDegrees;
+const DAYLIGHT_SAMPLE_MINUTES = DAYLIGHT.sampleMinutes;
 
 const INFLIGHT_ADVICE: readonly AdviceCode[] = [
   "INFLIGHT_WATER",

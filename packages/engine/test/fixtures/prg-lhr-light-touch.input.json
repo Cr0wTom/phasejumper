@@ -1,0 +1,42 @@
+{
+  "traveler": {
+    "habitualBedtime": "23:00",
+    "habitualWake": "07:00",
+    "chronotype": "intermediate",
+    "useMelatonin": false,
+    "caffeine": "normal",
+    "exercise": {
+      "enabled": true
+    },
+    "meditation": {
+      "enabled": true
+    },
+    "mealTiming": {
+      "enabled": false
+    },
+    "preAdjustDays": 0
+  },
+  "itinerary": {
+    "homeTz": "Europe/Prague",
+    "legs": [
+      {
+        "departureAirport": "PRG",
+        "arrivalAirport": "LHR",
+        "departureLocal": "2027-01-15T09:00",
+        "arrivalLocal": "2027-01-15T10:00",
+        "departureTz": "Europe/Prague",
+        "arrivalTz": "Europe/London",
+        "departureLatLon": {
+          "lat": 50.100874,
+          "lon": 14.259911
+        },
+        "arrivalLatLon": {
+          "lat": 51.470748,
+          "lon": -0.459909
+        }
+      }
+    ],
+    "destinationTz": "Europe/London"
+  },
+  "now": "2027-01-08T12:00:00Z"
+}

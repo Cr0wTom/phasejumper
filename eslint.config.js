@@ -37,4 +37,51 @@ export default tseslint.config(
       "@typescript-eslint/no-explicit-any": "error",
     },
   },
+  {
+    // §0 rule 2: the engine is pure — no I/O, no wall clock.
+    files: ["packages/engine/src/**/*.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            "node:*",
+            "fs",
+            "path",
+            "os",
+            "http",
+            "https",
+            "child_process",
+          ],
+        },
+      ],
+      "no-restricted-globals": [
+        "error",
+        "process",
+        "fetch",
+        "XMLHttpRequest",
+        "localStorage",
+        "sessionStorage",
+        "indexedDB",
+      ],
+      "no-restricted-properties": [
+        "error",
+        {
+          object: "Date",
+          property: "now",
+          message: "Inject the clock (PlanInput.now).",
+        },
+        {
+          object: "Math",
+          property: "random",
+          message: "The engine is deterministic.",
+        },
+        {
+          object: "Temporal",
+          property: "Now",
+          message: "Inject the clock (PlanInput.now).",
+        },
+      ],
+    },
+  },
 );

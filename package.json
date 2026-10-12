@@ -11,7 +11,8 @@
     "lint": "eslint . && prettier --check .",
     "typecheck": "pnpm --filter \"./packages/*\" --filter \"./apps/*\" typecheck",
     "test": "pnpm --filter \"./packages/*\" --filter \"./apps/*\" test",
-    "build": "pnpm --filter @phasejumper/web build"
+    "build": "pnpm --filter @phasejumper/web build",
+    "dev": "pnpm --filter @phasejumper/web dev"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

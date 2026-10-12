@@ -1,0 +1,58 @@
+{
+  "traveler": {
+    "habitualBedtime": "23:00",
+    "habitualWake": "07:00",
+    "chronotype": "intermediate",
+    "useMelatonin": false,
+    "caffeine": "normal",
+    "exercise": {
+      "enabled": true
+    },
+    "meditation": {
+      "enabled": true
+    },
+    "mealTiming": {
+      "enabled": false
+    },
+    "preAdjustDays": 0
+  },
+  "itinerary": {
+    "homeTz": "Europe/Prague",
+    "legs": [
+      {
+        "departureAirport": "PRG",
+        "arrivalAirport": "DXB",
+        "departureLocal": "2026-10-10T14:00",
+        "arrivalLocal": "2026-10-10T22:30",
+        "departureTz": "Europe/Prague",
+        "arrivalTz": "Asia/Dubai",
+        "departureLatLon": {
+          "lat": 50.100874,
+          "lon": 14.259911
+        },
+        "arrivalLatLon": {
+          "lat": 25.24979,
+          "lon": 55.370992
+        }
+      },
+      {
+        "departureAirport": "DXB",
+        "arrivalAirport": "SYD",
+        "departureLocal": "2026-10-11T02:30",
+        "arrivalLocal": "2026-10-11T22:00",
+        "departureTz": "Asia/Dubai",
+        "arrivalTz": "Australia/Sydney",
+        "departureLatLon": {
+          "lat": 25.24979,
+          "lon": 55.370992
+        },
+        "arrivalLatLon": {
+          "lat": -33.946098,
+          "lon": 151.177002
+        }
+      }
+    ],
+    "destinationTz": "Australia/Sydney"
+  },
+  "now": "2026-10-03T12:00:00Z"
+}
