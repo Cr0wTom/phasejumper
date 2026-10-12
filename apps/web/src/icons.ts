@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import type { BlockKind } from "@phasejumper/engine";
 import { createElement } from "react";
 import {
   BedSingle,
@@ -74,3 +75,27 @@ export function Icon({
     "aria-hidden": true,
   });
 }
+
+/**
+ * Icon for each block kind (§5). Used in the phase-map legend and the
+ * day-detail list only — never inside the calendar grid (§11.1).
+ */
+export const KIND_ICON: Partial<Record<BlockKind, IconName>> = {
+  SLEEP: "sleep",
+  SLEEP_INFLIGHT: "sleep",
+  NAP: "nap",
+  SEEK_LIGHT: "seekLight",
+  SEEK_LIGHT_ARTIFICIAL: "seekLight",
+  LIGHT_INFLIGHT_WINDOW: "seekLight",
+  AVOID_LIGHT: "avoidLight",
+  EXERCISE_GOOD: "exercise",
+  EXERCISE_OPTIONAL_WALK: "exercise",
+  EXERCISE_AVOID: "exercise",
+  CAFFEINE_OK: "caffeine",
+  CAFFEINE_LATE_OK: "caffeine",
+  CAFFEINE_STOP: "caffeine",
+  MELATONIN_WINDOW: "melatonin",
+  MEAL: "meal",
+  WIND_DOWN: "windDown",
+  NSDR: "windDown",
+};

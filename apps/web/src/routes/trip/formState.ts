@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import type { PlanInput } from "@phasejumper/engine";
 import type { AwakeForm, LegForm, TripFormValues, WindowForm } from "./schema";
 
 export function createId(): string {
@@ -89,4 +90,61 @@ export function isCaffeine(value: string): value is TripFormValues["caffeine"] {
 
 export function isPreAdjust(value: string): value is "0" | "1" | "2" | "3" {
   return value === "0" || value === "1" || value === "2" || value === "3";
+}
+
+/** The inverse of mapTripForm: a saved plan's input back into the form ("Edit trip"). */
+export function formFromPlanInput(
+  input: PlanInput,
+  airportLabel: (iata: string) => string,
+): TripFormValues {
+  const t = input.traveler;
+  const date = (local: string): string => local.slice(0, 10);
+  const time = (local: string): string => local.slice(11, 16);
+  return {
+    habitualBedtime: t.habitualBedtime,
+    habitualWake: t.habitualWake,
+    chronotype: t.chronotype,
+    sleepNeedHours: String(t.sleepNeedHours ?? 8),
+    useMelatonin: t.useMelatonin,
+    caffeine: t.caffeine,
+    exerciseEnabled: t.exercise.enabled,
+    meditationEnabled: t.meditation.enabled,
+    mealTimingEnabled: t.mealTiming.enabled,
+    preAdjustDays: t.preAdjustDays,
+    legs: input.itinerary.legs.map((leg) => ({
+      id: createId(),
+      fromQuery: airportLabel(leg.departureAirport),
+      fromIata: leg.departureAirport,
+      toQuery: airportLabel(leg.arrivalAirport),
+      toIata: leg.arrivalAirport,
+      departureDate: date(leg.departureLocal),
+      departureTime: time(leg.departureLocal),
+      arrivalDate: date(leg.arrivalLocal),
+      arrivalTime: time(leg.arrivalLocal),
+      flightNumber: leg.flightNumber ?? "",
+    })),
+    mustBeAwake: (input.constraints?.mustBeAwake ?? []).map((event) => ({
+      id: createId(),
+      label: event.label,
+      startDate: date(event.start),
+      startTime: time(event.start),
+      endDate: date(event.end),
+      endTime: time(event.end),
+      tz: event.tz,
+    })),
+    noWorkoutWindows: (input.constraints?.noWorkoutWindows ?? []).map(
+      (window) => ({
+        id: createId(),
+        startDate: date(window.start),
+        startTime: time(window.start),
+        endDate: date(window.end),
+        endTime: time(window.end),
+        tz: window.tz,
+      }),
+    ),
+    tripDays:
+      input.itinerary.tripDays === undefined
+        ? ""
+        : String(input.itinerary.tripDays),
+  };
 }

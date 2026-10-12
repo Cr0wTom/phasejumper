@@ -16,21 +16,45 @@
 
 import { useEffect, useState } from "react";
 
-/** Hash routes only, so the static host never sees the path. */
-export type Route = { name: "trip" } | { name: "plan"; id: string };
+/**
+ * Hash routes only, so the static host never sees the path (§7.2). Share
+ * links use `#p=<base64url PlanInput>` (§3.3): fragments are never sent to
+ * the host, so a shared plan is never logged.
+ */
+export type Route =
+  | { name: "trip"; editId?: string }
+  | { name: "plan"; id?: string }
+  | { name: "today" }
+  | { name: "share"; payload: string };
 
-const PLAN_HASH = /^\/plan\/([^/]+)$/;
+const PLAN_HASH = /^\/plan(?:\/([^/]+))?$/;
+const TRIP_HASH = /^\/trip(?:\/([^/]+))?$/;
 
 /** Returns null for `#/`, empty, and unknown hashes. Those render as the trip form. */
 export function parseHash(hash: string): Route | null {
   const withoutHash = hash.startsWith("#") ? hash.slice(1) : hash;
+  if (withoutHash.startsWith("p=")) {
+    const payload = withoutHash.slice(2);
+    return payload.length === 0 ? null : { name: "share", payload };
+  }
   if (withoutHash === "" || withoutHash === "/") return null;
   const path = withoutHash.startsWith("/") ? withoutHash : `/${withoutHash}`;
-  if (path === "/trip") return { name: "trip" };
-  const match = PLAN_HASH.exec(path);
-  const id = match?.[1];
-  if (id === undefined || id.length === 0) return null;
-  return { name: "plan", id: decodeURIComponent(id) };
+  if (path === "/today") return { name: "today" };
+  const plan = PLAN_HASH.exec(path);
+  if (plan !== null) {
+    const id = plan[1];
+    return id === undefined
+      ? { name: "plan" }
+      : { name: "plan", id: decodeURIComponent(id) };
+  }
+  const trip = TRIP_HASH.exec(path);
+  if (trip !== null) {
+    const id = trip[1];
+    return id === undefined
+      ? { name: "trip" }
+      : { name: "trip", editId: decodeURIComponent(id) };
+  }
+  return null;
 }
 
 function initialRoute(): Route {
@@ -64,6 +88,20 @@ export function useRoute(): Route {
   return route;
 }
 
+export function planHash(id: string): string {
+  return `#/plan/${encodeURIComponent(id)}`;
+}
+
 export function goToPlan(id: string): void {
-  window.location.hash = `#/plan/${encodeURIComponent(id)}`;
+  window.location.hash = planHash(id);
+}
+
+/** Replaces the current history entry (used after opening a share link). */
+export function replaceWithPlan(id: string): void {
+  window.history.replaceState(
+    null,
+    "",
+    `${window.location.pathname}${window.location.search}${planHash(id)}`,
+  );
+  window.dispatchEvent(new HashChangeEvent("hashchange"));
 }

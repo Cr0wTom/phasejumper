@@ -17,7 +17,7 @@
 import { readFileSync } from "node:fs";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
-import { messages } from "../src/messages";
+import { messages, planMessages } from "../src/messages";
 
 const PASTE = readFileSync(
   new URL(
@@ -113,10 +113,8 @@ test("creates a plan with the network disabled and no other origin", async ({
 
   await expect(page).toHaveURL(/#\/plan\/[0-9a-f-]{36}$/i);
   await expect(
-    page.getByRole("region", { name: messages.planSummary }),
-  ).not.toHaveText("");
-  await expect(page.getByText(messages.planComingLater)).toBeVisible();
-  await expect(page.getByText(/^\d+ days? in this plan\.$/)).toBeVisible();
+    page.getByRole("heading", { name: planMessages.planHeading, level: 1 }),
+  ).toBeVisible();
   await expect(page.getByText(messages.footer, { exact: true })).toBeVisible();
   expect(foreign).toEqual([]);
 });
@@ -149,7 +147,9 @@ test("completes the form with the keyboard only", async ({ page }) => {
   await page.keyboard.press("Enter");
 
   await expect(page).toHaveURL(/#\/plan\/[0-9a-f-]{36}$/i);
-  await expect(page.getByText(messages.planComingLater)).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: planMessages.planHeading, level: 1 }),
+  ).toBeVisible();
   await expect(page.getByText(messages.footer, { exact: true })).toBeVisible();
 });
 
@@ -222,7 +222,9 @@ test("reads a pasted itinerary offline and does not store the text", async ({
 
   await page.getByRole("button", { name: messages.generate }).click();
   await expect(page).toHaveURL(/#\/plan\/[0-9a-f-]{36}$/i);
-  await expect(page.getByText(messages.planComingLater)).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: planMessages.planHeading, level: 1 }),
+  ).toBeVisible();
 
   const stored = await indexedDbText(page);
   expect(stored.length).toBeGreaterThan(0);

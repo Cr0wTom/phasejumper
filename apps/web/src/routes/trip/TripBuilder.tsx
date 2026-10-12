@@ -34,12 +34,13 @@ import { LegalGate } from "../../components/LegalGate";
 import { flags } from "../../flags";
 import { messages } from "../../messages";
 import { goToPlan } from "../../router";
-import { savePlan } from "../../storage/plans";
+import { loadPlan, savePlan } from "../../storage/plans";
 import { errorClass, h1Class, pageClass, primaryButtonClass } from "../../ui";
 import { ConstraintsSection } from "./ConstraintsSection";
 import { FlightsSection } from "./FlightsSection";
 import {
   createDefaultForm,
+  formFromPlanInput,
   createId,
   emptyAwake,
   emptyLeg,
@@ -111,7 +112,7 @@ function dropReview(
   return changed ? next : current;
 }
 
-export function TripBuilder() {
+export function TripBuilder({ editId }: { editId?: string } = {}) {
   const [form, setForm] = useState<TripFormValues>(createDefaultForm);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [formAlert, setFormAlert] = useState<FormAlert | null>(null);
@@ -141,6 +142,34 @@ export function TripBuilder() {
       cancelled = true;
     };
   }, []);
+
+  // "Edit trip": fill the form from a saved plan once airports are loaded.
+  // Generating then creates a new plan; the original stays as it was.
+  useEffect(() => {
+    if (editId === undefined || directory === null) return;
+    let cancelled = false;
+    loadPlan(editId)
+      .then((plan) => {
+        if (cancelled) return;
+        if (plan === undefined) {
+          setFormAlert({ title: messages.editMissing, issues: [] });
+          return;
+        }
+        setForm(
+          formFromPlanInput(plan.input, (iata) => {
+            const airport = directory.lookup(iata);
+            return airport === undefined ? iata : airportLabel(airport);
+          }),
+        );
+      })
+      .catch(() => {
+        if (!cancelled)
+          setFormAlert({ title: messages.editMissing, issues: [] });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [editId, directory]);
 
   useEffect(() => {
     if (formAlert !== null) formAlertRef.current?.focus();
