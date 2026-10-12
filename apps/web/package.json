@@ -13,6 +13,7 @@
   "dependencies": {
     "@phasejumper/airports": "workspace:*",
     "@phasejumper/engine": "workspace:*",
+    "@phasejumper/ical": "workspace:*",
     "@phasejumper/itinerary": "workspace:*",
     "idb-keyval": "6.3.0",
     "lucide-react": "1.55.0",

@@ -14,4 +14,6 @@
  * limitations under the License.
  */
 
+export { toIcs, type ToIcsArgs } from "./toIcs";
+
 export const packageName = "@phasejumper/ical";
