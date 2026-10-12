@@ -1,0 +1,15 @@
+{
+  "legs": [
+    {
+      "departureAirport": "LAX",
+      "arrivalAirport": "SYD",
+      "departureDate": "2027-09-02",
+      "departureTime": "22:30",
+      "arrivalDate": "2027-09-03",
+      "arrivalTime": "06:45",
+      "flightNumber": "QF 12"
+    }
+  ],
+  "confidence": 1,
+  "unparsed": []
+}

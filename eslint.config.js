@@ -41,8 +41,9 @@ export default tseslint.config(
     },
   },
   {
-    // §0 rule 2: the engine is pure — no I/O, no wall clock.
-    files: ["packages/engine/src/**/*.ts"],
+    // §0 rule 2 / §3.2: the engine and the itinerary parser are pure —
+    // no I/O, no wall clock.
+    files: ["packages/engine/src/**/*.ts", "packages/itinerary/src/**/*.ts"],
     rules: {
       "no-restricted-imports": [
         "error",

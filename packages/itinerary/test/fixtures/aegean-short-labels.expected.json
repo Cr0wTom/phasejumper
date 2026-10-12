@@ -1,0 +1,15 @@
+{
+  "legs": [
+    {
+      "departureAirport": "ATH",
+      "arrivalAirport": "PRG",
+      "departureDate": "2027-08-18",
+      "departureTime": "11:20",
+      "arrivalDate": "2027-08-18",
+      "arrivalTime": "13:05",
+      "flightNumber": "A3 860"
+    }
+  ],
+  "confidence": 1,
+  "unparsed": []
+}

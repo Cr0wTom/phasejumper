@@ -1,0 +1,24 @@
+{
+  "legs": [
+    {
+      "departureAirport": "PRG",
+      "arrivalAirport": "ZRH",
+      "departureDate": "2027-03-11",
+      "departureTime": "06:50",
+      "arrivalDate": "2027-03-11",
+      "arrivalTime": "08:05",
+      "flightNumber": "LX 1492"
+    },
+    {
+      "departureAirport": "ZRH",
+      "arrivalAirport": "JFK",
+      "departureDate": "2027-03-11",
+      "departureTime": "10:00",
+      "arrivalDate": "2027-03-11",
+      "arrivalTime": "13:15",
+      "flightNumber": "LX 16"
+    }
+  ],
+  "confidence": 1,
+  "unparsed": []
+}

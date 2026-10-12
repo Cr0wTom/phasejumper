@@ -1,0 +1,15 @@
+{
+  "legs": [
+    {
+      "departureAirport": "ORD",
+      "arrivalAirport": "EWR",
+      "departureDate": "2027-04-12",
+      "departureTime": "10:30",
+      "arrivalDate": "2027-04-12",
+      "arrivalTime": "13:45",
+      "flightNumber": "UA 523"
+    }
+  ],
+  "confidence": 1,
+  "unparsed": []
+}

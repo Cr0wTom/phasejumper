@@ -2,7 +2,7 @@
 
 PhaseJumper is a static web app. GitHub Pages serves the built files; everything — planning, airport lookup, calendar — runs in the browser. There is no server, database, account or telemetry, and nothing a traveler enters leaves their device.
 
-*As built through T06. Updated with each ticket.*
+*As built through T07. Updated with each ticket.*
 
 ## Repository
 
@@ -10,7 +10,7 @@ PhaseJumper is a static web app. GitHub Pages serves the built files; everything
 phasejumper/                pnpm workspace, TypeScript strict, Node 22
 ├─ packages/engine/         @phasejumper/engine — the planner (pure)
 ├─ packages/airports/       OurAirports → airports.json + lookup(iata)
-├─ packages/itinerary/      itinerary-text parser (placeholder until T07)
+├─ packages/itinerary/      pasted booking text → flight legs (pure)
 ├─ packages/ical/           plan → .ics (placeholder until T10)
 ├─ apps/web/                Vite 6 + React 19 + Tailwind v4 + vite-plugin-pwa: trip builder, plan placeholder
 ├─ docs/                    this documentation (CC BY 4.0)
@@ -52,6 +52,12 @@ Testing: unit tests, fast-check property tests over 500 random trips, and eight 
 | `messages.ts` | Every user-facing string in the web app |
 
 "Generate plan" validates the form, maps it to `PlanInput` (zones and coordinates from `airports.json`), runs `generatePlan` in the browser, saves the result to IndexedDB and opens `#/plan/<id>`. The melatonin toggle and the legal gate stay hidden until T12 turns their flags on.
+
+## Itinerary parser (`packages/itinerary`)
+
+`parseItinerary(text, { referenceDate, isAirport })` reads pasted booking-confirmation text and returns `{ legs, confidence, unparsed }`. It is pure (lint-enforced, like the engine): the app passes today's date (to infer a missing year) and an airport check (to reject words like THE or AND). Times are kept as the booking states them; time zones always come from the airport, never from the text. 25 anonymized fixtures cover common confirmation layouts, 12 h and 24 h times, next-day arrivals and multi-leg trips.
+
+In the trip builder, "Read flights" replaces the flight legs with what was found and marks each filled field to check; lines that looked like flight data but couldn't be read are listed under the box. The pasted text is cleared at once and never stored.
 
 ## Data flow
 

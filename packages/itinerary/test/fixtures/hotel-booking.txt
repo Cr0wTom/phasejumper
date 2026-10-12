@@ -1,0 +1,8 @@
+Hotel confirmation
+Guest: Alex Morgan
+Property: Cedar Hotel, Prague
+Check-in from 15:00
+Check-out by 11:00
+Confirmation code HTL44821
+Address: 18 River Road
+This is a room booking, not a flight.

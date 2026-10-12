@@ -1,0 +1,9 @@
+Passenger: Camille Bernard
+Booking code F6N3KW
+
+Flight AF 1643
+Departure airport CDG
+Arrival airport PRG
+2027-03-02
+Departure time 09:15
+Arrival time 11:00

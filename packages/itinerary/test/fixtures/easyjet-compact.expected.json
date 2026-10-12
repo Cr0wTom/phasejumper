@@ -1,0 +1,15 @@
+{
+  "legs": [
+    {
+      "departureAirport": "PRG",
+      "arrivalAirport": "LGW",
+      "departureDate": "2027-05-04",
+      "departureTime": "06:15",
+      "arrivalDate": "2027-05-04",
+      "arrivalTime": "07:40",
+      "flightNumber": "U2 2341"
+    }
+  ],
+  "confidence": 1,
+  "unparsed": []
+}

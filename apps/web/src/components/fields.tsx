@@ -32,26 +32,34 @@ function FieldFrame({
   id,
   label,
   hint,
+  review,
   error,
   children,
 }: {
   id: string;
   label: string;
   hint?: string;
+  review?: string;
   error?: string;
   children: (described: string | undefined) => ReactNode;
 }) {
   const hintId = hint === undefined ? undefined : `${id}-hint`;
+  const reviewId = review === undefined ? undefined : `${id}-review`;
   const errorId = error === undefined ? undefined : `${id}-error`;
   return (
     <div className="flex min-w-0 flex-col gap-2">
       <label htmlFor={id} className={labelClass}>
         {label}
       </label>
-      {children(describedBy([hintId, errorId]))}
+      {children(describedBy([hintId, reviewId, errorId]))}
       {hintId === undefined ? null : (
         <p id={hintId} className={hintClass}>
           {hint}
+        </p>
+      )}
+      {reviewId === undefined || review === undefined ? null : (
+        <p id={reviewId} className={hintClass}>
+          {review}
         </p>
       )}
       {errorId === undefined || error === undefined ? null : (
@@ -70,6 +78,7 @@ export function TextField({
   onChange,
   error,
   hint,
+  review,
   required = false,
   inputMode,
 }: {
@@ -79,15 +88,20 @@ export function TextField({
   onChange: (value: string) => void;
   error?: string;
   hint?: string;
+  review?: string;
   required?: boolean;
   inputMode?: "text" | "decimal";
 }) {
   return (
-    <FieldFrame id={id} label={label} hint={hint} error={error}>
+    <FieldFrame id={id} label={label} hint={hint} review={review} error={error}>
       {(described) => (
         <input
           id={id}
-          className={controlClass}
+          className={
+            review === undefined
+              ? controlClass
+              : `${controlClass} ring-1 ring-inset ring-[#F2F2F0]`
+          }
           value={value}
           onChange={(event) => onChange(event.target.value)}
           aria-invalid={error === undefined ? undefined : true}

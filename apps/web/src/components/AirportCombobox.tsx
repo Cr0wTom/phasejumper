@@ -37,6 +37,7 @@ export function AirportCombobox({
   airports,
   disabled,
   error,
+  review,
   onQueryChange,
   onSelect,
 }: {
@@ -46,6 +47,7 @@ export function AirportCombobox({
   airports: readonly SearchableAirport[] | null;
   disabled: boolean;
   error?: string;
+  review?: string;
   onQueryChange: (query: string) => void;
   onSelect: (airport: SearchableAirport) => void;
 }) {
@@ -129,7 +131,10 @@ export function AirportCombobox({
     }
   }
 
-  const described = [hintId, errorId].filter((part) => part !== undefined);
+  const reviewId = review === undefined ? undefined : `${id}-review`;
+  const described = [hintId, reviewId, errorId].filter(
+    (part) => part !== undefined,
+  );
   const liveText = !expanded
     ? ""
     : results.length === 0
@@ -156,7 +161,11 @@ export function AirportCombobox({
       <input
         id={id}
         role="combobox"
-        className={controlClass}
+        className={
+          review === undefined
+            ? controlClass
+            : `${controlClass} ring-1 ring-inset ring-[#F2F2F0]`
+        }
         value={query}
         disabled={disabled}
         aria-autocomplete="list"
@@ -183,6 +192,11 @@ export function AirportCombobox({
       <p id={hintId} className={hintClass}>
         {messages.comboboxHint}
       </p>
+      {reviewId === undefined || review === undefined ? null : (
+        <p id={reviewId} className={hintClass}>
+          {review}
+        </p>
+      )}
       {errorId === undefined || error === undefined ? null : (
         <p id={errorId} role="alert" className={errorClass}>
           {error}

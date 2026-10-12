@@ -1,0 +1,15 @@
+{
+  "legs": [
+    {
+      "departureAirport": "MAD",
+      "arrivalAirport": "PRG",
+      "departureDate": "2027-10-15",
+      "departureTime": "10:05",
+      "arrivalDate": "2027-10-15",
+      "arrivalTime": "13:20",
+      "flightNumber": "IB 3114"
+    }
+  ],
+  "confidence": 1,
+  "unparsed": []
+}

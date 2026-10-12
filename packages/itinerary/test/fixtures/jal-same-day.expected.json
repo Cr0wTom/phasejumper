@@ -1,0 +1,15 @@
+{
+  "legs": [
+    {
+      "departureAirport": "HND",
+      "arrivalAirport": "SFO",
+      "departureDate": "2027-05-06",
+      "departureTime": "17:05",
+      "arrivalDate": "2027-05-06",
+      "arrivalTime": "11:00",
+      "flightNumber": "JL 707"
+    }
+  ],
+  "confidence": 1,
+  "unparsed": []
+}

@@ -1,0 +1,15 @@
+{
+  "legs": [
+    {
+      "departureAirport": "SFO",
+      "arrivalAirport": "SIN",
+      "departureDate": "2027-04-02",
+      "departureTime": "10:30",
+      "arrivalDate": "2027-04-03",
+      "arrivalTime": "19:15",
+      "flightNumber": "SQ 26"
+    }
+  ],
+  "confidence": 1,
+  "unparsed": []
+}

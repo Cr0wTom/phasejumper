@@ -1,0 +1,15 @@
+{
+  "legs": [
+    {
+      "departureAirport": "LHR",
+      "arrivalAirport": "BOM",
+      "departureDate": "2027-06-28",
+      "departureTime": "21:10",
+      "arrivalDate": "2027-06-29",
+      "arrivalTime": "10:40",
+      "flightNumber": "VS 7"
+    }
+  ],
+  "confidence": 1,
+  "unparsed": []
+}

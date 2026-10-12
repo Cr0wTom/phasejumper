@@ -13,6 +13,7 @@
   "dependencies": {
     "@phasejumper/airports": "workspace:*",
     "@phasejumper/engine": "workspace:*",
+    "@phasejumper/itinerary": "workspace:*",
     "idb-keyval": "6.3.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",

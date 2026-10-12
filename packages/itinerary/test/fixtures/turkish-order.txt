@@ -1,0 +1,14 @@
+Passenger: Mina Kovacs
+Booking code T4H8QP
+
+Flight TK 1788
+IST-PRG
+20 May 2027
+Departs 14:10
+Arrives 16:05
+
+Flight TK 1787
+PRG-IST
+18 May 2027
+Departs 09:40
+Arrives 13:25

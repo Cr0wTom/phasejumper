@@ -1,0 +1,15 @@
+{
+  "legs": [
+    {
+      "departureAirport": "PRG",
+      "arrivalAirport": "JFK",
+      "departureDate": "2027-01-12",
+      "departureTime": "10:30",
+      "arrivalDate": "2027-01-12",
+      "arrivalTime": "13:45",
+      "flightNumber": "LH 1394"
+    }
+  ],
+  "confidence": 0.8,
+  "unparsed": ["Leave the hotel by 07:15."]
+}
