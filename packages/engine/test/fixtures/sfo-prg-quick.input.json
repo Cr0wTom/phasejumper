@@ -1,0 +1,43 @@
+{
+  "traveler": {
+    "habitualBedtime": "23:00",
+    "habitualWake": "07:00",
+    "chronotype": "intermediate",
+    "useMelatonin": false,
+    "caffeine": "normal",
+    "exercise": {
+      "enabled": true
+    },
+    "meditation": {
+      "enabled": true
+    },
+    "mealTiming": {
+      "enabled": false
+    },
+    "preAdjustDays": 0
+  },
+  "itinerary": {
+    "homeTz": "America/Los_Angeles",
+    "legs": [
+      {
+        "departureAirport": "SFO",
+        "arrivalAirport": "PRG",
+        "departureLocal": "2027-01-15T16:00",
+        "arrivalLocal": "2027-01-16T11:30",
+        "departureTz": "America/Los_Angeles",
+        "arrivalTz": "Europe/Prague",
+        "departureLatLon": {
+          "lat": 37.619806,
+          "lon": -122.374821
+        },
+        "arrivalLatLon": {
+          "lat": 50.100874,
+          "lon": 14.259911
+        }
+      }
+    ],
+    "destinationTz": "Europe/Prague",
+    "tripDays": 2
+  },
+  "now": "2027-01-08T12:00:00Z"
+}

@@ -1,0 +1,988 @@
+{
+  "decision": {
+    "direction": "advance",
+    "deltaHours": 8,
+    "daysAdvance": 6,
+    "daysDelay": 8,
+    "chosenDays": 6,
+    "targetCbtMinLocal": "04:30",
+    "explanation": "We'll move your clock 8 h earlier over 6 days."
+  },
+  "days": [
+    {
+      "date": "2027-01-13",
+      "localTzAtWake": "Europe/Prague",
+      "cbtMinUtc": "2027-01-13T03:30:00Z",
+      "blocks": [
+        {
+          "kind": "SLEEP",
+          "startUtc": "2027-01-12T22:00:00Z",
+          "endUtc": "2027-01-13T06:00:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "SLEEP_SHIFTING",
+          "reason": "Sleep in this window; it moves a little each day with your clock.",
+          "source": "R1",
+          "confidence": "A",
+          "movable": false
+        },
+        {
+          "kind": "SEEK_LIGHT_ARTIFICIAL",
+          "startUtc": "2027-01-13T06:00:00Z",
+          "endUtc": "2027-01-13T07:00:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "SEEK_LIGHT_ARTIFICIAL",
+          "reason": "It's dark outside, so bright indoor light or a 10 000 lux lamp does the job now.",
+          "source": "R2",
+          "confidence": "A",
+          "movable": false
+        },
+        {
+          "kind": "CAFFEINE_OK",
+          "startUtc": "2027-01-13T06:00:00Z",
+          "endUtc": "2027-01-13T11:30:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "CAFFEINE_OK",
+          "reason": "Caffeine fits in this window.",
+          "source": "R10",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "MEAL",
+          "startUtc": "2027-01-13T07:00:00Z",
+          "endUtc": "2027-01-13T07:05:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "MEAL",
+          "reason": "A meal around now fits your new schedule.",
+          "source": "none",
+          "confidence": "C",
+          "movable": true
+        },
+        {
+          "kind": "CAFFEINE_STOP",
+          "startUtc": "2027-01-13T11:30:00Z",
+          "endUtc": "2027-01-13T11:35:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "CAFFEINE_STOP",
+          "reason": "Last caffeine here, so it does not keep you awake tonight.",
+          "source": "R11",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "EXERCISE_GOOD",
+          "startUtc": "2027-01-13T12:00:00Z",
+          "endUtc": "2027-01-13T12:45:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "EXERCISE_GOOD_ADVANCE",
+          "reason": "Exercise in this window can help move your clock earlier.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": true
+        },
+        {
+          "kind": "MEAL",
+          "startUtc": "2027-01-13T13:15:00Z",
+          "endUtc": "2027-01-13T13:20:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "MEAL",
+          "reason": "A meal around now fits your new schedule.",
+          "source": "none",
+          "confidence": "C",
+          "movable": true
+        },
+        {
+          "kind": "MELATONIN_WINDOW",
+          "startUtc": "2027-01-13T15:00:00Z",
+          "endUtc": "2027-01-13T15:30:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "MELATONIN_WINDOW",
+          "reason": "If you use melatonin, research on timing suggests this window.",
+          "source": "R4",
+          "confidence": "A",
+          "movable": true
+        },
+        {
+          "kind": "EXERCISE_AVOID",
+          "startUtc": "2027-01-13T17:30:00Z",
+          "endUtc": "2027-01-13T20:30:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "EXERCISE_AVOID_BEDTIME",
+          "reason": "Exercise this close to bedtime can make it harder to fall asleep.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "MEAL",
+          "startUtc": "2027-01-13T17:30:00Z",
+          "endUtc": "2027-01-13T17:35:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "MEAL",
+          "reason": "A meal around now fits your new schedule.",
+          "source": "none",
+          "confidence": "C",
+          "movable": true
+        },
+        {
+          "kind": "WIND_DOWN",
+          "startUtc": "2027-01-13T20:15:00Z",
+          "endUtc": "2027-01-13T20:30:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "WIND_DOWN",
+          "reason": "Wind down here: dim the lights and slow down before sleep.",
+          "source": "none",
+          "confidence": "C",
+          "movable": true
+        }
+      ],
+      "misalignmentBefore": 8,
+      "misalignmentAfter": 6.2,
+      "effectiveShiftHours": 1.8,
+      "flags": []
+    },
+    {
+      "date": "2027-01-14",
+      "localTzAtWake": "Europe/Prague",
+      "cbtMinUtc": "2027-01-14T02:00:00Z",
+      "blocks": [
+        {
+          "kind": "SLEEP",
+          "startUtc": "2027-01-13T20:30:00Z",
+          "endUtc": "2027-01-14T04:30:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "SLEEP_SHIFTING",
+          "reason": "Sleep in this window; it moves a little each day with your clock.",
+          "source": "R1",
+          "confidence": "A",
+          "movable": false
+        },
+        {
+          "kind": "SEEK_LIGHT_ARTIFICIAL",
+          "startUtc": "2027-01-14T04:30:00Z",
+          "endUtc": "2027-01-14T05:30:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "SEEK_LIGHT_ARTIFICIAL",
+          "reason": "It's dark outside, so bright indoor light or a 10 000 lux lamp does the job now.",
+          "source": "R2",
+          "confidence": "A",
+          "movable": false
+        },
+        {
+          "kind": "CAFFEINE_OK",
+          "startUtc": "2027-01-14T04:30:00Z",
+          "endUtc": "2027-01-14T10:00:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "CAFFEINE_OK",
+          "reason": "Caffeine fits in this window.",
+          "source": "R10",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "MEAL",
+          "startUtc": "2027-01-14T05:30:00Z",
+          "endUtc": "2027-01-14T05:35:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "MEAL",
+          "reason": "A meal around now fits your new schedule.",
+          "source": "none",
+          "confidence": "C",
+          "movable": true
+        },
+        {
+          "kind": "CAFFEINE_STOP",
+          "startUtc": "2027-01-14T10:00:00Z",
+          "endUtc": "2027-01-14T10:05:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "CAFFEINE_STOP",
+          "reason": "Last caffeine here, so it does not keep you awake tonight.",
+          "source": "R11",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "EXERCISE_GOOD",
+          "startUtc": "2027-01-14T10:30:00Z",
+          "endUtc": "2027-01-14T11:15:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "EXERCISE_GOOD_ADVANCE",
+          "reason": "Exercise in this window can help move your clock earlier.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": true
+        },
+        {
+          "kind": "MEAL",
+          "startUtc": "2027-01-14T11:45:00Z",
+          "endUtc": "2027-01-14T11:50:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "MEAL",
+          "reason": "A meal around now fits your new schedule.",
+          "source": "none",
+          "confidence": "C",
+          "movable": true
+        },
+        {
+          "kind": "MELATONIN_WINDOW",
+          "startUtc": "2027-01-14T13:30:00Z",
+          "endUtc": "2027-01-14T14:00:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "MELATONIN_WINDOW",
+          "reason": "If you use melatonin, research on timing suggests this window.",
+          "source": "R4",
+          "confidence": "A",
+          "movable": true
+        },
+        {
+          "kind": "EXERCISE_AVOID",
+          "startUtc": "2027-01-14T16:00:00Z",
+          "endUtc": "2027-01-14T19:00:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "EXERCISE_AVOID_BEDTIME",
+          "reason": "Exercise this close to bedtime can make it harder to fall asleep.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "MEAL",
+          "startUtc": "2027-01-14T16:00:00Z",
+          "endUtc": "2027-01-14T16:05:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "MEAL",
+          "reason": "A meal around now fits your new schedule.",
+          "source": "none",
+          "confidence": "C",
+          "movable": true
+        },
+        {
+          "kind": "WIND_DOWN",
+          "startUtc": "2027-01-14T18:45:00Z",
+          "endUtc": "2027-01-14T19:00:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "WIND_DOWN",
+          "reason": "Wind down here: dim the lights and slow down before sleep.",
+          "source": "none",
+          "confidence": "C",
+          "movable": true
+        }
+      ],
+      "misalignmentBefore": 6.2,
+      "misalignmentAfter": 4.4,
+      "effectiveShiftHours": 1.8,
+      "flags": []
+    },
+    {
+      "date": "2027-01-15",
+      "localTzAtWake": "Europe/Prague",
+      "cbtMinUtc": "2027-01-15T00:30:00Z",
+      "blocks": [
+        {
+          "kind": "SLEEP",
+          "startUtc": "2027-01-14T19:00:00Z",
+          "endUtc": "2027-01-15T03:00:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "SLEEP_SHIFTING",
+          "reason": "Sleep in this window; it moves a little each day with your clock.",
+          "source": "R1",
+          "confidence": "A",
+          "movable": false
+        },
+        {
+          "kind": "SEEK_LIGHT_ARTIFICIAL",
+          "startUtc": "2027-01-15T03:00:00Z",
+          "endUtc": "2027-01-15T04:00:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "SEEK_LIGHT_ARTIFICIAL",
+          "reason": "It's dark outside, so bright indoor light or a 10 000 lux lamp does the job now.",
+          "source": "R2",
+          "confidence": "A",
+          "movable": false
+        },
+        {
+          "kind": "CAFFEINE_OK",
+          "startUtc": "2027-01-15T03:00:00Z",
+          "endUtc": "2027-01-15T08:30:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "CAFFEINE_OK",
+          "reason": "Caffeine fits in this window.",
+          "source": "R10",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "MEAL",
+          "startUtc": "2027-01-15T04:00:00Z",
+          "endUtc": "2027-01-15T04:05:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "MEAL",
+          "reason": "A meal around now fits your new schedule.",
+          "source": "none",
+          "confidence": "C",
+          "movable": true
+        },
+        {
+          "kind": "CAFFEINE_STOP",
+          "startUtc": "2027-01-15T08:30:00Z",
+          "endUtc": "2027-01-15T08:35:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "CAFFEINE_STOP",
+          "reason": "Last caffeine here, so it does not keep you awake tonight.",
+          "source": "R11",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "MEAL",
+          "startUtc": "2027-01-15T10:15:00Z",
+          "endUtc": "2027-01-15T10:20:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "MEAL",
+          "reason": "A meal around now fits your new schedule.",
+          "source": "none",
+          "confidence": "C",
+          "movable": true
+        },
+        {
+          "kind": "MELATONIN_WINDOW",
+          "startUtc": "2027-01-15T12:00:00Z",
+          "endUtc": "2027-01-15T12:30:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "MELATONIN_WINDOW",
+          "reason": "If you use melatonin, research on timing suggests this window.",
+          "source": "R4",
+          "confidence": "A",
+          "movable": true
+        },
+        {
+          "kind": "EXERCISE_AVOID",
+          "startUtc": "2027-01-15T14:30:00Z",
+          "endUtc": "2027-01-15T17:30:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "EXERCISE_AVOID_BEDTIME",
+          "reason": "Exercise this close to bedtime can make it harder to fall asleep.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "MEAL",
+          "startUtc": "2027-01-15T14:30:00Z",
+          "endUtc": "2027-01-15T14:35:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "MEAL",
+          "reason": "A meal around now fits your new schedule.",
+          "source": "none",
+          "confidence": "C",
+          "movable": true
+        },
+        {
+          "kind": "AVOID_LIGHT",
+          "startUtc": "2027-01-15T17:00:00Z",
+          "endUtc": "2027-01-15T17:30:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "AVOID_LIGHT_INFLIGHT",
+          "reason": "Keep light out now: close the window shade or wear an eye mask.",
+          "source": "R2",
+          "confidence": "A",
+          "movable": false
+        },
+        {
+          "kind": "WIND_DOWN",
+          "startUtc": "2027-01-15T17:15:00Z",
+          "endUtc": "2027-01-15T17:30:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "WIND_DOWN",
+          "reason": "Wind down here: dim the lights and slow down before sleep.",
+          "source": "none",
+          "confidence": "C",
+          "movable": true
+        }
+      ],
+      "misalignmentBefore": 4.4,
+      "misalignmentAfter": 2.9,
+      "effectiveShiftHours": 1.5,
+      "flags": [
+        "FLIGHT_DAY"
+      ]
+    },
+    {
+      "date": "2027-01-16",
+      "localTzAtWake": "Asia/Tokyo",
+      "cbtMinUtc": "2027-01-15T23:00:00Z",
+      "blocks": [
+        {
+          "kind": "SLEEP_INFLIGHT",
+          "startUtc": "2027-01-15T17:30:00Z",
+          "endUtc": "2027-01-16T01:30:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "SLEEP_INFLIGHT",
+          "reason": "Sleep on the plane in this window; an eye mask helps.",
+          "source": "R1",
+          "confidence": "A",
+          "movable": false
+        },
+        {
+          "kind": "SEEK_LIGHT",
+          "startUtc": "2027-01-16T01:30:00Z",
+          "endUtc": "2027-01-16T02:30:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "SEEK_LIGHT_ADVANCE",
+          "reason": "Bright light now pulls your clock earlier.",
+          "source": "R2",
+          "confidence": "A",
+          "movable": false
+        },
+        {
+          "kind": "CAFFEINE_OK",
+          "startUtc": "2027-01-16T01:30:00Z",
+          "endUtc": "2027-01-16T07:00:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "CAFFEINE_OK",
+          "reason": "Caffeine fits in this window.",
+          "source": "R10",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "MEAL",
+          "startUtc": "2027-01-16T02:30:00Z",
+          "endUtc": "2027-01-16T02:35:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "MEAL",
+          "reason": "A meal around now fits your new schedule.",
+          "source": "none",
+          "confidence": "C",
+          "movable": true
+        },
+        {
+          "kind": "CAFFEINE_STOP",
+          "startUtc": "2027-01-16T07:00:00Z",
+          "endUtc": "2027-01-16T07:05:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "CAFFEINE_STOP",
+          "reason": "Last caffeine here, so it does not keep you awake tonight.",
+          "source": "R11",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "MEAL",
+          "startUtc": "2027-01-16T08:45:00Z",
+          "endUtc": "2027-01-16T08:50:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "MEAL",
+          "reason": "A meal around now fits your new schedule.",
+          "source": "none",
+          "confidence": "C",
+          "movable": true
+        },
+        {
+          "kind": "MELATONIN_WINDOW",
+          "startUtc": "2027-01-16T10:30:00Z",
+          "endUtc": "2027-01-16T11:00:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "MELATONIN_WINDOW",
+          "reason": "If you use melatonin, research on timing suggests this window.",
+          "source": "R4",
+          "confidence": "A",
+          "movable": true
+        },
+        {
+          "kind": "EXERCISE_AVOID",
+          "startUtc": "2027-01-16T13:00:00Z",
+          "endUtc": "2027-01-16T16:00:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "EXERCISE_AVOID_BEDTIME",
+          "reason": "Exercise this close to bedtime can make it harder to fall asleep.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "MEAL",
+          "startUtc": "2027-01-16T13:00:00Z",
+          "endUtc": "2027-01-16T13:05:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "MEAL",
+          "reason": "A meal around now fits your new schedule.",
+          "source": "none",
+          "confidence": "C",
+          "movable": true
+        },
+        {
+          "kind": "WIND_DOWN",
+          "startUtc": "2027-01-16T15:45:00Z",
+          "endUtc": "2027-01-16T16:00:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "WIND_DOWN",
+          "reason": "Wind down here: dim the lights and slow down before sleep.",
+          "source": "none",
+          "confidence": "C",
+          "movable": true
+        }
+      ],
+      "misalignmentBefore": 2.9,
+      "misalignmentAfter": 1.4,
+      "effectiveShiftHours": 1.5,
+      "flags": [
+        "FLIGHT_DAY"
+      ]
+    },
+    {
+      "date": "2027-01-17",
+      "localTzAtWake": "Asia/Tokyo",
+      "cbtMinUtc": "2027-01-16T21:30:00Z",
+      "blocks": [
+        {
+          "kind": "SLEEP",
+          "startUtc": "2027-01-16T16:00:00Z",
+          "endUtc": "2027-01-17T00:00:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "SLEEP_SHIFTING",
+          "reason": "Sleep in this window; it moves a little each day with your clock.",
+          "source": "R1",
+          "confidence": "A",
+          "movable": false
+        },
+        {
+          "kind": "SEEK_LIGHT",
+          "startUtc": "2027-01-17T00:00:00Z",
+          "endUtc": "2027-01-17T01:00:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "SEEK_LIGHT_ADVANCE",
+          "reason": "Bright light now pulls your clock earlier.",
+          "source": "R2",
+          "confidence": "A",
+          "movable": false
+        },
+        {
+          "kind": "CAFFEINE_OK",
+          "startUtc": "2027-01-17T00:00:00Z",
+          "endUtc": "2027-01-17T05:30:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "CAFFEINE_OK",
+          "reason": "Caffeine fits in this window.",
+          "source": "R10",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "MEAL",
+          "startUtc": "2027-01-17T01:00:00Z",
+          "endUtc": "2027-01-17T01:05:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "MEAL",
+          "reason": "A meal around now fits your new schedule.",
+          "source": "none",
+          "confidence": "C",
+          "movable": true
+        },
+        {
+          "kind": "CAFFEINE_STOP",
+          "startUtc": "2027-01-17T05:30:00Z",
+          "endUtc": "2027-01-17T05:35:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "CAFFEINE_STOP",
+          "reason": "Last caffeine here, so it does not keep you awake tonight.",
+          "source": "R11",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "EXERCISE_GOOD",
+          "startUtc": "2027-01-17T06:00:00Z",
+          "endUtc": "2027-01-17T06:45:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "EXERCISE_GOOD_ADVANCE",
+          "reason": "Exercise in this window can help move your clock earlier.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": true
+        },
+        {
+          "kind": "MEAL",
+          "startUtc": "2027-01-17T07:15:00Z",
+          "endUtc": "2027-01-17T07:20:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "MEAL",
+          "reason": "A meal around now fits your new schedule.",
+          "source": "none",
+          "confidence": "C",
+          "movable": true
+        },
+        {
+          "kind": "MELATONIN_WINDOW",
+          "startUtc": "2027-01-17T09:00:00Z",
+          "endUtc": "2027-01-17T09:30:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "MELATONIN_WINDOW",
+          "reason": "If you use melatonin, research on timing suggests this window.",
+          "source": "R4",
+          "confidence": "A",
+          "movable": true
+        },
+        {
+          "kind": "EXERCISE_AVOID",
+          "startUtc": "2027-01-17T11:30:00Z",
+          "endUtc": "2027-01-17T14:30:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "EXERCISE_AVOID_BEDTIME",
+          "reason": "Exercise this close to bedtime can make it harder to fall asleep.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "MEAL",
+          "startUtc": "2027-01-17T11:30:00Z",
+          "endUtc": "2027-01-17T11:35:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "MEAL",
+          "reason": "A meal around now fits your new schedule.",
+          "source": "none",
+          "confidence": "C",
+          "movable": true
+        },
+        {
+          "kind": "WIND_DOWN",
+          "startUtc": "2027-01-17T14:15:00Z",
+          "endUtc": "2027-01-17T14:30:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "WIND_DOWN",
+          "reason": "Wind down here: dim the lights and slow down before sleep.",
+          "source": "none",
+          "confidence": "C",
+          "movable": true
+        }
+      ],
+      "misalignmentBefore": 1.4,
+      "misalignmentAfter": 0,
+      "effectiveShiftHours": 1.4,
+      "flags": []
+    },
+    {
+      "date": "2027-01-18",
+      "localTzAtWake": "Asia/Tokyo",
+      "cbtMinUtc": "2027-01-17T20:00:00Z",
+      "blocks": [
+        {
+          "kind": "SLEEP",
+          "startUtc": "2027-01-17T14:30:00Z",
+          "endUtc": "2027-01-17T22:30:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "SLEEP_SHIFTING",
+          "reason": "Sleep in this window; it moves a little each day with your clock.",
+          "source": "R1",
+          "confidence": "A",
+          "movable": false
+        },
+        {
+          "kind": "SEEK_LIGHT",
+          "startUtc": "2027-01-17T22:30:00Z",
+          "endUtc": "2027-01-17T23:30:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "SEEK_LIGHT_ADVANCE",
+          "reason": "Bright light now pulls your clock earlier.",
+          "source": "R2",
+          "confidence": "A",
+          "movable": false
+        },
+        {
+          "kind": "CAFFEINE_OK",
+          "startUtc": "2027-01-17T22:30:00Z",
+          "endUtc": "2027-01-18T04:00:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "CAFFEINE_OK",
+          "reason": "Caffeine fits in this window.",
+          "source": "R10",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "MEAL",
+          "startUtc": "2027-01-17T23:30:00Z",
+          "endUtc": "2027-01-17T23:35:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "MEAL",
+          "reason": "A meal around now fits your new schedule.",
+          "source": "none",
+          "confidence": "C",
+          "movable": true
+        },
+        {
+          "kind": "CAFFEINE_STOP",
+          "startUtc": "2027-01-18T04:00:00Z",
+          "endUtc": "2027-01-18T04:05:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "CAFFEINE_STOP",
+          "reason": "Last caffeine here, so it does not keep you awake tonight.",
+          "source": "R11",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "EXERCISE_GOOD",
+          "startUtc": "2027-01-18T04:30:00Z",
+          "endUtc": "2027-01-18T05:15:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "EXERCISE_GOOD_ADVANCE",
+          "reason": "Exercise in this window can help move your clock earlier.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": true
+        },
+        {
+          "kind": "MEAL",
+          "startUtc": "2027-01-18T06:15:00Z",
+          "endUtc": "2027-01-18T06:20:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "MEAL",
+          "reason": "A meal around now fits your new schedule.",
+          "source": "none",
+          "confidence": "C",
+          "movable": true
+        },
+        {
+          "kind": "MELATONIN_WINDOW",
+          "startUtc": "2027-01-18T08:30:00Z",
+          "endUtc": "2027-01-18T09:00:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "MELATONIN_WINDOW",
+          "reason": "If you use melatonin, research on timing suggests this window.",
+          "source": "R4",
+          "confidence": "A",
+          "movable": true
+        },
+        {
+          "kind": "EXERCISE_AVOID",
+          "startUtc": "2027-01-18T10:30:00Z",
+          "endUtc": "2027-01-18T11:00:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "EXERCISE_AVOID_DIRECTION",
+          "reason": "Exercise now would nudge your clock the wrong way.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "EXERCISE_AVOID",
+          "startUtc": "2027-01-18T11:00:00Z",
+          "endUtc": "2027-01-18T14:00:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "EXERCISE_AVOID_BEDTIME",
+          "reason": "Exercise this close to bedtime can make it harder to fall asleep.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "MEAL",
+          "startUtc": "2027-01-18T11:00:00Z",
+          "endUtc": "2027-01-18T11:05:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "MEAL",
+          "reason": "A meal around now fits your new schedule.",
+          "source": "none",
+          "confidence": "C",
+          "movable": true
+        },
+        {
+          "kind": "WIND_DOWN",
+          "startUtc": "2027-01-18T13:45:00Z",
+          "endUtc": "2027-01-18T14:00:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "WIND_DOWN",
+          "reason": "Wind down here: dim the lights and slow down before sleep.",
+          "source": "none",
+          "confidence": "C",
+          "movable": true
+        }
+      ],
+      "misalignmentBefore": 0,
+      "misalignmentAfter": 0,
+      "effectiveShiftHours": 0,
+      "flags": []
+    },
+    {
+      "date": "2027-01-19",
+      "localTzAtWake": "Asia/Tokyo",
+      "cbtMinUtc": "2027-01-18T19:30:00Z",
+      "blocks": [
+        {
+          "kind": "SLEEP",
+          "startUtc": "2027-01-18T14:00:00Z",
+          "endUtc": "2027-01-18T22:00:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "SLEEP_SETTLED",
+          "reason": "Sleep in this window; your clock is now on destination time.",
+          "source": "R1",
+          "confidence": "A",
+          "movable": false
+        },
+        {
+          "kind": "CAFFEINE_OK",
+          "startUtc": "2027-01-18T22:00:00Z",
+          "endUtc": "2027-01-19T06:00:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "CAFFEINE_OK",
+          "reason": "Caffeine fits in this window.",
+          "source": "R10",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "MEAL",
+          "startUtc": "2027-01-18T23:00:00Z",
+          "endUtc": "2027-01-18T23:05:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "MEAL",
+          "reason": "A meal around now fits your new schedule.",
+          "source": "none",
+          "confidence": "C",
+          "movable": true
+        },
+        {
+          "kind": "CAFFEINE_STOP",
+          "startUtc": "2027-01-19T06:00:00Z",
+          "endUtc": "2027-01-19T06:05:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "CAFFEINE_STOP",
+          "reason": "Last caffeine here, so it does not keep you awake tonight.",
+          "source": "R11",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "MEAL",
+          "startUtc": "2027-01-19T06:00:00Z",
+          "endUtc": "2027-01-19T06:05:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "MEAL",
+          "reason": "A meal around now fits your new schedule.",
+          "source": "none",
+          "confidence": "C",
+          "movable": true
+        },
+        {
+          "kind": "EXERCISE_AVOID",
+          "startUtc": "2027-01-19T11:00:00Z",
+          "endUtc": "2027-01-19T14:00:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "EXERCISE_AVOID_BEDTIME",
+          "reason": "Exercise this close to bedtime can make it harder to fall asleep.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "MEAL",
+          "startUtc": "2027-01-19T11:00:00Z",
+          "endUtc": "2027-01-19T11:05:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "MEAL",
+          "reason": "A meal around now fits your new schedule.",
+          "source": "none",
+          "confidence": "C",
+          "movable": true
+        },
+        {
+          "kind": "WIND_DOWN",
+          "startUtc": "2027-01-19T13:45:00Z",
+          "endUtc": "2027-01-19T14:00:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "WIND_DOWN",
+          "reason": "Wind down here: dim the lights and slow down before sleep.",
+          "source": "none",
+          "confidence": "C",
+          "movable": true
+        }
+      ],
+      "misalignmentBefore": 0,
+      "misalignmentAfter": 0,
+      "effectiveShiftHours": 0,
+      "flags": []
+    }
+  ],
+  "staticAdvice": [
+    {
+      "dayIndex": 0,
+      "text": "It's dark outside during part of your avoid-light time; keep indoor lights dim.",
+      "source": "none"
+    },
+    {
+      "dayIndex": 1,
+      "text": "It's dark outside during part of your avoid-light time; keep indoor lights dim.",
+      "source": "none"
+    },
+    {
+      "dayIndex": 2,
+      "text": "Drink water regularly during the flight.",
+      "source": "none"
+    },
+    {
+      "dayIndex": 2,
+      "text": "Skip alcohol on board; it makes sleep lighter and more broken.",
+      "source": "none"
+    },
+    {
+      "dayIndex": 2,
+      "text": "Set your watch to destination time when you board.",
+      "source": "none"
+    },
+    {
+      "dayIndex": 2,
+      "text": "Use an eye mask during avoid-light windows on board.",
+      "source": "none"
+    },
+    {
+      "dayIndex": 2,
+      "text": "Cabin lighting varies by airline, so in-flight light windows are a rough guide.",
+      "source": "none"
+    },
+    {
+      "dayIndex": 3,
+      "text": "Drink water regularly during the flight.",
+      "source": "none"
+    },
+    {
+      "dayIndex": 3,
+      "text": "Skip alcohol on board; it makes sleep lighter and more broken.",
+      "source": "none"
+    },
+    {
+      "dayIndex": 3,
+      "text": "Set your watch to destination time when you board.",
+      "source": "none"
+    },
+    {
+      "dayIndex": 3,
+      "text": "Use an eye mask during avoid-light windows on board.",
+      "source": "none"
+    },
+    {
+      "dayIndex": 3,
+      "text": "Cabin lighting varies by airline, so in-flight light windows are a rough guide.",
+      "source": "none"
+    },
+    {
+      "dayIndex": 3,
+      "text": "It's dark outside during part of your avoid-light time; keep indoor lights dim.",
+      "source": "none"
+    },
+    {
+      "dayIndex": 4,
+      "text": "It's dark outside during part of your avoid-light time; keep indoor lights dim.",
+      "source": "none"
+    },
+    {
+      "dayIndex": 5,
+      "text": "It's dark outside during part of your avoid-light time; keep indoor lights dim.",
+      "source": "none"
+    }
+  ],
+  "warnings": [],
+  "droppedBlocks": [],
+  "engineVersion": "0.2.0"
+}

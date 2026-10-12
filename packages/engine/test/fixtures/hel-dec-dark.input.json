@@ -1,0 +1,42 @@
+{
+  "traveler": {
+    "habitualBedtime": "23:00",
+    "habitualWake": "07:00",
+    "chronotype": "intermediate",
+    "useMelatonin": false,
+    "caffeine": "normal",
+    "exercise": {
+      "enabled": true
+    },
+    "meditation": {
+      "enabled": true
+    },
+    "mealTiming": {
+      "enabled": false
+    },
+    "preAdjustDays": 0
+  },
+  "itinerary": {
+    "homeTz": "Europe/Helsinki",
+    "legs": [
+      {
+        "departureAirport": "HEL",
+        "arrivalAirport": "BOS",
+        "departureLocal": "2026-12-14T10:00",
+        "arrivalLocal": "2026-12-14T13:00",
+        "departureTz": "Europe/Helsinki",
+        "arrivalTz": "America/New_York",
+        "departureLatLon": {
+          "lat": 60.318363,
+          "lon": 24.963341
+        },
+        "arrivalLatLon": {
+          "lat": 42.36197,
+          "lon": -71.0079
+        }
+      }
+    ],
+    "destinationTz": "America/New_York"
+  },
+  "now": "2026-12-07T12:00:00Z"
+}

@@ -1,0 +1,496 @@
+{
+  "decision": {
+    "direction": "delay",
+    "deltaHours": -6,
+    "daysAdvance": 18,
+    "daysDelay": 3,
+    "chosenDays": 3,
+    "targetCbtMinLocal": "04:30",
+    "explanation": "We'll move your clock 6 h later over 3 days."
+  },
+  "days": [
+    {
+      "date": "2027-01-18",
+      "localTzAtWake": "Europe/Prague",
+      "cbtMinUtc": "2027-01-18T03:30:00Z",
+      "blocks": [
+        {
+          "kind": "SLEEP",
+          "startUtc": "2027-01-17T22:00:00Z",
+          "endUtc": "2027-01-18T06:00:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "SLEEP_SHIFTING",
+          "reason": "Sleep in this window; it moves a little each day with your clock.",
+          "source": "R1",
+          "confidence": "A",
+          "movable": false
+        },
+        {
+          "kind": "CAFFEINE_OK",
+          "startUtc": "2027-01-18T06:00:00Z",
+          "endUtc": "2027-01-18T16:00:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "CAFFEINE_OK",
+          "reason": "Caffeine fits in this window.",
+          "source": "R10",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "AVOID_LIGHT",
+          "startUtc": "2027-01-18T06:55:00Z",
+          "endUtc": "2027-01-18T09:00:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "AVOID_LIGHT_DELAY",
+          "reason": "Light now would pull your clock earlier, so keep it dim or wear sunglasses.",
+          "source": "R2",
+          "confidence": "A",
+          "movable": false
+        },
+        {
+          "kind": "AVOID_LIGHT",
+          "startUtc": "2027-01-18T09:00:00Z",
+          "endUtc": "2027-01-18T09:30:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "AVOID_LIGHT_INFLIGHT",
+          "reason": "Keep light out now: close the window shade or wear an eye mask.",
+          "source": "R2",
+          "confidence": "A",
+          "movable": false
+        },
+        {
+          "kind": "CAFFEINE_STOP",
+          "startUtc": "2027-01-18T16:00:00Z",
+          "endUtc": "2027-01-18T16:05:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "CAFFEINE_STOP",
+          "reason": "Last caffeine here, so it does not keep you awake tonight.",
+          "source": "R11",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "EXERCISE_OPTIONAL_WALK",
+          "startUtc": "2027-01-18T18:00:00Z",
+          "endUtc": "2027-01-18T18:30:00Z",
+          "localTz": "America/New_York",
+          "reasonCode": "EXERCISE_OPTIONAL_WALK",
+          "reason": "An easy walk after landing, if you feel like it.",
+          "source": "R9",
+          "confidence": "C",
+          "movable": true
+        },
+        {
+          "kind": "NSDR",
+          "startUtc": "2027-01-18T19:00:00Z",
+          "endUtc": "2027-01-18T19:20:00Z",
+          "localTz": "America/New_York",
+          "reasonCode": "NSDR",
+          "reason": "A short rest here helps after a long flight; you don't need to fall asleep.",
+          "source": "none",
+          "confidence": "C",
+          "movable": true
+        },
+        {
+          "kind": "EXERCISE_AVOID",
+          "startUtc": "2027-01-18T21:00:00Z",
+          "endUtc": "2027-01-19T00:00:00Z",
+          "localTz": "America/New_York",
+          "reasonCode": "EXERCISE_AVOID_BEDTIME",
+          "reason": "Exercise this close to bedtime can make it harder to fall asleep.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "SEEK_LIGHT_ARTIFICIAL",
+          "startUtc": "2027-01-18T23:00:00Z",
+          "endUtc": "2027-01-19T00:00:00Z",
+          "localTz": "America/New_York",
+          "reasonCode": "SEEK_LIGHT_ARTIFICIAL",
+          "reason": "It's dark outside, so bright indoor light or a 10 000 lux lamp does the job now.",
+          "source": "R2",
+          "confidence": "A",
+          "movable": false
+        },
+        {
+          "kind": "WIND_DOWN",
+          "startUtc": "2027-01-18T23:45:00Z",
+          "endUtc": "2027-01-19T00:00:00Z",
+          "localTz": "America/New_York",
+          "reasonCode": "WIND_DOWN",
+          "reason": "Wind down here: dim the lights and slow down before sleep.",
+          "source": "none",
+          "confidence": "C",
+          "movable": true
+        }
+      ],
+      "misalignmentBefore": 6,
+      "misalignmentAfter": 4,
+      "effectiveShiftHours": 2,
+      "flags": [
+        "FLIGHT_DAY"
+      ]
+    },
+    {
+      "date": "2027-01-19",
+      "localTzAtWake": "America/New_York",
+      "cbtMinUtc": "2027-01-19T05:30:00Z",
+      "blocks": [
+        {
+          "kind": "SLEEP",
+          "startUtc": "2027-01-19T00:00:00Z",
+          "endUtc": "2027-01-19T08:00:00Z",
+          "localTz": "America/New_York",
+          "reasonCode": "SLEEP_SHIFTING",
+          "reason": "Sleep in this window; it moves a little each day with your clock.",
+          "source": "R1",
+          "confidence": "A",
+          "movable": false
+        },
+        {
+          "kind": "EXERCISE_AVOID",
+          "startUtc": "2027-01-19T08:00:00Z",
+          "endUtc": "2027-01-19T08:30:00Z",
+          "localTz": "America/New_York",
+          "reasonCode": "EXERCISE_AVOID_DIRECTION",
+          "reason": "Exercise now would nudge your clock the wrong way.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "CAFFEINE_OK",
+          "startUtc": "2027-01-19T08:00:00Z",
+          "endUtc": "2027-01-19T18:00:00Z",
+          "localTz": "America/New_York",
+          "reasonCode": "CAFFEINE_OK",
+          "reason": "Caffeine fits in this window.",
+          "source": "R10",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "EXERCISE_AVOID",
+          "startUtc": "2027-01-19T14:00:00Z",
+          "endUtc": "2027-01-19T17:00:00Z",
+          "localTz": "America/New_York",
+          "reasonCode": "EXERCISE_AVOID_DIRECTION",
+          "reason": "Exercise now would nudge your clock the wrong way.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "CAFFEINE_STOP",
+          "startUtc": "2027-01-19T18:00:00Z",
+          "endUtc": "2027-01-19T18:05:00Z",
+          "localTz": "America/New_York",
+          "reasonCode": "CAFFEINE_STOP",
+          "reason": "Last caffeine here, so it does not keep you awake tonight.",
+          "source": "R11",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "EXERCISE_GOOD",
+          "startUtc": "2027-01-19T20:00:00Z",
+          "endUtc": "2027-01-19T20:45:00Z",
+          "localTz": "America/New_York",
+          "reasonCode": "EXERCISE_GOOD_DELAY",
+          "reason": "Exercise in this window can help move your clock later.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": true
+        },
+        {
+          "kind": "EXERCISE_AVOID",
+          "startUtc": "2027-01-19T23:00:00Z",
+          "endUtc": "2027-01-20T02:00:00Z",
+          "localTz": "America/New_York",
+          "reasonCode": "EXERCISE_AVOID_BEDTIME",
+          "reason": "Exercise this close to bedtime can make it harder to fall asleep.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "SEEK_LIGHT_ARTIFICIAL",
+          "startUtc": "2027-01-20T01:00:00Z",
+          "endUtc": "2027-01-20T02:00:00Z",
+          "localTz": "America/New_York",
+          "reasonCode": "SEEK_LIGHT_ARTIFICIAL",
+          "reason": "It's dark outside, so bright indoor light or a 10 000 lux lamp does the job now.",
+          "source": "R2",
+          "confidence": "A",
+          "movable": false
+        },
+        {
+          "kind": "WIND_DOWN",
+          "startUtc": "2027-01-20T01:45:00Z",
+          "endUtc": "2027-01-20T02:00:00Z",
+          "localTz": "America/New_York",
+          "reasonCode": "WIND_DOWN",
+          "reason": "Wind down here: dim the lights and slow down before sleep.",
+          "source": "none",
+          "confidence": "C",
+          "movable": true
+        }
+      ],
+      "misalignmentBefore": 4,
+      "misalignmentAfter": 1.7,
+      "effectiveShiftHours": 2.3,
+      "flags": []
+    },
+    {
+      "date": "2027-01-20",
+      "localTzAtWake": "America/New_York",
+      "cbtMinUtc": "2027-01-20T07:30:00Z",
+      "blocks": [
+        {
+          "kind": "SLEEP",
+          "startUtc": "2027-01-20T05:30:00Z",
+          "endUtc": "2027-01-20T10:00:00Z",
+          "localTz": "America/New_York",
+          "reasonCode": "SLEEP_SHIFTING",
+          "reason": "Sleep in this window; it moves a little each day with your clock.",
+          "source": "R1",
+          "confidence": "A",
+          "movable": false
+        },
+        {
+          "kind": "NAP",
+          "startUtc": "2027-01-20T10:00:00Z",
+          "endUtc": "2027-01-20T10:20:00Z",
+          "localTz": "America/New_York",
+          "reasonCode": "NAP_SHORT_SLEEP",
+          "reason": "A short nap here makes up for a short night.",
+          "source": "R12",
+          "confidence": "B",
+          "movable": true
+        },
+        {
+          "kind": "CAFFEINE_OK",
+          "startUtc": "2027-01-20T10:20:00Z",
+          "endUtc": "2027-01-20T20:00:00Z",
+          "localTz": "America/New_York",
+          "reasonCode": "CAFFEINE_OK",
+          "reason": "Caffeine fits in this window.",
+          "source": "R10",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "AVOID_LIGHT",
+          "startUtc": "2027-01-20T12:15:00Z",
+          "endUtc": "2027-01-20T13:30:00Z",
+          "localTz": "America/New_York",
+          "reasonCode": "AVOID_LIGHT_DELAY",
+          "reason": "Light now would pull your clock earlier, so keep it dim or wear sunglasses.",
+          "source": "R2",
+          "confidence": "A",
+          "movable": false
+        },
+        {
+          "kind": "EXERCISE_AVOID",
+          "startUtc": "2027-01-20T16:00:00Z",
+          "endUtc": "2027-01-20T19:00:00Z",
+          "localTz": "America/New_York",
+          "reasonCode": "EXERCISE_AVOID_DIRECTION",
+          "reason": "Exercise now would nudge your clock the wrong way.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "CAFFEINE_STOP",
+          "startUtc": "2027-01-20T20:00:00Z",
+          "endUtc": "2027-01-20T20:05:00Z",
+          "localTz": "America/New_York",
+          "reasonCode": "CAFFEINE_STOP",
+          "reason": "Last caffeine here, so it does not keep you awake tonight.",
+          "source": "R11",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "EXERCISE_GOOD",
+          "startUtc": "2027-01-20T22:00:00Z",
+          "endUtc": "2027-01-20T22:45:00Z",
+          "localTz": "America/New_York",
+          "reasonCode": "EXERCISE_GOOD_DELAY",
+          "reason": "Exercise in this window can help move your clock later.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": true
+        },
+        {
+          "kind": "EXERCISE_AVOID",
+          "startUtc": "2027-01-21T01:00:00Z",
+          "endUtc": "2027-01-21T04:00:00Z",
+          "localTz": "America/New_York",
+          "reasonCode": "EXERCISE_AVOID_BEDTIME",
+          "reason": "Exercise this close to bedtime can make it harder to fall asleep.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "SEEK_LIGHT_ARTIFICIAL",
+          "startUtc": "2027-01-21T03:00:00Z",
+          "endUtc": "2027-01-21T04:00:00Z",
+          "localTz": "America/New_York",
+          "reasonCode": "SEEK_LIGHT_ARTIFICIAL",
+          "reason": "It's dark outside, so bright indoor light or a 10 000 lux lamp does the job now.",
+          "source": "R2",
+          "confidence": "A",
+          "movable": false
+        },
+        {
+          "kind": "WIND_DOWN",
+          "startUtc": "2027-01-21T03:45:00Z",
+          "endUtc": "2027-01-21T04:00:00Z",
+          "localTz": "America/New_York",
+          "reasonCode": "WIND_DOWN",
+          "reason": "Wind down here: dim the lights and slow down before sleep.",
+          "source": "none",
+          "confidence": "C",
+          "movable": true
+        }
+      ],
+      "misalignmentBefore": 1.7,
+      "misalignmentAfter": 0,
+      "effectiveShiftHours": 1.7,
+      "flags": [
+        "SHORT_SLEEP_DAY"
+      ]
+    },
+    {
+      "date": "2027-01-21",
+      "localTzAtWake": "America/New_York",
+      "cbtMinUtc": "2027-01-21T09:30:00Z",
+      "blocks": [
+        {
+          "kind": "SLEEP",
+          "startUtc": "2027-01-21T04:00:00Z",
+          "endUtc": "2027-01-21T11:00:00Z",
+          "localTz": "America/New_York",
+          "reasonCode": "SLEEP_SETTLED",
+          "reason": "Sleep in this window; your clock is now on destination time.",
+          "source": "R1",
+          "confidence": "A",
+          "movable": false
+        },
+        {
+          "kind": "CAFFEINE_OK",
+          "startUtc": "2027-01-21T12:00:00Z",
+          "endUtc": "2027-01-21T20:00:00Z",
+          "localTz": "America/New_York",
+          "reasonCode": "CAFFEINE_OK",
+          "reason": "Caffeine fits in this window.",
+          "source": "R10",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "CAFFEINE_STOP",
+          "startUtc": "2027-01-21T20:00:00Z",
+          "endUtc": "2027-01-21T20:05:00Z",
+          "localTz": "America/New_York",
+          "reasonCode": "CAFFEINE_STOP",
+          "reason": "Last caffeine here, so it does not keep you awake tonight.",
+          "source": "R11",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "EXERCISE_AVOID",
+          "startUtc": "2027-01-22T01:00:00Z",
+          "endUtc": "2027-01-22T04:00:00Z",
+          "localTz": "America/New_York",
+          "reasonCode": "EXERCISE_AVOID_BEDTIME",
+          "reason": "Exercise this close to bedtime can make it harder to fall asleep.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "WIND_DOWN",
+          "startUtc": "2027-01-22T03:45:00Z",
+          "endUtc": "2027-01-22T04:00:00Z",
+          "localTz": "America/New_York",
+          "reasonCode": "WIND_DOWN",
+          "reason": "Wind down here: dim the lights and slow down before sleep.",
+          "source": "none",
+          "confidence": "C",
+          "movable": true
+        }
+      ],
+      "misalignmentBefore": 0,
+      "misalignmentAfter": 0,
+      "effectiveShiftHours": 0,
+      "flags": []
+    }
+  ],
+  "staticAdvice": [
+    {
+      "dayIndex": 0,
+      "text": "Drink water regularly during the flight.",
+      "source": "none"
+    },
+    {
+      "dayIndex": 0,
+      "text": "Skip alcohol on board; it makes sleep lighter and more broken.",
+      "source": "none"
+    },
+    {
+      "dayIndex": 0,
+      "text": "Set your watch to destination time when you board.",
+      "source": "none"
+    },
+    {
+      "dayIndex": 0,
+      "text": "Use an eye mask during avoid-light windows on board.",
+      "source": "none"
+    },
+    {
+      "dayIndex": 0,
+      "text": "Cabin lighting varies by airline, so in-flight light windows are a rough guide.",
+      "source": "none"
+    },
+    {
+      "dayIndex": 0,
+      "text": "It's dark outside during part of your avoid-light time; keep indoor lights dim.",
+      "source": "none"
+    },
+    {
+      "dayIndex": 1,
+      "text": "It's dark outside during part of your avoid-light time; keep indoor lights dim.",
+      "source": "none"
+    },
+    {
+      "dayIndex": 2,
+      "text": "It's dark outside during part of your avoid-light time; keep indoor lights dim.",
+      "source": "none"
+    }
+  ],
+  "warnings": [
+    {
+      "code": "LIGHT_BLOCK_SHIFTED",
+      "message": "The best light time falls while you sleep, so light windows sit just before your sleep instead."
+    },
+    {
+      "code": "SHORT_SLEEP_DAY",
+      "message": "Your sleep window is short today, so the plan adds a nap.",
+      "dayIndex": 2
+    }
+  ],
+  "droppedBlocks": [
+    {
+      "dayIndex": 2,
+      "kind": "EXERCISE_AVOID",
+      "reason": "It overlapped a more important window and was too short to keep."
+    }
+  ],
+  "engineVersion": "0.2.0"
+}

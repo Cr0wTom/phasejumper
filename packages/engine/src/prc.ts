@@ -125,6 +125,29 @@ export const WIND_DOWN = {
   defaultMinutes: 15,
   nsdrMinutes: 20,
   nsdrAfterFlightHours: 8,
+  /** NSDR goes in the first afternoon: max(arrival + 60 min, from), ending by to. */
+  nsdrWindow: { from: "14:00", to: "18:00", afterArrivalMinutes: 60 },
+} as const;
+
+/** Feasibility pass thresholds (§2.7). */
+export const FEASIBILITY = {
+  /** In-air sleep that makes the night SLEEP_INFLIGHT. */
+  inflightSleepHours: 4,
+  /** Below this the day is a SHORT_SLEEP_DAY (§2.5 sleep window). */
+  shortSleepHours: 5,
+  /** Trimmed blocks shorter than this are dropped. */
+  minBlockMinutes: 15,
+  /** Optional walk at the arrival airport on flight days. */
+  walkMinutes: 30,
+  /** The walk must end this long before sleep (exercise sleep hygiene). */
+  walkBeforeSleepHours: 3,
+} as const;
+
+/** Daylight check (§2.7 rule 3), via suncalc. */
+export const DAYLIGHT = {
+  /** suncalc's apparent altitude of the sun's centre at sunrise/sunset. */
+  sunUpAltitudeDegrees: -0.35,
+  sampleMinutes: 5,
 } as const;
 
 /** Point events (caffeine stop, meals) are emitted as short blocks. */

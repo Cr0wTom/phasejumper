@@ -1,0 +1,255 @@
+{
+  "decision": {
+    "direction": "short-trip",
+    "deltaHours": 9,
+    "daysAdvance": 9,
+    "daysDelay": 8,
+    "chosenDays": 2,
+    "targetCbtMinLocal": "04:30",
+    "explanation": "Your trip is 2 days and shifting would take 8 days, so the plan keeps you on home time. You can switch to a full shift."
+  },
+  "days": [
+    {
+      "date": "2027-01-15",
+      "localTzAtWake": "America/Los_Angeles",
+      "cbtMinUtc": "2027-01-15T12:30:00Z",
+      "blocks": [
+        {
+          "kind": "SLEEP",
+          "startUtc": "2027-01-15T07:00:00Z",
+          "endUtc": "2027-01-15T15:00:00Z",
+          "localTz": "America/Los_Angeles",
+          "reasonCode": "SLEEP_HOME_TIME",
+          "reason": "Sleep on your home schedule; this trip is too short to shift your clock.",
+          "source": "R1",
+          "confidence": "A",
+          "movable": false
+        },
+        {
+          "kind": "CAFFEINE_OK",
+          "startUtc": "2027-01-15T15:00:00Z",
+          "endUtc": "2027-01-15T23:00:00Z",
+          "localTz": "America/Los_Angeles",
+          "reasonCode": "CAFFEINE_OK",
+          "reason": "Caffeine fits in this window.",
+          "source": "R10",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "CAFFEINE_STOP",
+          "startUtc": "2027-01-15T23:00:00Z",
+          "endUtc": "2027-01-15T23:05:00Z",
+          "localTz": "America/Los_Angeles",
+          "reasonCode": "CAFFEINE_STOP",
+          "reason": "Last caffeine here, so it does not keep you awake tonight.",
+          "source": "R11",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "WIND_DOWN",
+          "startUtc": "2027-01-16T06:45:00Z",
+          "endUtc": "2027-01-16T07:00:00Z",
+          "localTz": "America/Los_Angeles",
+          "reasonCode": "WIND_DOWN",
+          "reason": "Wind down here: dim the lights and slow down before sleep.",
+          "source": "none",
+          "confidence": "C",
+          "movable": true
+        }
+      ],
+      "misalignmentBefore": 9,
+      "misalignmentAfter": 9,
+      "effectiveShiftHours": 0,
+      "flags": [
+        "FLIGHT_DAY"
+      ]
+    },
+    {
+      "date": "2027-01-16",
+      "localTzAtWake": "Europe/Prague",
+      "cbtMinUtc": "2027-01-16T12:30:00Z",
+      "blocks": [
+        {
+          "kind": "NAP",
+          "startUtc": "2027-01-16T07:00:00Z",
+          "endUtc": "2027-01-16T07:20:00Z",
+          "localTz": "America/Los_Angeles",
+          "reasonCode": "NAP_SHORT_SLEEP",
+          "reason": "A short nap here makes up for a short night.",
+          "source": "R12",
+          "confidence": "B",
+          "movable": true
+        },
+        {
+          "kind": "SLEEP",
+          "startUtc": "2027-01-16T10:30:00Z",
+          "endUtc": "2027-01-16T15:00:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "SLEEP_HOME_TIME",
+          "reason": "Sleep on your home schedule; this trip is too short to shift your clock.",
+          "source": "R1",
+          "confidence": "A",
+          "movable": false
+        },
+        {
+          "kind": "CAFFEINE_OK",
+          "startUtc": "2027-01-16T15:00:00Z",
+          "endUtc": "2027-01-16T23:00:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "CAFFEINE_OK",
+          "reason": "Caffeine fits in this window.",
+          "source": "R10",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "CAFFEINE_STOP",
+          "startUtc": "2027-01-16T23:00:00Z",
+          "endUtc": "2027-01-16T23:05:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "CAFFEINE_STOP",
+          "reason": "Last caffeine here, so it does not keep you awake tonight.",
+          "source": "R11",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "WIND_DOWN",
+          "startUtc": "2027-01-17T06:45:00Z",
+          "endUtc": "2027-01-17T07:00:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "WIND_DOWN",
+          "reason": "Wind down here: dim the lights and slow down before sleep.",
+          "source": "none",
+          "confidence": "C",
+          "movable": true
+        }
+      ],
+      "misalignmentBefore": 9,
+      "misalignmentAfter": 9,
+      "effectiveShiftHours": 0,
+      "flags": [
+        "FLIGHT_DAY",
+        "SHORT_SLEEP_DAY"
+      ]
+    },
+    {
+      "date": "2027-01-17",
+      "localTzAtWake": "Europe/Prague",
+      "cbtMinUtc": "2027-01-17T12:30:00Z",
+      "blocks": [
+        {
+          "kind": "SLEEP",
+          "startUtc": "2027-01-17T07:00:00Z",
+          "endUtc": "2027-01-17T15:00:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "SLEEP_HOME_TIME",
+          "reason": "Sleep on your home schedule; this trip is too short to shift your clock.",
+          "source": "R1",
+          "confidence": "A",
+          "movable": false
+        },
+        {
+          "kind": "CAFFEINE_OK",
+          "startUtc": "2027-01-17T15:00:00Z",
+          "endUtc": "2027-01-17T23:00:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "CAFFEINE_OK",
+          "reason": "Caffeine fits in this window.",
+          "source": "R10",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "CAFFEINE_STOP",
+          "startUtc": "2027-01-17T23:00:00Z",
+          "endUtc": "2027-01-17T23:05:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "CAFFEINE_STOP",
+          "reason": "Last caffeine here, so it does not keep you awake tonight.",
+          "source": "R11",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "WIND_DOWN",
+          "startUtc": "2027-01-18T06:45:00Z",
+          "endUtc": "2027-01-18T07:00:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "WIND_DOWN",
+          "reason": "Wind down here: dim the lights and slow down before sleep.",
+          "source": "none",
+          "confidence": "C",
+          "movable": true
+        }
+      ],
+      "misalignmentBefore": 9,
+      "misalignmentAfter": 9,
+      "effectiveShiftHours": 0,
+      "flags": []
+    }
+  ],
+  "staticAdvice": [
+    {
+      "dayIndex": 0,
+      "text": "Drink water regularly during the flight.",
+      "source": "none"
+    },
+    {
+      "dayIndex": 0,
+      "text": "Skip alcohol on board; it makes sleep lighter and more broken.",
+      "source": "none"
+    },
+    {
+      "dayIndex": 0,
+      "text": "Set your watch to destination time when you board.",
+      "source": "none"
+    },
+    {
+      "dayIndex": 0,
+      "text": "Use an eye mask during avoid-light windows on board.",
+      "source": "none"
+    },
+    {
+      "dayIndex": 0,
+      "text": "Cabin lighting varies by airline, so in-flight light windows are a rough guide.",
+      "source": "none"
+    },
+    {
+      "dayIndex": 1,
+      "text": "Drink water regularly during the flight.",
+      "source": "none"
+    },
+    {
+      "dayIndex": 1,
+      "text": "Skip alcohol on board; it makes sleep lighter and more broken.",
+      "source": "none"
+    },
+    {
+      "dayIndex": 1,
+      "text": "Set your watch to destination time when you board.",
+      "source": "none"
+    },
+    {
+      "dayIndex": 1,
+      "text": "Use an eye mask during avoid-light windows on board.",
+      "source": "none"
+    },
+    {
+      "dayIndex": 1,
+      "text": "Cabin lighting varies by airline, so in-flight light windows are a rough guide.",
+      "source": "none"
+    }
+  ],
+  "warnings": [
+    {
+      "code": "SHORT_SLEEP_DAY",
+      "message": "Your sleep window is short today, so the plan adds a nap.",
+      "dayIndex": 1
+    }
+  ],
+  "droppedBlocks": [],
+  "engineVersion": "0.2.0"
+}

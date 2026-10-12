@@ -1,0 +1,42 @@
+{
+  "traveler": {
+    "habitualBedtime": "23:00",
+    "habitualWake": "07:00",
+    "chronotype": "intermediate",
+    "useMelatonin": true,
+    "caffeine": "normal",
+    "exercise": {
+      "enabled": true
+    },
+    "meditation": {
+      "enabled": true
+    },
+    "mealTiming": {
+      "enabled": true
+    },
+    "preAdjustDays": 2
+  },
+  "itinerary": {
+    "homeTz": "Europe/Prague",
+    "legs": [
+      {
+        "departureAirport": "PRG",
+        "arrivalAirport": "HND",
+        "departureLocal": "2027-01-15T12:00",
+        "arrivalLocal": "2027-01-16T08:00",
+        "departureTz": "Europe/Prague",
+        "arrivalTz": "Asia/Tokyo",
+        "departureLatLon": {
+          "lat": 50.100874,
+          "lon": 14.259911
+        },
+        "arrivalLatLon": {
+          "lat": 35.549678,
+          "lon": 139.786958
+        }
+      }
+    ],
+    "destinationTz": "Asia/Tokyo"
+  },
+  "now": "2027-01-08T12:00:00Z"
+}

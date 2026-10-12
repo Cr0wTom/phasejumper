@@ -1,0 +1,58 @@
+{
+  "traveler": {
+    "habitualBedtime": "23:00",
+    "habitualWake": "07:00",
+    "chronotype": "intermediate",
+    "useMelatonin": false,
+    "caffeine": "normal",
+    "exercise": {
+      "enabled": true
+    },
+    "meditation": {
+      "enabled": true
+    },
+    "mealTiming": {
+      "enabled": false
+    },
+    "preAdjustDays": 0
+  },
+  "itinerary": {
+    "homeTz": "Europe/Prague",
+    "legs": [
+      {
+        "departureAirport": "PRG",
+        "arrivalAirport": "JFK",
+        "departureLocal": "2027-01-18T10:00",
+        "arrivalLocal": "2027-01-18T13:00",
+        "departureTz": "Europe/Prague",
+        "arrivalTz": "America/New_York",
+        "departureLatLon": {
+          "lat": 50.100874,
+          "lon": 14.259911
+        },
+        "arrivalLatLon": {
+          "lat": 40.639447,
+          "lon": -73.779317
+        }
+      }
+    ],
+    "destinationTz": "America/New_York"
+  },
+  "constraints": {
+    "mustBeAwake": [
+      {
+        "start": "2027-01-19T19:00",
+        "end": "2027-01-20T00:30",
+        "tz": "America/New_York",
+        "label": "Client dinner"
+      },
+      {
+        "start": "2027-01-21T06:00",
+        "end": "2027-01-21T08:00",
+        "tz": "America/New_York",
+        "label": "Breakfast meeting"
+      }
+    ]
+  },
+  "now": "2027-01-11T12:00:00Z"
+}
