@@ -81,6 +81,7 @@ export function TextField({
   review,
   required = false,
   inputMode,
+  type = "text",
 }: {
   id: string;
   label: string;
@@ -91,12 +92,15 @@ export function TextField({
   review?: string;
   required?: boolean;
   inputMode?: "text" | "decimal";
+  /** "date" and "time" use the platform's own picker (values YYYY-MM-DD, HH:MM). */
+  type?: "text" | "date" | "time";
 }) {
   return (
     <FieldFrame id={id} label={label} hint={hint} review={review} error={error}>
       {(described) => (
         <input
           id={id}
+          type={type}
           className={
             review === undefined
               ? controlClass
@@ -109,7 +113,7 @@ export function TextField({
           aria-required={required ? true : undefined}
           autoComplete="off"
           spellCheck={false}
-          inputMode={inputMode}
+          inputMode={type === "text" ? inputMode : undefined}
         />
       )}
     </FieldFrame>

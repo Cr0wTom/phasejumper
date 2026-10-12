@@ -174,7 +174,7 @@ export function FlightsSection({
               <TextField
                 id={fieldDomId(`legs.${index}.departureDate`)}
                 label={messages.departureDate}
-                hint={messages.dateHint}
+                type="date"
                 value={leg.departureDate}
                 error={errors[`legs.${index}.departureDate`]}
                 review={
@@ -190,7 +190,7 @@ export function FlightsSection({
               <TextField
                 id={fieldDomId(`legs.${index}.departureTime`)}
                 label={messages.departureTime}
-                hint={messages.timeHint}
+                type="time"
                 value={leg.departureTime}
                 error={errors[`legs.${index}.departureTime`]}
                 review={
@@ -206,7 +206,7 @@ export function FlightsSection({
               <TextField
                 id={fieldDomId(`legs.${index}.arrivalDate`)}
                 label={messages.arrivalDate}
-                hint={messages.dateHint}
+                type="date"
                 value={leg.arrivalDate}
                 error={errors[`legs.${index}.arrivalDate`]}
                 review={
@@ -220,7 +220,7 @@ export function FlightsSection({
               <TextField
                 id={fieldDomId(`legs.${index}.arrivalTime`)}
                 label={messages.arrivalTime}
-                hint={messages.timeHint}
+                type="time"
                 value={leg.arrivalTime}
                 error={errors[`legs.${index}.arrivalTime`]}
                 review={
