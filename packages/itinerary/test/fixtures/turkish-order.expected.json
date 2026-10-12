@@ -1,0 +1,24 @@
+{
+  "legs": [
+    {
+      "departureAirport": "PRG",
+      "arrivalAirport": "IST",
+      "departureDate": "2027-05-18",
+      "departureTime": "09:40",
+      "arrivalDate": "2027-05-18",
+      "arrivalTime": "13:25",
+      "flightNumber": "TK 1787"
+    },
+    {
+      "departureAirport": "IST",
+      "arrivalAirport": "PRG",
+      "departureDate": "2027-05-20",
+      "departureTime": "14:10",
+      "arrivalDate": "2027-05-20",
+      "arrivalTime": "16:05",
+      "flightNumber": "TK 1788"
+    }
+  ],
+  "confidence": 1,
+  "unparsed": []
+}

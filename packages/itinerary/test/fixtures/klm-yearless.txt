@@ -1,0 +1,14 @@
+Passenger: Jonas Berger
+Booking code H7P2LD
+
+Flight KL 1365
+From AMS to PRG
+12 Jan
+Departs 18:10
+Arrives 19:45
+
+Flight KL 1361
+From PRG to AMS
+3 Nov
+Departs 08:05
+Arrives 09:35

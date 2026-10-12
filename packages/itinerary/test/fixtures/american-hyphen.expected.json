@@ -1,0 +1,15 @@
+{
+  "legs": [
+    {
+      "departureAirport": "PRG",
+      "arrivalAirport": "ORD",
+      "departureDate": "2027-06-22",
+      "departureTime": "11:05",
+      "arrivalDate": "2027-06-22",
+      "arrivalTime": "14:40",
+      "flightNumber": "AA 7634"
+    }
+  ],
+  "confidence": 1,
+  "unparsed": []
+}

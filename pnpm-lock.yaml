@@ -202,6 +202,9 @@ importers:
       '@phasejumper/engine':
         specifier: workspace:*
         version: link:../../packages/engine
+      '@phasejumper/itinerary':
+        specifier: workspace:*
+        version: link:../../packages/itinerary
       idb-keyval:
         specifier: 6.3.0
         version: 6.3.0
@@ -302,7 +305,14 @@ importers:
         version: 5.0.3(@types/node@22.20.5)(vite@6.4.4(@types/node@22.20.5)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.51.2))
 
   packages/itinerary:
+    dependencies:
+      temporal-polyfill:
+        specifier: 1.0.5
+        version: 1.0.5
     devDependencies:
+      '@types/node':
+        specifier: 22.20.5
+        version: 22.20.5
       typescript:
         specifier: 'catalog:'
         version: 6.0.3

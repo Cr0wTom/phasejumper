@@ -20,3 +20,8 @@ import { Temporal } from "temporal-polyfill";
 export function currentInstant(): string {
   return Temporal.Now.instant().toString();
 }
+
+/** Local calendar date (YYYY-MM-DD). Used only to infer a missing year in pasted text. */
+export function currentPlainDate(): string {
+  return Temporal.Now.plainDateISO().toString();
+}

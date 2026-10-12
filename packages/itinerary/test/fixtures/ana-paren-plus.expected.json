@@ -1,0 +1,15 @@
+{
+  "legs": [
+    {
+      "departureAirport": "HND",
+      "arrivalAirport": "SFO",
+      "departureDate": "2027-04-02",
+      "departureTime": "17:00",
+      "arrivalDate": "2027-04-03",
+      "arrivalTime": "10:30",
+      "flightNumber": "NH 104"
+    }
+  ],
+  "confidence": 1,
+  "unparsed": []
+}

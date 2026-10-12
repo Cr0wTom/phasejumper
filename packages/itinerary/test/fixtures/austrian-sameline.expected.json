@@ -1,0 +1,15 @@
+{
+  "legs": [
+    {
+      "departureAirport": "PRG",
+      "arrivalAirport": "VIE",
+      "departureDate": "2027-02-09",
+      "departureTime": "07:20",
+      "arrivalDate": "2027-02-09",
+      "arrivalTime": "08:15",
+      "flightNumber": "OS 715"
+    }
+  ],
+  "confidence": 1,
+  "unparsed": []
+}

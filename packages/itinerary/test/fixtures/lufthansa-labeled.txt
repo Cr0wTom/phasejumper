@@ -1,0 +1,10 @@
+Passenger: Alex Morgan
+Booking code 7K2Q9M
+
+Flight LH 1394
+From PRG to JFK
+12 Jan 2027
+Departs 10:30
+Arrives 13:45
+
+Leave the hotel by 07:15.

@@ -1,0 +1,14 @@
+Passenger: Luca Meier
+Booking code X3N7VD
+
+LX 1492
+PRG-ZRH
+11 Mar 2027
+Departs 06:50
+Arrives 08:05
+
+LX 16
+ZRH-JFK
+11 Mar 2027
+Departs 10:00
+Arrives 13:15

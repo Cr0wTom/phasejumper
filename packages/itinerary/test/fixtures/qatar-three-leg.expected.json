@@ -1,0 +1,33 @@
+{
+  "legs": [
+    {
+      "departureAirport": "PRG",
+      "arrivalAirport": "DOH",
+      "departureDate": "2027-02-14",
+      "departureTime": "15:40",
+      "arrivalDate": "2027-02-14",
+      "arrivalTime": "22:55",
+      "flightNumber": "QR 292"
+    },
+    {
+      "departureAirport": "DOH",
+      "arrivalAirport": "SIN",
+      "departureDate": "2027-02-15",
+      "departureTime": "02:20",
+      "arrivalDate": "2027-02-15",
+      "arrivalTime": "14:05",
+      "flightNumber": "QR 948"
+    },
+    {
+      "departureAirport": "SIN",
+      "arrivalAirport": "SYD",
+      "departureDate": "2027-02-15",
+      "departureTime": "19:10",
+      "arrivalDate": "2027-02-16",
+      "arrivalTime": "05:40",
+      "flightNumber": "QR 947"
+    }
+  ],
+  "confidence": 1,
+  "unparsed": []
+}

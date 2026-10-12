@@ -1,0 +1,15 @@
+{
+  "legs": [
+    {
+      "departureAirport": "PRG",
+      "arrivalAirport": "DXB",
+      "departureDate": "2027-01-12",
+      "departureTime": "22:15",
+      "arrivalDate": "2027-01-13",
+      "arrivalTime": "06:40",
+      "flightNumber": "EK 140"
+    }
+  ],
+  "confidence": 1,
+  "unparsed": []
+}

@@ -1,0 +1,15 @@
+{
+  "legs": [
+    {
+      "departureAirport": "LHR",
+      "arrivalAirport": "PRG",
+      "departureDate": "2027-01-12",
+      "departureTime": "14:20",
+      "arrivalDate": "2027-01-12",
+      "arrivalTime": "17:35",
+      "flightNumber": "BA 854"
+    }
+  ],
+  "confidence": 1,
+  "unparsed": []
+}

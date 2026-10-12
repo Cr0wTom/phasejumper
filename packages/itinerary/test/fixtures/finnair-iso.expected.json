@@ -1,0 +1,15 @@
+{
+  "legs": [
+    {
+      "departureAirport": "HEL",
+      "arrivalAirport": "PRG",
+      "departureDate": "2027-01-20",
+      "departureTime": "16:40",
+      "arrivalDate": "2027-01-20",
+      "arrivalTime": "18:05",
+      "flightNumber": "AY 832"
+    }
+  ],
+  "confidence": 1,
+  "unparsed": []
+}

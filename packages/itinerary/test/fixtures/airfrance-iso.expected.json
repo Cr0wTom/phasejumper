@@ -1,0 +1,15 @@
+{
+  "legs": [
+    {
+      "departureAirport": "CDG",
+      "arrivalAirport": "PRG",
+      "departureDate": "2027-03-02",
+      "departureTime": "09:15",
+      "arrivalDate": "2027-03-02",
+      "arrivalTime": "11:00",
+      "flightNumber": "AF 1643"
+    }
+  ],
+  "confidence": 1,
+  "unparsed": []
+}

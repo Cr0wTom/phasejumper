@@ -1,0 +1,24 @@
+{
+  "legs": [
+    {
+      "departureAirport": "PRG",
+      "arrivalAirport": "AMS",
+      "departureDate": "2026-11-03",
+      "departureTime": "08:05",
+      "arrivalDate": "2026-11-03",
+      "arrivalTime": "09:35",
+      "flightNumber": "KL 1361"
+    },
+    {
+      "departureAirport": "AMS",
+      "arrivalAirport": "PRG",
+      "departureDate": "2027-01-12",
+      "departureTime": "18:10",
+      "arrivalDate": "2027-01-12",
+      "arrivalTime": "19:45",
+      "flightNumber": "KL 1365"
+    }
+  ],
+  "confidence": 1,
+  "unparsed": []
+}

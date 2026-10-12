@@ -14,8 +14,17 @@
  * limitations under the License.
  */
 
+import { readFileSync } from "node:fs";
 import { expect, test, type Page } from "@playwright/test";
 import { messages } from "../src/messages";
+
+const PASTE = readFileSync(
+  new URL(
+    "../../../packages/itinerary/test/fixtures/lufthansa-labeled.txt",
+    import.meta.url,
+  ),
+  "utf8",
+);
 
 const ORIGIN = "http://127.0.0.1:4173";
 
@@ -133,6 +142,108 @@ test("completes the form with the keyboard only", async ({ page }) => {
   await expect(page).toHaveURL(/#\/plan\/[0-9a-f-]{36}$/i);
   await expect(page.getByText(messages.planComingLater)).toBeVisible();
   await expect(page.getByText(messages.footer, { exact: true })).toBeVisible();
+});
+
+async function indexedDbText(page: Page): Promise<string> {
+  return page.evaluate(async () => {
+    const listed = await indexedDB.databases();
+    const chunks: string[] = [];
+    for (const info of listed) {
+      if (info.name === undefined || info.name.length === 0) continue;
+      const db = await new Promise<IDBDatabase>((resolve, reject) => {
+        const request = indexedDB.open(info.name as string);
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+      try {
+        for (const storeName of db.objectStoreNames) {
+          const values = await new Promise<unknown[]>((resolve, reject) => {
+            const tx = db.transaction(storeName, "readonly");
+            const request = tx.objectStore(storeName).getAll();
+            request.onsuccess = () => resolve(request.result as unknown[]);
+            request.onerror = () => reject(request.error);
+          });
+          chunks.push(JSON.stringify(values));
+        }
+      } finally {
+        db.close();
+      }
+    }
+    return chunks.join("\n");
+  });
+}
+
+test("reads a pasted itinerary offline and does not store the text", async ({
+  page,
+}) => {
+  const foreign: string[] = [];
+  page.on("request", (request) => {
+    const url = new URL(request.url());
+    if (url.protocol !== "http:" && url.protocol !== "https:") return;
+    if (url.origin !== ORIGIN) foreign.push(request.url());
+  });
+
+  await page.goto("#/trip");
+  await expect(
+    page.getByRole("combobox", { name: messages.fromAirport }),
+  ).toBeEnabled();
+  await page.context().setOffline(true);
+
+  await labeled(page, messages.pasteLabel).fill(PASTE);
+  await page.getByRole("button", { name: messages.readFlights }).click();
+
+  await expect(labeled(page, messages.pasteLabel)).toHaveValue("");
+  await expect(labeled(page, messages.fromAirport)).toHaveValue(/^PRG,/);
+  await expect(labeled(page, messages.toAirport)).toHaveValue(/^JFK,/);
+  await expect(labeled(page, messages.departureDate)).toHaveValue("2027-01-12");
+  await expect(labeled(page, messages.departureTime)).toHaveValue("10:30");
+  await expect(labeled(page, messages.arrivalTime)).toHaveValue("13:45");
+  await expect(labeled(page, messages.flightNumber)).toHaveValue("LH 1394");
+  await expect(page.getByText(messages.pasteUnparsed)).toBeVisible();
+  await expect(page.getByText("Leave the hotel by 07:15.")).toBeVisible();
+  await expect(page.locator("#field-legs-0-departureTime-review")).toHaveText(
+    messages.checkThis,
+  );
+
+  await labeled(page, messages.departureTime).fill("10:31");
+  await expect(page.locator("#field-legs-0-departureTime-review")).toHaveCount(
+    0,
+  );
+  await expect(page.getByText(messages.checkThis).first()).toBeVisible();
+
+  await page.getByRole("button", { name: messages.generate }).click();
+  await expect(page).toHaveURL(/#\/plan\/[0-9a-f-]{36}$/i);
+  await expect(page.getByText(messages.planComingLater)).toBeVisible();
+
+  const stored = await indexedDbText(page);
+  expect(stored.length).toBeGreaterThan(0);
+  expect(stored).toContain("2027-01-12");
+  expect(stored).not.toContain(PASTE);
+  for (const line of PASTE.split("\n")) {
+    const trimmed = line.trim();
+    if (trimmed.length === 0) continue;
+    expect(stored).not.toContain(trimmed);
+  }
+  expect(foreign).toEqual([]);
+});
+
+test("leaves the form unchanged when the paste has no flights", async ({
+  page,
+}) => {
+  await page.goto("#/trip");
+  await expect(
+    page.getByRole("combobox", { name: messages.fromAirport }),
+  ).toBeEnabled();
+  await labeled(page, messages.pasteLabel).fill(
+    "Hello Alex,\nOur spring sale is open.\n",
+  );
+  await page.getByRole("button", { name: messages.readFlights }).click();
+
+  await expect(labeled(page, messages.pasteLabel)).toHaveValue("");
+  await expect(page.getByRole("alert")).toHaveText(messages.pasteUnread);
+  await expect(labeled(page, messages.fromAirport)).toHaveValue("");
+  await expect(labeled(page, messages.departureDate)).toHaveValue("");
+  await expect(page).toHaveURL(/#\/trip$/);
 });
 
 test("shows a field error for an invalid time", async ({ page }) => {

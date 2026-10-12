@@ -1,0 +1,24 @@
+{
+  "legs": [
+    {
+      "departureAirport": "YYZ",
+      "arrivalAirport": "LHR",
+      "departureDate": "2027-07-01",
+      "departureTime": "20:15",
+      "arrivalDate": "2027-07-02",
+      "arrivalTime": "08:30",
+      "flightNumber": "AC 845"
+    },
+    {
+      "departureAirport": "LHR",
+      "arrivalAirport": "YYZ",
+      "departureDate": "2027-07-15",
+      "departureTime": "12:00",
+      "arrivalDate": "2027-07-15",
+      "arrivalTime": "15:05",
+      "flightNumber": "AC 850"
+    }
+  ],
+  "confidence": 1,
+  "unparsed": []
+}

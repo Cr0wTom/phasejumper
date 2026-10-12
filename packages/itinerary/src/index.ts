@@ -15,3 +15,10 @@
  */
 
 export const packageName = "@phasejumper/itinerary";
+
+export {
+  parseItinerary,
+  type ParsedLeg,
+  type ParseOptions,
+  type ParseResult,
+} from "./parse";
