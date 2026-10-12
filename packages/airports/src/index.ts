@@ -14,4 +14,24 @@
  * limitations under the License.
  */
 
+import data from "./airports.json";
+
 export const packageName = "@phasejumper/airports";
+
+export interface Airport {
+  iata: string;
+  icao: string;
+  name: string;
+  city: string;
+  country: string;
+  lat: number;
+  lon: number;
+  tz: string;
+}
+
+const table = data as Readonly<Record<string, Airport>>;
+
+export function lookup(iata: string): Airport | undefined {
+  if (!Object.hasOwn(table, iata)) return undefined;
+  return table[iata];
+}
