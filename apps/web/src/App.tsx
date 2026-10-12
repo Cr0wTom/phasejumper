@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import { messages } from "./messages";
+import { PlanPlaceholder } from "./routes/plan/PlanPlaceholder";
+import { TripBuilder } from "./routes/trip/TripBuilder";
+import { useRoute } from "./router";
 
 export function App() {
-  return (
-    <main className="min-h-screen p-8">
-      <h1 className="text-2xl font-semibold">{messages.title}</h1>
-    </main>
-  );
+  const route = useRoute();
+  if (route.name === "plan") return <PlanPlaceholder id={route.id} />;
+  return <TripBuilder />;
 }

@@ -2,7 +2,7 @@
 
 PhaseJumper is a static web app. GitHub Pages serves the built files; everything — planning, airport lookup, calendar — runs in the browser. There is no server, database, account or telemetry, and nothing a traveler enters leaves their device.
 
-*As built through T05. Updated with each ticket.*
+*As built through T06. Updated with each ticket.*
 
 ## Repository
 
@@ -12,7 +12,7 @@ phasejumper/                pnpm workspace, TypeScript strict, Node 22
 ├─ packages/airports/       OurAirports → airports.json + lookup(iata)
 ├─ packages/itinerary/      itinerary-text parser (placeholder until T07)
 ├─ packages/ical/           plan → .ics (placeholder until T10)
-├─ apps/web/                Vite 6 + React 19 + Tailwind v4 + vite-plugin-pwa (placeholder page)
+├─ apps/web/                Vite 6 + React 19 + Tailwind v4 + vite-plugin-pwa: trip builder, plan placeholder
 ├─ docs/                    this documentation (CC BY 4.0)
 └─ .github/workflows/       ci.yml (pull requests), pages.yml (deploy on push to main)
 ```
@@ -38,6 +38,21 @@ Testing: unit tests, fast-check property tests over 500 random trips, and eight 
 
 `build.ts` downloads the OurAirports CSV pinned to a commit with a recorded SHA-256 (60 s timeout, no retries), keeps airports with scheduled service and an IATA code, resolves each IANA zone from coordinates with `@photostructure/tz-lookup`, and writes `src/airports.json` (≈ 4,100 airports, ≈ 200 KB gzipped). It is run by hand; the generated file is committed so builds need no network. `lookup(iata)` returns `{ iata, icao, name, city, country, lat, lon, tz }`.
 
+## Web app (`apps/web/src`)
+
+| Path | Role |
+|---|---|
+| `router.ts` | Hash routing: `#/trip`, `#/plan/<id>`; anything else goes to `#/trip` |
+| `routes/trip/` | Trip builder: You, Flights, Constraints; zod schema (`schema.ts`), form → `PlanInput` (`mapPlanInput.ts`) |
+| `routes/plan/` | Placeholder showing the saved plan's explanation (full view: T09) |
+| `components/AirportCombobox.tsx` | WAI-ARIA combobox over the airport list (top 12 matches shown, full list searched) |
+| `airports/` | Lazy-loads `airports.json` as its own chunk; search by IATA, city, name |
+| `storage/plans.ts` | IndexedDB via `idb-keyval`: `plan:<id>` → `{ id, input, result, engineVersion, createdAt }` |
+| `flags.json` | Build-time flags (§7.4) plus `legal.acceptanceGate` and `melatonin.optIn`, all off |
+| `messages.ts` | Every user-facing string in the web app |
+
+"Generate plan" validates the form, maps it to `PlanInput` (zones and coordinates from `airports.json`), runs `generatePlan` in the browser, saves the result to IndexedDB and opens `#/plan/<id>`. The melatonin toggle and the legal gate stay hidden until T12 turns their flags on.
+
 ## Data flow
 
 ```
@@ -50,7 +65,7 @@ No request leaves the page.
 
 ## Build and deploy
 
-- **CI** (`ci.yml`, every pull request): `pnpm install --frozen-lockfile`, lint, typecheck, test, build.
+- **CI** (`ci.yml`, every pull request): `pnpm install --frozen-lockfile`, lint, typecheck, test, build; a second job runs the Playwright end-to-end tests in Chromium (`pnpm test:e2e`).
 - **Pages** (`pages.yml`, push to `main`): build → `actions/upload-pages-artifact` → `actions/deploy-pages`. Site: https://cr0wtom.github.io/phasejumper/
 - The base path comes from `VITE_BASE_PATH` (default `/phasejumper/`); set it to `/` to serve from a custom domain root.
 - Rollback: revert the merge commit; Pages redeploys in about a minute.
