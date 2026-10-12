@@ -236,6 +236,12 @@ importers:
 
   packages/airports:
     devDependencies:
+      '@photostructure/tz-lookup':
+        specifier: 11.7.0
+        version: 11.7.0
+      '@types/node':
+        specifier: 22.20.5
+        version: 22.20.5
       typescript:
         specifier: 'catalog:'
         version: 6.0.3
@@ -1050,6 +1056,9 @@ packages:
     cpu: [x64]
     os: [linux]
     libc: [glibc]
+
+  '@photostructure/tz-lookup@11.7.0':
+    resolution: {integrity: sha512-QbKHXvleluMIlAHf2JiQTJNU5rLQBeQhLobyRqgXZ6NNGKqNikaRkjYviJ4nMU7Y75QE7bBYM8xjiFGjAukyhw==}
 
   '@rolldown/pluginutils@1.0.0-rc.3':
     resolution: {integrity: sha512-eybk3TjzzzV97Dlj5c+XrBFW57eTNhzod66y9HrBlzJ6NsCrWCp/2kaPS3K9wJmurBC0Tdw4yPjXKZqlznim3Q==}
@@ -3634,6 +3643,8 @@ snapshots:
 
   '@napi-rs/lzma-linux-x64-gnu@1.5.1':
     optional: true
+
+  '@photostructure/tz-lookup@11.7.0': {}
 
   '@rolldown/pluginutils@1.0.0-rc.3': {}
 
