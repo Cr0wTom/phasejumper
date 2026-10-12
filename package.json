@@ -1,0 +1,24 @@
+{
+  "name": "phasejumper",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@12.12.1",
+  "engines": {
+    "node": ">=22.12.0 <23",
+    "pnpm": ">=12 <13"
+  },
+  "scripts": {
+    "lint": "eslint . && prettier --check .",
+    "typecheck": "pnpm --filter \"./packages/*\" --filter \"./apps/*\" typecheck",
+    "test": "pnpm --filter \"./packages/*\" --filter \"./apps/*\" test",
+    "build": "pnpm --filter @phasejumper/web build"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "eslint": "10.12.0",
+    "eslint-config-prettier": "10.1.8",
+    "prettier": "3.9.10",
+    "typescript": "catalog:",
+    "typescript-eslint": "8.71.1"
+  }
+}
