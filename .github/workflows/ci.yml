@@ -81,3 +81,15 @@ jobs:
 
       - name: End-to-end tests
         run: pnpm test:e2e
+
+      # Phase map screenshots: on a missing baseline Playwright writes the new
+      # image; on a mismatch it writes actual/diff images. Kept for review.
+      - name: Upload phase map screenshots
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: phasemap-screenshots
+          path: |
+            apps/web/e2e/phasemap/__screenshots__/
+            apps/web/test-results/
+          if-no-files-found: ignore

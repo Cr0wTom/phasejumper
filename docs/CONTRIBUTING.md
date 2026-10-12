@@ -35,6 +35,10 @@ Never run `vitest -u` to make a test pass; run it only when the PR intentionally
 
 A change that alters engine output also bumps `ENGINE_VERSION`.
 
+### Phase map screenshots
+
+The phase map's visual baselines (`apps/web/e2e/phasemap/__screenshots__/`) are rendered on CI's Linux Chromium, never on a laptop, and compared only on CI (or locally with `PW_VISUAL=1`). When a PR intentionally changes how the map looks, run the **Update phase map baselines** workflow on the branch, review the images it uploads, and commit them. The same rule as above applies: never regenerate baselines to make a test pass, and describe the visual change in the PR.
+
 ## Words we don't use
 
 PhaseJumper is general wellness information, not medical advice, and never a prescription. User-facing text (UI, engine copy, README, terms and privacy) must not contain these words:

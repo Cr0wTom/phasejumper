@@ -23,6 +23,7 @@ export default tseslint.config(
     ignores: [
       "**/dist/**",
       "**/dev-dist/**",
+      "**/dist-harness/**",
       "**/node_modules/**",
       "**/coverage/**",
       "**/playwright-report/**",

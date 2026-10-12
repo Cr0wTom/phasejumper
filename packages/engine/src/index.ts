@@ -29,6 +29,6 @@ export {
   validatePlanInput,
   type ValidationResult,
 } from "./phase";
-export { ENGINE_VERSION, generatePlan } from "./schedule";
+export { ENGINE_VERSION, generatePlan, travelerZoneAt } from "./schedule";
 export { DAY_FLAGS, REASON_CODES, WARNING_CODES } from "./types";
 export type * from "./types";
