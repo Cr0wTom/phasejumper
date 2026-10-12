@@ -16,7 +16,7 @@
 
 // Test-only page: renders a golden fixture in the phase map for Playwright.
 // Built by vite.harness.config.ts into dist-harness/; never part of the app.
-// URL: /harness/phasemap.html?fixture=<name>
+// URL: /harness/phasemap.html?fixture=<name>[&now=<ISO instant>]
 
 import { generatePlan, type PlanInput } from "@phasejumper/engine";
 import { StrictMode } from "react";
@@ -29,7 +29,9 @@ const inputs = import.meta.glob<PlanInput>(
   { eager: true, import: "default" },
 );
 
-const name = new URLSearchParams(window.location.search).get("fixture") ?? "";
+const params = new URLSearchParams(window.location.search);
+const name = params.get("fixture") ?? "";
+const now = params.get("now") ?? undefined;
 const input = Object.entries(inputs).find(([path]) =>
   path.endsWith(`/${name}.input.json`),
 )?.[1];
@@ -44,7 +46,7 @@ createRoot(root).render(
       {input === undefined ? (
         <p role="alert">Unknown fixture: {name}</p>
       ) : (
-        <PhaseMap input={input} result={generatePlan(input)} />
+        <PhaseMap input={input} result={generatePlan(input)} now={now} />
       )}
     </main>
   </StrictMode>,

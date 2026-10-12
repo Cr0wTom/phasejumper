@@ -15,20 +15,19 @@
  */
 
 // Pure layout for the phase map (§4): one row per calendar date in the
-// chosen axis zone, every block placed by its own UTC instant. x is the
+// grid's zone (destination or home), every block placed by its own UTC instant. x is the
 // wall-clock minute of the day (0–1440) in the axis zone, so DST days read
 // correctly: pieces are split at midnight and at clock changes.
 
-import {
-  travelerZoneAt,
-  type Block,
-  type BlockKind,
-  type PlanInput,
-  type PlanResult,
+import type {
+  Block,
+  BlockKind,
+  PlanInput,
+  PlanResult,
 } from "@phasejumper/engine";
 import { Temporal } from "temporal-polyfill";
 
-export type Axis = "destination" | "home" | "local";
+export type Axis = "destination" | "home";
 
 export type Lane = "sleep" | "light" | "move" | "caffeine";
 
@@ -95,11 +94,20 @@ const POINT: ReadonlySet<BlockKind> = new Set([
   "MEAL",
 ]);
 
-/** Zone used for an instant on a given axis. */
-export function zoneFor(axis: Axis, input: PlanInput, atUtc: string): string {
-  if (axis === "destination") return input.itinerary.destinationTz;
-  if (axis === "home") return input.itinerary.homeTz;
-  return travelerZoneAt(input, atUtc);
+/** The IANA zone an axis reads in. */
+export function axisZone(axis: Axis, input: PlanInput): string {
+  return axis === "destination"
+    ? input.itinerary.destinationTz
+    : input.itinerary.homeTz;
+}
+
+/** Where an instant falls on the grid: its date and wall-clock minute. */
+export function positionOf(
+  atUtc: string,
+  zone: string,
+): { date: string; min: number } {
+  const z = Temporal.Instant.from(atUtc).toZonedDateTimeISO(zone);
+  return { date: z.toPlainDate().toString(), min: z.hour * 60 + z.minute };
 }
 
 function wallMinutes(z: Temporal.ZonedDateTime): number {
@@ -187,8 +195,7 @@ export function layoutPlan(
 
   result.days.forEach((day, dayIndex) => {
     day.blocks.forEach((block, blockIndex) => {
-      const zone =
-        axis === "local" ? block.localTz : zoneFor(axis, input, block.startUtc);
+      const zone = axisZone(axis, input);
       const start = Temporal.Instant.from(block.startUtc);
       const end = Temporal.Instant.from(block.endUtc);
       const from = hhmm(start.toZonedDateTimeISO(zone));
@@ -214,7 +221,7 @@ export function layoutPlan(
     });
 
     const cbt = Temporal.Instant.from(day.cbtMinUtc);
-    const cbtZone = zoneFor(axis, input, day.cbtMinUtc);
+    const cbtZone = axisZone(axis, input);
     const at = cbt.toZonedDateTimeISO(cbtZone);
     row(at.toPlainDate().toString(), cbtZone).cbtMin.push({
       dayIndex,
@@ -229,11 +236,7 @@ export function layoutPlan(
     const end = Temporal.PlainDateTime.from(leg.arrivalLocal)
       .toZonedDateTime(leg.arrivalTz)
       .toInstant();
-    // In the air the traveler is on the departure zone (engine convention).
-    const zone =
-      axis === "local"
-        ? leg.departureTz
-        : zoneFor(axis, input, start.toString());
+    const zone = axisZone(axis, input);
     pieces(start, end, zone).forEach((p, pieceIndex) => {
       row(p.date, zone).flights.push({
         id: `f${index}-p${pieceIndex}`,
@@ -262,11 +265,7 @@ export function layoutPlan(
   ) {
     const date = d.toString();
     const existing = rows.get(date);
-    const zone =
-      existing?.zone ??
-      (axis === "home"
-        ? input.itinerary.homeTz
-        : input.itinerary.destinationTz);
+    const zone = existing?.zone ?? axisZone(axis, input);
     const r = existing ?? {
       date,
       zone,

@@ -132,15 +132,18 @@ export const messages = {
 /** Phase map (§4). Kept separate from the trip form strings. */
 export const phaseMapMessages = {
   title: "Phase map",
-  axisLabel: "Time axis",
+  axisLabel: "Time scales",
   axis: {
     destination: "Destination time",
     home: "Home time",
-    local: "Where I am",
   },
-  offsets: (destination: string, home: string): string =>
-    `Destination is ${destination}. Home is ${home}.`,
-  localNote: "Each row shows the clock where you are at that moment.",
+  scaleShort: {
+    destination: "Dest.",
+    home: "Home",
+  },
+  scale: (name: string, offset: string): string => `${name} (${offset})`,
+  lastScale: "Keep at least one time scale on.",
+  now: (time: string): string => `Now, ${time}`,
   rowLabel: (date: string, count: number): string =>
     count === 1
       ? `${date}, 1 item. Use the arrow keys to move between items.`

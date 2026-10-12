@@ -70,6 +70,19 @@ async function layoutProblems(page: Page): Promise<string[]> {
           problems.push(`${row.dataset.date}: ${prev[2]} overlaps ${cur[2]}`);
         }
       }
+      // Flight hatches must be painted under the bands, never over them.
+      const firstBand = row.querySelector("g[data-kind]");
+      for (const hatch of row.querySelectorAll(
+        'rect[role="img"][aria-label^="Flight"]',
+      )) {
+        if (
+          firstBand !== null &&
+          firstBand.compareDocumentPosition(hatch) &
+            Node.DOCUMENT_POSITION_FOLLOWING
+        ) {
+          problems.push(`${row.dataset.date}: flight band painted over items`);
+        }
+      }
       for (const g of row.querySelectorAll<SVGGElement>("g[data-kind]")) {
         const text = g.querySelector("text");
         const band = g.querySelector("rect");
@@ -117,21 +130,59 @@ for (const fixture of FIXTURES) {
   });
 }
 
-test("DST fixture shows the right wall times in all three axis modes", async ({
+test("DST fixture shows the right wall times on both time scales", async ({
   page,
 }) => {
   await open(page, "nyc-lon-dst", 1280);
-  const expected = {
-    "Destination time": "23:00 to 07:00",
-    "Home time": "18:00 to 02:00",
-    "Where I am": "23:00 to 07:00",
-  } as const;
-  for (const [axis, times] of Object.entries(expected)) {
-    await page.getByRole("radio", { name: axis }).click();
-    const sleeps = page.getByRole("button", { name: /^Sleep, / });
-    // The last night of the plan is settled on destination time.
-    await expect(sleeps.last()).toHaveAccessibleName(`Sleep, ${times}`);
-  }
+  const lastSleep = () => page.getByRole("button", { name: /^Sleep, / }).last();
+  // Both scales on: the grid reads in destination (London) time.
+  await expect(lastSleep()).toHaveAccessibleName("Sleep, 23:00 to 07:00");
+  // Destination off: the grid reads in home (New York) time.
+  await page.getByRole("button", { name: /^Destination time/ }).click();
+  await expect(lastSleep()).toHaveAccessibleName("Sleep, 18:00 to 02:00");
+  // The last scale left on cannot be switched off.
+  await expect(page.getByRole("button", { name: /^Home time/ })).toBeDisabled();
+  await page.getByRole("button", { name: /^Destination time/ }).click();
+  await expect(lastSleep()).toHaveAccessibleName("Sleep, 23:00 to 07:00");
+});
+
+test("both time scales show by default and can be switched", async ({
+  page,
+}) => {
+  await open(page, "prg-sfo-delay", 1280);
+  const dest = page.getByRole("button", {
+    name: /^Destination time \(UTC−8\)$/,
+  });
+  const home = page.getByRole("button", { name: /^Home time \(UTC\+1\)$/ });
+  await expect(dest).toHaveAttribute("aria-pressed", "true");
+  await expect(home).toHaveAttribute("aria-pressed", "true");
+  await home.click();
+  await expect(home).toHaveAttribute("aria-pressed", "false");
+  await expect(dest).toBeDisabled();
+});
+
+test("marks now on today's row when the plan is underway", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  // 2027-01-16 20:30 UTC = 12:30 in San Francisco, inside the plan.
+  await page.goto(
+    "phasemap.html?fixture=prg-sfo-delay&now=2027-01-16T20:30:00Z",
+  );
+  const marker = page.getByRole("img", { name: "Now, 12:30" });
+  await expect(marker).toHaveCount(1);
+  await expect(
+    page
+      .locator('g[data-date="2027-01-16"]')
+      .getByRole("img", { name: "Now, 12:30" }),
+  ).toHaveCount(1);
+});
+
+test("no now marker before the plan starts", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto(
+    "phasemap.html?fixture=prg-sfo-delay&now=2026-12-01T12:00:00Z",
+  );
+  await expect(page.getByTestId("phase-map")).toBeVisible();
+  await expect(page.getByRole("img", { name: /^Now, / })).toHaveCount(0);
 });
 
 test("keyboard: rows focus, arrows move between items, Enter opens the details", async ({

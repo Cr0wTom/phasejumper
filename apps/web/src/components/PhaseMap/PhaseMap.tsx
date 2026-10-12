@@ -29,7 +29,13 @@ import {
 import { Temporal } from "temporal-polyfill";
 import { phaseMapMessages as m } from "../../messages";
 import { focusRing } from "../../ui";
-import { layoutPlan, type Axis, type Segment } from "./layout";
+import {
+  axisZone,
+  layoutPlan,
+  positionOf,
+  type Axis,
+  type Segment,
+} from "./layout";
 
 const COLOR: Record<BlockKind, string> = {
   SLEEP: "var(--sleep, #6C7BFF)",
@@ -75,7 +81,7 @@ interface Geometry {
   compact: boolean;
 }
 
-function geometry(width: number): Geometry {
+function geometry(width: number, scaleCount: number): Geometry {
   const compact = width < 600;
   const gutter = compact ? 52 : 96;
   const k = compact ? 1.3 : 1;
@@ -83,7 +89,7 @@ function geometry(width: number): Geometry {
     width,
     gutter,
     ribbon: Math.max(1, width - gutter - 8),
-    header: 22,
+    header: 4 + 18 * scaleCount,
     rowH: Math.round(52 * k),
     lanes: {
       sleep: { y: Math.round(6 * k), h: Math.round(16 * k) },
@@ -113,6 +119,19 @@ function offsetLabel(zone: string, atUtc: string): string {
   return `UTC${sign}${Number(h)}${mm === "00" ? "" : `:${mm}`}`;
 }
 
+function offsetMinutes(zone: string, atUtc: string): number {
+  return Math.round(
+    Temporal.Instant.from(atUtc).toZonedDateTimeISO(zone).offsetNanoseconds /
+      60_000_000_000,
+  );
+}
+
+/** Minutes after midnight as "HH" (whole hours) or "HH:MM". */
+function clockLabel(min: number, withMinutes: boolean): string {
+  const h = String(Math.floor(min / 60)).padStart(2, "0");
+  return withMinutes ? `${h}:${String(min % 60).padStart(2, "0")}` : h;
+}
+
 function textFits(label: string, px: number): boolean {
   return label.length * 6.6 + 8 <= px;
 }
@@ -120,11 +139,21 @@ function textFits(label: string, px: number): boolean {
 export function PhaseMap({
   input,
   result,
+  now,
 }: {
   input: PlanInput;
   result: PlanResult;
+  /** Current instant (ISO), read by the app on load; marks "Now" on the grid. */
+  now?: string;
 }) {
-  const [axis, setAxis] = useState<Axis>("destination");
+  // Both scales show by default; the grid reads in the first one switched on.
+  const [scales, setScales] = useState<Record<Axis, boolean>>({
+    destination: true,
+    home: true,
+  });
+  const axis: Axis = scales.destination ? "destination" : "home";
+  const otherAxis: Axis = axis === "destination" ? "home" : "destination";
+  const shownScales: Axis[] = scales[otherAxis] ? [axis, otherAxis] : [axis];
   const [width, setWidth] = useState(1040);
   const [open, setOpen] = useState<{ id: string; x: number; y: number } | null>(
     null,
@@ -151,8 +180,17 @@ export function PhaseMap({
     () => layoutPlan(input, result, axis),
     [input, result, axis],
   );
-  const g = geometry(width);
+  const g = geometry(width, shownScales.length);
   const height = g.header + rows.length * g.rowH;
+  const zone = axisZone(axis, input);
+  const nowAt =
+    now === undefined
+      ? undefined
+      : (() => {
+          const p = positionOf(now, zone);
+          const rowIndex = rows.findIndex((r) => r.date === p.date);
+          return rowIndex < 0 ? undefined : { ...p, rowIndex };
+        })();
   const x = (min: number): number => g.gutter + (min / 1440) * g.ribbon;
   const segmentsOf = (rowIndex: number): Segment[] =>
     rows[rowIndex]?.segments ?? [];
@@ -162,7 +200,16 @@ export function PhaseMap({
     [rows],
   );
 
-  const firstUtc = result.days[0]?.cbtMinUtc ?? input.now;
+  // Offsets as they are now, or at the start of the plan if it hasn't begun.
+  const refUtc =
+    nowAt !== undefined && now !== undefined
+      ? now
+      : (result.days[0]?.cbtMinUtc ?? input.now);
+  const shift =
+    (offsetMinutes(axisZone(otherAxis, input), refUtc) -
+      offsetMinutes(zone, refUtc) +
+      1440) %
+    1440;
 
   function openFor(seg: Segment, rowIndex: number): void {
     setOpen({
@@ -232,36 +279,38 @@ export function PhaseMap({
         <h2 id={headingId} className="text-[17px] font-medium leading-[1.1]">
           {m.title}
         </h2>
-        <div role="radiogroup" aria-label={m.axisLabel} className="flex gap-1">
-          {(["destination", "home", "local"] as const).map((a) => (
-            <button
-              key={a}
-              type="button"
-              role="radio"
-              aria-checked={axis === a}
-              onClick={() => {
-                setOpen(null);
-                setAxis(a);
-              }}
-              className={`rounded-md border px-2 py-1 text-[13px] leading-[1.45] ${
-                axis === a
-                  ? "border-[#F2F2F0] bg-[#F2F2F0] text-[#17171A]"
-                  : "border-[#26262B] text-[#F2F2F0]"
-              } ${focusRing}`}
-            >
-              {m.axis[a]}
-            </button>
-          ))}
+        <div
+          role="group"
+          aria-label={m.axisLabel}
+          className="flex flex-wrap gap-1"
+        >
+          {(["destination", "home"] as const).map((a) => {
+            const on = scales[a];
+            const last =
+              on && !scales[a === "destination" ? "home" : "destination"];
+            return (
+              <button
+                key={a}
+                type="button"
+                aria-pressed={on}
+                disabled={last}
+                title={last ? m.lastScale : undefined}
+                onClick={() => {
+                  setOpen(null);
+                  setScales((cur) => ({ ...cur, [a]: !cur[a] }));
+                }}
+                className={`rounded-md border px-2 py-1 text-[13px] leading-[1.45] ${
+                  on
+                    ? "border-[#F2F2F0] bg-[#F2F2F0] text-[#17171A]"
+                    : "border-[#26262B] text-[#F2F2F0]"
+                } ${focusRing}`}
+              >
+                {m.scale(m.axis[a], offsetLabel(axisZone(a, input), refUtc))}
+              </button>
+            );
+          })}
         </div>
       </div>
-      <p className="text-[13px] leading-[1.45] text-[#8B8B93]">
-        {axis === "local"
-          ? m.localNote
-          : m.offsets(
-              offsetLabel(input.itinerary.destinationTz, firstUtc),
-              offsetLabel(input.itinerary.homeTz, firstUtc),
-            )}
-      </p>
 
       <div ref={containerRef} className="relative w-full">
         <svg
@@ -294,25 +343,35 @@ export function PhaseMap({
             </pattern>
           </defs>
 
-          {/* Hour axis, shown once. */}
-          <g aria-hidden="true">
-            {Array.from(
-              { length: 24 / g.tickEvery + 1 },
-              (_, i) => i * g.tickEvery,
-            ).map((h) => (
-              <text
-                key={h}
-                x={x(h * 60)}
-                y={14}
-                textAnchor={h === 0 ? "start" : h === 24 ? "end" : "middle"}
-                fontSize="11"
-                fill={MUTED}
-                className="font-mono"
-              >
-                {String(h).padStart(2, "0")}
+          {/* Hour scales, shown once: the grid's, then the other zone's. */}
+          {shownScales.map((a, i) => (
+            <g key={a} aria-hidden="true">
+              <text x={0} y={14 + i * 18} fontSize="11" fill={MUTED}>
+                {m.scaleShort[a]}
               </text>
-            ))}
-          </g>
+              {Array.from(
+                { length: 24 / g.tickEvery + 1 },
+                (_, t) => t * g.tickEvery * 60,
+              ).map((min) => (
+                <text
+                  key={min}
+                  x={x(min)}
+                  y={14 + i * 18}
+                  textAnchor={
+                    min === 0 ? "start" : min === 1440 ? "end" : "middle"
+                  }
+                  fontSize="11"
+                  fill={i === 0 ? FG : MUTED}
+                  className="font-mono"
+                >
+                  {clockLabel(
+                    i === 0 ? min : (min + shift) % 1440,
+                    i > 0 && shift % 60 !== 0,
+                  )}
+                </text>
+              ))}
+            </g>
+          ))}
 
           {rows.map((row, rowIndex) => {
             const y0 = g.header + rowIndex * g.rowH;
@@ -364,6 +423,21 @@ export function PhaseMap({
                     stroke={LINE}
                     strokeWidth={1}
                     aria-hidden="true"
+                  />
+                ))}
+
+                {/* Flights: the hatched band sits under everything... */}
+                {row.flights.map((f) => (
+                  <rect
+                    key={f.id}
+                    role="img"
+                    aria-label={m.flight(f.label)}
+                    x={x(f.startMin)}
+                    y={3}
+                    width={x(f.endMin) - x(f.startMin)}
+                    height={g.rowH - 6}
+                    fill={`url(#${patternId})`}
+                    rx={4}
                   />
                 ))}
 
@@ -479,41 +553,43 @@ export function PhaseMap({
                   );
                 })}
 
-                {row.flights.map((f) => {
-                  const w = x(f.endMin) - x(f.startMin);
-                  return (
-                    <g key={f.id} aria-label={m.flight(f.label)} role="img">
+                {/* ...and its label chip sits on top. */}
+                {row.flights.map((f) =>
+                  textFits(f.label, x(f.endMin) - x(f.startMin)) ? (
+                    <g key={`${f.id}-label`} aria-hidden="true">
                       <rect
-                        x={x(f.startMin)}
-                        y={3}
-                        width={w}
-                        height={g.rowH - 6}
-                        fill={`url(#${patternId})`}
-                        rx={4}
+                        x={x(f.startMin) + 3}
+                        y={g.rowH - 19}
+                        width={f.label.length * 6.6 + 6}
+                        height={15}
+                        rx={3}
+                        fill={SURFACE}
                       />
-                      {textFits(f.label, w) ? (
-                        <g aria-hidden="true">
-                          <rect
-                            x={x(f.startMin) + 3}
-                            y={g.rowH - 19}
-                            width={f.label.length * 6.6 + 6}
-                            height={15}
-                            rx={3}
-                            fill={SURFACE}
-                          />
-                          <text
-                            x={x(f.startMin) + 6}
-                            y={g.rowH - 8}
-                            fontSize="11"
-                            fill={MUTED}
-                          >
-                            {f.label}
-                          </text>
-                        </g>
-                      ) : null}
+                      <text
+                        x={x(f.startMin) + 6}
+                        y={g.rowH - 8}
+                        fontSize="11"
+                        fill={MUTED}
+                      >
+                        {f.label}
+                      </text>
                     </g>
-                  );
-                })}
+                  ) : null,
+                )}
+
+                {nowAt?.rowIndex === rowIndex ? (
+                  <g role="img" aria-label={m.now(clockLabel(nowAt.min, true))}>
+                    <line
+                      x1={x(nowAt.min)}
+                      x2={x(nowAt.min)}
+                      y1={1}
+                      y2={g.rowH - 1}
+                      stroke={FG}
+                      strokeWidth={2}
+                    />
+                    <circle cx={x(nowAt.min)} cy={2} r={3} fill={FG} />
+                  </g>
+                ) : null}
 
                 {row.cbtMin.map((c) => (
                   <circle

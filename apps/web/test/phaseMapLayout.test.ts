@@ -16,7 +16,11 @@
 
 import { generatePlan, type PlanInput } from "@phasejumper/engine";
 import { describe, expect, it } from "vitest";
-import { layoutPlan, pieces } from "../src/components/PhaseMap/layout";
+import {
+  layoutPlan,
+  pieces,
+  positionOf,
+} from "../src/components/PhaseMap/layout";
 import { Temporal } from "temporal-polyfill";
 import nycLonDst from "../../../packages/engine/test/fixtures/nyc-lon-dst.input.json";
 import prgSfoDelay from "../../../packages/engine/test/fixtures/prg-sfo-delay.input.json";
@@ -24,7 +28,7 @@ import prgSfoDelay from "../../../packages/engine/test/fixtures/prg-sfo-delay.in
 const dst = nycLonDst as unknown as PlanInput;
 const sfo = prgSfoDelay as unknown as PlanInput;
 
-function lastSleep(input: PlanInput, axis: "destination" | "home" | "local") {
+function lastSleep(input: PlanInput, axis: "destination" | "home") {
   const result = generatePlan(input);
   const lastDay = result.days.length - 1;
   const rows = layoutPlan(input, result, axis);
@@ -43,7 +47,7 @@ function lastSleep(input: PlanInput, axis: "destination" | "home" | "local") {
 
 describe("phase map layout", () => {
   it("rows are consecutive calendar dates, none skipped or repeated", () => {
-    for (const axis of ["destination", "home", "local"] as const) {
+    for (const axis of ["destination", "home"] as const) {
       const rows = layoutPlan(sfo, generatePlan(sfo), axis);
       for (let i = 1; i < rows.length; i += 1) {
         const prev = Temporal.PlainDate.from(rows[i - 1]?.date ?? "");
@@ -52,9 +56,9 @@ describe("phase map layout", () => {
     }
   });
 
-  it("DST fixture: the settled night reads 23:00–07:00 London in destination and local axes", () => {
-    for (const axis of ["destination", "local"] as const) {
-      const sleep = lastSleep(dst, axis);
+  it("DST fixture: the settled night reads 23:00–07:00 London on the destination axis", () => {
+    {
+      const sleep = lastSleep(dst, "destination");
       expect(sleep[0]).toMatchObject({
         startMin: 23 * 60,
         endMin: 1440,
@@ -90,6 +94,17 @@ describe("phase map layout", () => {
       { date: "2027-03-28", startMin: 0, endMin: 60 },
       { date: "2027-03-28", startMin: 120, endMin: 180 },
     ]);
+  });
+
+  it("positions an instant by date and wall-clock minute in a zone", () => {
+    expect(positionOf("2027-03-28T12:15:00Z", "Europe/London")).toEqual({
+      date: "2027-03-28",
+      min: 13 * 60 + 15,
+    });
+    expect(positionOf("2027-03-28T02:00:00Z", "America/New_York")).toEqual({
+      date: "2027-03-27",
+      min: 22 * 60,
+    });
   });
 
   it("the target line sits at the target clock time in the destination axis", () => {

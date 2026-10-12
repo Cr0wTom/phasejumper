@@ -184,22 +184,6 @@ function zoneLocator(
 }
 
 /** Ground position; home is taken as the first departure airport. */
-/**
- * The IANA zone the traveler is in at an instant: home before the first
- * departure, a leg's departure zone while in the air, the arrival zone on a
- * layover, the destination after the last leg. For rendering ("where I am").
- * Assumes validated input.
- */
-export function travelerZoneAt(input: PlanInput, atUtc: string): string {
-  const legs: Leg[] = legInstants(input).map((l) => ({
-    start: l.dep,
-    end: l.arr,
-    depTz: l.depTz,
-    arrTz: l.arrTz,
-  }));
-  return zoneLocator(input, legs)(Temporal.Instant.from(atUtc));
-}
-
 function latLonLocator(
   legs: readonly Leg[],
 ): (at: Instant) => LatLon | undefined {
