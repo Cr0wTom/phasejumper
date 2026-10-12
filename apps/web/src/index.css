@@ -237,3 +237,8 @@ body {
     font-size: var(--text-15);
   }
 }
+
+/* The plan's header sticks just below the app header (48 px + notch). */
+.pj-plan-header {
+  top: calc(48px + env(safe-area-inset-top));
+}
