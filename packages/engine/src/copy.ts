@@ -61,6 +61,22 @@ export function reasonCopy(code: ReasonCode): string {
       return "A meal around now fits your new schedule.";
     case "WIND_DOWN":
       return "Wind down here: dim the lights and slow down before sleep.";
+    case "SLEEP_INFLIGHT":
+      return "Sleep on the plane in this window; an eye mask helps.";
+    case "LIGHT_INFLIGHT":
+      return "Light now helps your clock; open the window shade if it's bright outside.";
+    case "AVOID_LIGHT_INFLIGHT":
+      return "Keep light out now: close the window shade or wear an eye mask.";
+    case "SEEK_LIGHT_ARTIFICIAL":
+      return "It's dark outside, so bright indoor light or a 10 000 lux lamp does the job now.";
+    case "NAP_SHORT_SLEEP":
+      return "A short nap here makes up for a short night.";
+    case "NSDR":
+      return "A short rest here helps after a long flight; you don't need to fall asleep.";
+    case "EXERCISE_OPTIONAL_WALK":
+      return "An easy walk after landing, if you feel like it.";
+    case "CAFFEINE_LATE_OK":
+      return "Caffeine still fits here today while your clock catches up.";
   }
 }
 
@@ -69,11 +85,52 @@ export function warningCopy(code: WarningCode): string {
     case "PHASE_ESTIMATE_UNCERTAIN":
       return "Your sleep times don't match your chronotype, so the plan uses your sleep times and keeps wider margins around light.";
     case "LIGHT_BLOCK_SHIFTED":
-      return "The best light time falls while you sleep, so the light window moved next to your sleep.";
+      return "The best light time falls while you sleep, so light windows sit just before your sleep instead.";
+    case "SHORT_SLEEP_DAY":
+      return "Your sleep window is short today, so the plan adds a nap.";
+    case "MELATONIN_MOVED":
+      return "The melatonin window clashed with something you must be awake for, so it moved to just after it.";
+    case "WEAK_DAY":
+      return "Today has no light window at the right time, so the plan expects a smaller shift and may run longer.";
+    case "DAYLIGHT_UNKNOWN":
+      return "Airport locations are missing, so light windows don't account for daylight.";
   }
 }
 
-export const DROP_CODES = ["MELATONIN_NO_WINDOW"] as const;
+export const ADVICE_CODES = [
+  "INFLIGHT_WATER",
+  "INFLIGHT_ALCOHOL",
+  "INFLIGHT_WATCH",
+  "INFLIGHT_EYE_MASK",
+  "INFLIGHT_CABIN_LIGHT",
+  "KEEP_LIGHTS_DIM",
+] as const;
+
+export type AdviceCode = (typeof ADVICE_CODES)[number];
+
+/** Static, unscheduled advice (§2.5 in-flight list, §2.7 rule 3 note). */
+export function adviceCopy(code: AdviceCode): string {
+  switch (code) {
+    case "INFLIGHT_WATER":
+      return "Drink water regularly during the flight.";
+    case "INFLIGHT_ALCOHOL":
+      return "Skip alcohol on board; it makes sleep lighter and more broken.";
+    case "INFLIGHT_WATCH":
+      return "Set your watch to destination time when you board.";
+    case "INFLIGHT_EYE_MASK":
+      return "Use an eye mask during avoid-light windows on board.";
+    case "INFLIGHT_CABIN_LIGHT":
+      return "Cabin lighting varies by airline, so in-flight light windows are a rough guide.";
+    case "KEEP_LIGHTS_DIM":
+      return "It's dark outside during part of your avoid-light time; keep indoor lights dim.";
+  }
+}
+
+export const DROP_CODES = [
+  "MELATONIN_NO_WINDOW",
+  "TRIMMED",
+  "NAP_TOO_LATE",
+] as const;
 
 export type DropCode = (typeof DROP_CODES)[number];
 
@@ -81,6 +138,10 @@ export function droppedCopy(code: DropCode): string {
   switch (code) {
     case "MELATONIN_NO_WINDOW":
       return "No melatonin window today: the useful time falls too close to your sleep.";
+    case "TRIMMED":
+      return "It overlapped a more important window and was too short to keep.";
+    case "NAP_TOO_LATE":
+      return "No nap today: the only time for it is too close to tonight's sleep.";
   }
 }
 

@@ -69,12 +69,14 @@ describe("light (§2.5)", () => {
     });
   });
 
-  it("delaying: SEEK_LIGHT slides out of sleep and warns LIGHT_BLOCK_SHIFTED", () => {
+  it("delaying: SEEK_LIGHT slides out of sleep and warns LIGHT_BLOCK_SHIFTED once", () => {
     const plan = generatePlan(prgSfo());
     expect(blocks("SEEK_LIGHT", plan)).toHaveLength(5);
-    expect(
-      plan.warnings.filter((w) => w.code === "LIGHT_BLOCK_SHIFTED"),
-    ).toHaveLength(5);
+    const shifted = plan.warnings.filter(
+      (w) => w.code === "LIGHT_BLOCK_SHIFTED",
+    );
+    expect(shifted).toHaveLength(1);
+    expect(shifted[0]?.dayIndex).toBeUndefined();
   });
 
   it("no light block ever overlaps a sleep window", () => {
@@ -208,6 +210,6 @@ describe("contract", () => {
   });
 
   it("stamps the engine version", () => {
-    expect(generatePlan(prgTyo()).engineVersion).toBe("0.1.0");
+    expect(generatePlan(prgTyo()).engineVersion).toBe("0.2.0");
   });
 });

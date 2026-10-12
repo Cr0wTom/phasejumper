@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-// §2.6 day loop. Unfiltered: flights, must-be-awake, daylight and block
-// collisions are the feasibility pass (T04).
+// §2.6 day loop. Each day: build blocks (§2.5), run the feasibility pass
+// (§2.7), check the day-level sanity rule, forecast (§2.8).
 //
 // Day d = the main sleep that contains CBTmin_d, then the waking period up to
 // the next sleep. Morning blocks are placed from CBTmin_d; evening blocks from
@@ -23,7 +23,26 @@
 // evening).
 
 import { Temporal } from "temporal-polyfill";
-import { droppedCopy, explanationCopy, reasonCopy, warningCopy } from "./copy";
+import {
+  adviceCopy,
+  droppedCopy,
+  explanationCopy,
+  reasonCopy,
+  warningCopy,
+  type AdviceCode,
+} from "./copy";
+import {
+  feasibilityPass,
+  type FilterResult,
+  type Leg,
+  type RawBlock,
+  type TripContext,
+} from "./filter";
+import {
+  exerciseBonusMinutes,
+  forecastStep,
+  type ForecastState,
+} from "./forecast";
 import {
   CAFFEINE,
   EXERCISE,
@@ -50,13 +69,25 @@ import {
   type DirectionDecision,
   type PhaseEstimate,
 } from "./phase";
+import {
+  compare,
+  earlier,
+  later,
+  minutesBetween,
+  overlaps,
+  plus,
+  type Instant,
+  type Interval,
+} from "./time";
 import type {
   Block,
   BlockKind,
+  DayFlag,
   Decision,
   Direction,
   EngineOptions,
   EvidenceGrade,
+  LatLon,
   PlanDay,
   PlanInput,
   PlanResult,
@@ -65,103 +96,67 @@ import type {
   SourceRef,
 } from "./types";
 
-export const ENGINE_VERSION = "0.1.0";
+/** Bumped whenever plan output changes (§7.4). */
+export const ENGINE_VERSION = "0.2.0";
 
-/** Guard against a non-terminating loop; no real plan comes close. */
-const MAX_SHIFT_DAYS = 40;
-
-type Instant = Temporal.Instant;
+/** Guard against a non-terminating loop; weak days at half rate stay far below. */
+const MAX_PLAN_DAYS = 60;
 
 const META: Record<
   BlockKind,
   { source: SourceRef; confidence: EvidenceGrade; movable: boolean }
 > = {
   SLEEP: { source: "R1", confidence: "A", movable: false },
+  SLEEP_INFLIGHT: { source: "R1", confidence: "A", movable: false },
   SEEK_LIGHT: { source: "R2", confidence: "A", movable: false },
+  SEEK_LIGHT_ARTIFICIAL: { source: "R2", confidence: "A", movable: false },
+  LIGHT_INFLIGHT_WINDOW: { source: "R2", confidence: "C", movable: false },
   AVOID_LIGHT: { source: "R2", confidence: "A", movable: false },
   MELATONIN_WINDOW: { source: "R4", confidence: "A", movable: true },
   EXERCISE_GOOD: { source: "R9", confidence: "B", movable: true },
+  EXERCISE_OPTIONAL_WALK: { source: "R9", confidence: "C", movable: true },
   EXERCISE_AVOID: { source: "R9", confidence: "B", movable: false },
   CAFFEINE_OK: { source: "R10", confidence: "B", movable: false },
+  CAFFEINE_LATE_OK: { source: "R10", confidence: "B", movable: false },
   CAFFEINE_STOP: { source: "R11", confidence: "B", movable: false },
+  NAP: { source: "R12", confidence: "B", movable: true },
+  NSDR: { source: "none", confidence: "C", movable: true },
   MEAL: { source: "none", confidence: "C", movable: true },
   WIND_DOWN: { source: "none", confidence: "C", movable: true },
 };
-
-function plus(instant: Instant, minutes: number): Instant {
-  return instant.add({ minutes });
-}
-
-function minutesBetween(a: Instant, b: Instant): number {
-  return Math.round(b.since(a).total({ unit: "minutes" }));
-}
-
-function earlier(a: Instant, b: Instant): Instant {
-  return Temporal.Instant.compare(a, b) <= 0 ? a : b;
-}
-
-function later(a: Instant, b: Instant): Instant {
-  return Temporal.Instant.compare(a, b) >= 0 ? a : b;
-}
-
-function overlaps(
-  aStart: Instant,
-  aEnd: Instant,
-  bStart: Instant,
-  bEnd: Instant,
-): boolean {
-  return (
-    Temporal.Instant.compare(aStart, bEnd) < 0 &&
-    Temporal.Instant.compare(bStart, aEnd) < 0
-  );
-}
-
-/** Where the traveler is: home, a leg's departure zone in the air, a layover, the destination. */
-function locator(input: PlanInput): (at: Instant) => string {
-  const legs = legInstants(input);
-  return (at) => {
-    let zone = input.itinerary.homeTz;
-    for (const leg of legs) {
-      if (Temporal.Instant.compare(at, leg.dep) < 0) return zone;
-      if (Temporal.Instant.compare(at, leg.arr) < 0) return leg.depTz;
-      zone = leg.arrTz;
-    }
-    return input.itinerary.destinationTz;
-  };
-}
 
 interface DayFrame {
   index: number;
   cbtMin: Instant;
   nextCbtMin: Instant;
-  /** Shift applied from this day to the next, minutes (0 on settled days). */
+  /** Shift from this day to the next, minutes (0 on settled/steady days). */
   shift: number;
 }
 
-interface Builder {
-  blocks: Block[];
-  warnings: PlanWarning[];
-  dropped: PlanResult["droppedBlocks"];
-  zoneAt: (at: Instant) => string;
+interface PlanContext {
+  input: PlanInput;
+  opts: EngineOptions;
+  phase: PhaseEstimate;
+  trip: TripContext;
+  /** Direction blocks are built for, when the day is shifting. */
+  direction: Direction;
+  shifting: boolean;
+  sleepReason: (frame: DayFrame) => ReasonCode;
 }
 
-function addBlock(
-  b: Builder,
-  kind: BlockKind,
-  start: Instant,
-  end: Instant,
-  reasonCode: ReasonCode,
-): void {
-  if (minutesBetween(start, end) <= 0) return;
-  b.blocks.push({
-    kind,
-    startUtc: start.toString(),
-    endUtc: end.toString(),
-    localTz: b.zoneAt(start),
-    reasonCode,
-    reason: reasonCopy(reasonCode),
-    ...META[kind],
-  });
+interface BuiltDay {
+  frame: DayFrame;
+  filtered: FilterResult;
+  lightShifted: boolean;
+  melatoninDropped: boolean;
+}
+
+interface DayOutcome {
+  day: BuiltDay;
+  weak: boolean;
+  before: number;
+  after: number;
+  effective: number;
 }
 
 function wakeOf(cbtMin: Instant, phase: PhaseEstimate): Instant {
@@ -172,274 +167,286 @@ function sleepStartOf(cbtMin: Instant, phase: PhaseEstimate): Instant {
   return plus(wakeOf(cbtMin, phase), -phase.sleepNeedMinutes);
 }
 
-function lightBlocks(
-  b: Builder,
-  day: DayFrame,
-  direction: Direction,
-  phase: PhaseEstimate,
-): void {
-  const wake = wakeOf(day.cbtMin, phase);
-  const nextSleep = sleepStartOf(day.nextCbtMin, phase);
-  const nextWake = wakeOf(day.nextCbtMin, phase);
-  const u = phase.uncertaintyMinutes;
-  if (direction === "advance") {
-    const seekStart = later(
-      plus(day.cbtMin, LIGHT.seekAdvanceStartHours * 60),
-      wake,
-    );
-    addBlock(
-      b,
-      "SEEK_LIGHT",
-      seekStart,
-      plus(seekStart, Math.min(LIGHT.seekMinutes, LIGHT.maxBlockMinutes)),
-      "SEEK_LIGHT_ADVANCE",
-    );
-    // Evening before the next sleep: the delay zone, widened by u past the
-    // crossover, awake part only.
-    const [from, to] = LIGHT.avoidWhenAdvancing;
-    addBlock(
-      b,
-      "AVOID_LIGHT",
-      later(plus(day.nextCbtMin, from * 60), wake),
-      earlier(plus(day.nextCbtMin, to * 60 + u), nextSleep),
-      "AVOID_LIGHT_ADVANCE",
-    );
-    return;
-  }
-  // Delaying: seek light late in the evening, before the next CBTmin.
-  const seekEnd = plus(day.nextCbtMin, LIGHT.seekDelayEndHours * 60);
-  let seekStart = plus(seekEnd, -LIGHT.seekMinutes);
-  let seekStop = seekEnd;
-  if (overlaps(seekStart, seekStop, nextSleep, nextWake)) {
-    seekStart = plus(nextSleep, -LIGHT.seekMinutes);
-    seekStop = nextSleep;
-    b.warnings.push({
-      code: "LIGHT_BLOCK_SHIFTED",
-      message: warningCopy("LIGHT_BLOCK_SHIFTED"),
-      dayIndex: day.index,
-    });
-  }
-  addBlock(b, "SEEK_LIGHT", seekStart, seekStop, "SEEK_LIGHT_DELAY");
-  // Morning after this sleep: the advance zone, widened by u, awake part only.
-  const [from, to] = LIGHT.avoidWhenDelaying;
-  addBlock(
-    b,
-    "AVOID_LIGHT",
-    later(plus(day.cbtMin, from * 60 - u), wake),
-    earlier(plus(day.cbtMin, to * 60), nextSleep),
-    "AVOID_LIGHT_DELAY",
-  );
+/** Where the traveler is: home, a leg's departure zone in the air, a layover, the destination. */
+function zoneLocator(
+  input: PlanInput,
+  legs: readonly Leg[],
+): (at: Instant) => string {
+  return (at) => {
+    let zone = input.itinerary.homeTz;
+    for (const leg of legs) {
+      if (compare(at, leg.start) < 0) return zone;
+      if (compare(at, leg.end) < 0) return leg.depTz;
+      zone = leg.arrTz;
+    }
+    return input.itinerary.destinationTz;
+  };
 }
 
-function melatoninBlock(
-  b: Builder,
-  day: DayFrame,
-  direction: Direction,
-  phase: PhaseEstimate,
-  opts: EngineOptions,
-): void {
-  if (direction === "delay") {
-    if (opts.allowDelayMelatonin !== true) return;
-    const wake = wakeOf(day.cbtMin, phase);
-    addBlock(
-      b,
-      "MELATONIN_WINDOW",
-      wake,
-      plus(wake, MELATONIN.delayAfterWakeMinutes),
-      "MELATONIN_WINDOW",
-    );
-    return;
-  }
-  const nextSleep = sleepStartOf(day.nextCbtMin, phase);
-  let start = plus(nextSleep, -MELATONIN.advanceBeforeSleepHours * 60);
-  const zone = b.zoneAt(start);
-  const local = start.toZonedDateTimeISO(zone);
-  const earliest = parseClock(MELATONIN.earliestLocalTime) ?? 0;
-  if (local.hour * 60 + local.minute < earliest) {
-    start = instantAt(local.toPlainDate(), earliest, zone);
-  }
-  const end = plus(start, MELATONIN.windowMinutes);
-  if (Temporal.Instant.compare(end, nextSleep) > 0) {
-    b.dropped.push({
-      dayIndex: day.index,
-      kind: "MELATONIN_WINDOW",
-      reason: droppedCopy("MELATONIN_NO_WINDOW"),
-    });
-    return;
-  }
-  addBlock(b, "MELATONIN_WINDOW", start, end, "MELATONIN_WINDOW");
+/** Ground position; home is taken as the first departure airport. */
+function latLonLocator(
+  legs: readonly Leg[],
+): (at: Instant) => LatLon | undefined {
+  return (at) => {
+    let where = legs[0]?.depLatLon;
+    for (const leg of legs) {
+      if (compare(at, leg.start) < 0) return where;
+      if (compare(at, leg.end) < 0) return undefined;
+      where = leg.arrLatLon;
+    }
+    return where;
+  };
 }
 
-function exerciseBlocks(
-  b: Builder,
-  day: DayFrame,
-  direction: Direction,
-  phase: PhaseEstimate,
-  preferredMinutes: number,
-  shifting: boolean,
-): void {
-  const wake = wakeOf(day.cbtMin, phase);
-  const nextSleep = sleepStartOf(day.nextCbtMin, phase);
-  const bedtimeAvoid = plus(nextSleep, -EXERCISE.avoidBeforeSleepHours * 60);
-  addBlock(
-    b,
-    "EXERCISE_AVOID",
-    later(bedtimeAvoid, wake),
-    nextSleep,
-    "EXERCISE_AVOID_BEDTIME",
-  );
-  if (!shifting) return;
+function localInterval(start: string, end: string, tz: string): Interval {
+  const at = (v: string): Instant =>
+    Temporal.PlainDateTime.from(v).toZonedDateTime(tz).toInstant();
+  return { start: at(start), end: at(end) };
+}
 
-  const at = (hours: number): Instant => plus(day.cbtMin, hours * 60);
-  const awakeBeforeBedtimeAvoid = (
+/** Raw (unfiltered) blocks for one day, from §2.5. */
+function buildRaw(
+  ctx: PlanContext,
+  frame: DayFrame,
+  behindSchedule: boolean,
+): { raw: RawBlock[]; lightShifted: boolean; melatoninDropped: boolean } {
+  const { phase, input, opts, direction } = ctx;
+  const t = input.traveler;
+  const raw: RawBlock[] = [];
+  const add = (
+    kind: BlockKind,
     start: Instant,
     end: Instant,
-  ): [Instant, Instant] => [later(start, wake), earlier(end, bedtimeAvoid)];
-
-  const good =
-    direction === "advance"
-      ? [EXERCISE.advanceAfternoonZone, EXERCISE.advanceMorningZone]
-      : [EXERCISE.delayZone];
-  for (const [from, to] of good) {
-    const [start, zoneEnd] = awakeBeforeBedtimeAvoid(at(from), at(to));
-    const end = earlier(plus(start, preferredMinutes), zoneEnd);
+    reasonCode: ReasonCode,
+  ): void => {
     if (minutesBetween(start, end) > 0) {
-      addBlock(
-        b,
-        "EXERCISE_GOOD",
-        start,
-        end,
-        direction === "advance"
-          ? "EXERCISE_GOOD_ADVANCE"
-          : "EXERCISE_GOOD_DELAY",
+      raw.push({ kind, start, end, reasonCode });
+    }
+  };
+  const wake = wakeOf(frame.cbtMin, phase);
+  const nextSleep = sleepStartOf(frame.nextCbtMin, phase);
+  const nextWake = wakeOf(frame.nextCbtMin, phase);
+  const at = (hours: number): Instant => plus(frame.cbtMin, hours * 60);
+  const shiftingToday = ctx.shifting && frame.shift > 0;
+  let lightShifted = false;
+  let melatoninDropped = false;
+
+  add("SLEEP", sleepStartOf(frame.cbtMin, phase), wake, ctx.sleepReason(frame));
+
+  if (shiftingToday) {
+    // Light (R2, R3).
+    const u = phase.uncertaintyMinutes;
+    if (direction === "advance") {
+      const seekStart = later(at(LIGHT.seekAdvanceStartHours), wake);
+      add(
+        "SEEK_LIGHT",
+        seekStart,
+        plus(seekStart, Math.min(LIGHT.seekMinutes, LIGHT.maxBlockMinutes)),
+        "SEEK_LIGHT_ADVANCE",
       );
-      break;
+      // Evening before the next sleep: the delay zone, widened by u past the
+      // crossover, awake part only.
+      const [from, to] = LIGHT.avoidWhenAdvancing;
+      add(
+        "AVOID_LIGHT",
+        later(plus(frame.nextCbtMin, from * 60), wake),
+        earlier(plus(frame.nextCbtMin, to * 60 + u), nextSleep),
+        "AVOID_LIGHT_ADVANCE",
+      );
+    } else {
+      // Late evening before the next CBTmin; slid out of sleep if needed.
+      const seekEnd = plus(frame.nextCbtMin, LIGHT.seekDelayEndHours * 60);
+      let seek: Interval = {
+        start: plus(seekEnd, -LIGHT.seekMinutes),
+        end: seekEnd,
+      };
+      if (overlaps(seek, { start: nextSleep, end: nextWake })) {
+        seek = { start: plus(nextSleep, -LIGHT.seekMinutes), end: nextSleep };
+        lightShifted = true;
+      }
+      add("SEEK_LIGHT", seek.start, seek.end, "SEEK_LIGHT_DELAY");
+      // Morning after this sleep: the advance zone, widened by u.
+      const [from, to] = LIGHT.avoidWhenDelaying;
+      add(
+        "AVOID_LIGHT",
+        later(plus(frame.cbtMin, from * 60 - u), wake),
+        earlier(plus(frame.cbtMin, to * 60), nextSleep),
+        "AVOID_LIGHT_DELAY",
+      );
+    }
+
+    // Melatonin (R4, R5): opted in and not contraindicated.
+    if (t.useMelatonin && t.melatoninContraindicated !== true) {
+      if (direction === "delay") {
+        if (opts.allowDelayMelatonin === true) {
+          add(
+            "MELATONIN_WINDOW",
+            wake,
+            plus(wake, MELATONIN.delayAfterWakeMinutes),
+            "MELATONIN_WINDOW",
+          );
+        }
+      } else {
+        let start = plus(nextSleep, -MELATONIN.advanceBeforeSleepHours * 60);
+        const zone = ctx.trip.zoneAt(start);
+        const local = start.toZonedDateTimeISO(zone);
+        const earliest = parseClock(MELATONIN.earliestLocalTime) ?? 0;
+        if (local.hour * 60 + local.minute < earliest) {
+          start = instantAt(local.toPlainDate(), earliest, zone);
+        }
+        const end = plus(start, MELATONIN.windowMinutes);
+        if (compare(end, nextSleep) > 0) melatoninDropped = true;
+        else add("MELATONIN_WINDOW", start, end, "MELATONIN_WINDOW");
+      }
     }
   }
-  const opposite =
-    direction === "advance"
-      ? [EXERCISE.delayZone]
-      : [EXERCISE.advanceMorningZone, EXERCISE.advanceAfternoonZone];
-  for (const [from, to] of opposite) {
-    const [start, end] = awakeBeforeBedtimeAvoid(at(from), at(to));
-    addBlock(b, "EXERCISE_AVOID", start, end, "EXERCISE_AVOID_DIRECTION");
+
+  // Exercise (R9): shifting plans only.
+  if (ctx.shifting && t.exercise.enabled) {
+    const bedtimeAvoid = plus(nextSleep, -EXERCISE.avoidBeforeSleepHours * 60);
+    add(
+      "EXERCISE_AVOID",
+      later(bedtimeAvoid, wake),
+      nextSleep,
+      "EXERCISE_AVOID_BEDTIME",
+    );
+    if (shiftingToday) {
+      const preferred = Math.round(
+        t.exercise.preferredMinutes ?? EXERCISE.defaultMinutes,
+      );
+      const awakePart = (from: number, to: number): Interval => ({
+        start: later(at(from), wake),
+        end: earlier(at(to), bedtimeAvoid),
+      });
+      const good =
+        direction === "advance"
+          ? [EXERCISE.advanceAfternoonZone, EXERCISE.advanceMorningZone]
+          : [EXERCISE.delayZone];
+      for (const [from, to] of good) {
+        const zone = awakePart(from, to);
+        const end = earlier(plus(zone.start, preferred), zone.end);
+        if (minutesBetween(zone.start, end) > 0) {
+          add(
+            "EXERCISE_GOOD",
+            zone.start,
+            end,
+            direction === "advance"
+              ? "EXERCISE_GOOD_ADVANCE"
+              : "EXERCISE_GOOD_DELAY",
+          );
+          break;
+        }
+      }
+      const opposite =
+        direction === "advance"
+          ? [EXERCISE.delayZone]
+          : [EXERCISE.advanceMorningZone, EXERCISE.advanceAfternoonZone];
+      for (const [from, to] of opposite) {
+        const zone = awakePart(from, to);
+        add("EXERCISE_AVOID", zone.start, zone.end, "EXERCISE_AVOID_DIRECTION");
+      }
+    }
   }
-}
 
-function symptomBlocks(
-  b: Builder,
-  day: DayFrame,
-  phase: PhaseEstimate,
-  input: PlanInput,
-  advancing: boolean,
-): void {
-  const t = input.traveler;
-  const wake = wakeOf(day.cbtMin, phase);
-  const nextSleep = sleepStartOf(day.nextCbtMin, phase);
-
+  // Caffeine (R10, R11).
   if (t.caffeine !== "none") {
     let stop = plus(nextSleep, -CAFFEINE.stopBeforeSleepHours[t.caffeine] * 60);
-    if (advancing) {
-      stop = earlier(
-        stop,
-        plus(day.cbtMin, CAFFEINE.advanceStopAfterCbtMinHours * 60),
-      );
+    if (shiftingToday && direction === "advance") {
+      stop = earlier(stop, at(CAFFEINE.advanceStopAfterCbtMinHours));
     }
-    if (Temporal.Instant.compare(stop, wake) > 0) {
-      addBlock(b, "CAFFEINE_OK", wake, stop, "CAFFEINE_OK");
-      addBlock(
-        b,
-        "CAFFEINE_STOP",
-        stop,
-        plus(stop, MARKER_MINUTES),
-        "CAFFEINE_STOP",
-      );
+    if (compare(stop, wake) > 0) {
+      add("CAFFEINE_OK", wake, stop, "CAFFEINE_OK");
+      if (shiftingToday && direction === "delay" && behindSchedule) {
+        const lateEnd = plus(nextSleep, -CAFFEINE.lateOkBeforeSleepHours * 60);
+        if (compare(lateEnd, stop) > 0) {
+          add("CAFFEINE_LATE_OK", stop, lateEnd, "CAFFEINE_LATE_OK");
+          stop = lateEnd;
+        }
+      }
+      add("CAFFEINE_STOP", stop, plus(stop, MARKER_MINUTES), "CAFFEINE_STOP");
     }
   }
 
+  // Meals (opt-in, grade C): markers.
   if (t.mealTiming.enabled) {
     const awake = minutesBetween(wake, nextSleep);
-    for (const at of [
+    for (const meal of [
       plus(wake, MEALS.afterWakeHours * 60),
       plus(wake, Math.round(awake / 2)),
       plus(nextSleep, -MEALS.lastBeforeSleepHours * 60),
     ]) {
-      addBlock(b, "MEAL", at, plus(at, MARKER_MINUTES), "MEAL");
+      add("MEAL", meal, plus(meal, MARKER_MINUTES), "MEAL");
     }
   }
 
+  // Wind-down (opt-in, grade C).
   if (t.meditation.enabled) {
     const minutes = Math.round(
       t.meditation.minutes ?? WIND_DOWN.defaultMinutes,
     );
-    addBlock(
-      b,
+    add(
       "WIND_DOWN",
       later(plus(nextSleep, -minutes), wake),
       nextSleep,
       "WIND_DOWN",
     );
   }
+
+  return { raw, lightShifted, melatoninDropped };
 }
 
-function sortBlocks(blocks: Block[]): Block[] {
-  return [...blocks].sort(
-    (x, y) =>
-      Temporal.Instant.compare(
-        Temporal.Instant.from(x.startUtc),
-        Temporal.Instant.from(y.startUtc),
-      ) || x.kind.localeCompare(y.kind),
+function buildDay(
+  ctx: PlanContext,
+  frame: DayFrame,
+  behindSchedule: boolean,
+): BuiltDay {
+  const { raw, lightShifted, melatoninDropped } = buildRaw(
+    ctx,
+    frame,
+    behindSchedule,
+  );
+  const filtered = feasibilityPass(
+    raw,
+    {
+      index: frame.index,
+      sleepStart: sleepStartOf(frame.cbtMin, ctx.phase),
+      wake: wakeOf(frame.cbtMin, ctx.phase),
+      nextSleepStart: sleepStartOf(frame.nextCbtMin, ctx.phase),
+    },
+    ctx.trip,
+  );
+  return { frame, filtered, lightShifted, melatoninDropped };
+}
+
+/** §2.7 rule 5: a seek-light block overlapping the zone that moves the clock the right way. */
+function hasLightInZone(day: BuiltDay, direction: Direction): boolean {
+  const zone: Interval =
+    direction === "advance"
+      ? {
+          start: plus(day.frame.cbtMin, LIGHT.advanceZone[0] * 60),
+          end: plus(day.frame.cbtMin, LIGHT.advanceZone[1] * 60),
+        }
+      : {
+          start: plus(day.frame.nextCbtMin, LIGHT.delayZone[0] * 60),
+          end: plus(day.frame.nextCbtMin, LIGHT.delayZone[1] * 60),
+        };
+  return day.filtered.blocks.some(
+    (b) =>
+      (b.kind === "SEEK_LIGHT" || b.kind === "SEEK_LIGHT_ARTIFICIAL") &&
+      overlaps(b, zone),
   );
 }
 
-/** CBTmin of each day while shifting, then one settled day (§2.6). */
-function shiftFrames(
-  cbtMin0: Instant,
-  decision: DirectionDecision,
-  destinationTz: string,
-): DayFrame[] {
-  const direction = decision.shiftDirection;
-  const rate = decision.rateMinutes[direction];
-  const sign = direction === "advance" ? -1 : 1;
-  let remaining =
-    direction === "advance" ? decision.advanceMinutes : decision.delayMinutes;
-  const frames: DayFrame[] = [];
-  let cbtMin = cbtMin0;
-  while (remaining > 0) {
-    if (frames.length >= MAX_SHIFT_DAYS) {
-      throw new Error(
-        `engine invariant: shift did not converge within ${MAX_SHIFT_DAYS} days`,
-      );
-    }
-    const shift = Math.min(rate, remaining);
-    const next = plus(cbtMin, MINUTES_PER_DAY + sign * shift);
-    // A DST change at the destination moves the target in UTC.
-    const offsetChange =
-      offsetMinutes(next, destinationTz) - offsetMinutes(cbtMin, destinationTz);
-    remaining = Math.max(0, remaining - shift - sign * offsetChange);
-    frames.push({ index: frames.length, cbtMin, nextCbtMin: next, shift });
-    cbtMin = next;
-  }
-  frames.push({
-    index: frames.length,
-    cbtMin,
-    nextCbtMin: plus(cbtMin, MINUTES_PER_DAY),
-    shift: 0,
-  });
-  return frames;
-}
-
-/** Same CBTmin every day (no shift). */
-function steadyFrames(cbtMin0: Instant, count: number): DayFrame[] {
-  return Array.from({ length: count }, (_, index) => {
-    const cbtMin = plus(cbtMin0, index * MINUTES_PER_DAY);
-    return {
-      index,
-      cbtMin,
-      nextCbtMin: plus(cbtMin, MINUTES_PER_DAY),
-      shift: 0,
-    };
-  });
+function finalize(raw: RawBlock, zoneAt: (at: Instant) => string): Block {
+  return {
+    kind: raw.kind,
+    startUtc: raw.start.toString(),
+    endUtc: raw.end.toString(),
+    localTz: zoneAt(raw.start),
+    reasonCode: raw.reasonCode,
+    reason: reasonCopy(raw.reasonCode),
+    ...META[raw.kind],
+  };
 }
 
 function explanation(
@@ -482,17 +489,31 @@ export function generatePlan(
 
   const { traveler, itinerary } = input;
   const phase = estimatePhase(traveler);
-  const legs = legInstants(input);
+  const legs: Leg[] = legInstants(input).map((l, i) => {
+    const source = itinerary.legs[i];
+    return {
+      start: l.dep,
+      end: l.arr,
+      depTz: l.depTz,
+      arrTz: l.arrTz,
+      ...(source?.departureLatLon === undefined
+        ? {}
+        : { depLatLon: source.departureLatLon }),
+      ...(source?.arrivalLatLon === undefined
+        ? {}
+        : { arrLatLon: source.arrivalLatLon }),
+    };
+  });
   const firstLeg = legs[0];
   const lastLeg = legs[legs.length - 1];
   if (firstLeg === undefined || lastLeg === undefined) {
     throw new EngineInputError(["itinerary.legs must not be empty"]);
   }
-  const departureDate = firstLeg.dep
-    .toZonedDateTimeISO(itinerary.homeTz)
-    .toPlainDate();
   const destinationTz = itinerary.destinationTz;
   const target = phase.cbtMinClock;
+  const departureDate = firstLeg.start
+    .toZonedDateTimeISO(itinerary.homeTz)
+    .toPlainDate();
 
   // §2.3: delta from CBTmin on the first planned day, read in destination time.
   const firstDay = departureDate.subtract({ days: traveler.preAdjustDays });
@@ -505,108 +526,213 @@ export function generatePlan(
     opts,
   );
 
-  const builder: Builder = {
-    blocks: [],
-    warnings: [],
-    dropped: [],
-    zoneAt: locator(input),
+  const constraints = input.constraints ?? {};
+  const zoneAt = zoneLocator(input, legs);
+  const trip: TripContext = {
+    legs,
+    mustBeAwake: (constraints.mustBeAwake ?? []).map((e) =>
+      localInterval(e.start, e.end, e.tz),
+    ),
+    noWorkout: (constraints.noWorkoutWindows ?? []).map((e) =>
+      localInterval(e.start, e.end, e.tz),
+    ),
+    exerciseEnabled: traveler.exercise.enabled,
+    meditationEnabled: traveler.meditation.enabled,
+    zoneAt,
+    latLonAt: latLonLocator(legs),
   };
-  if (phase.uncertain) {
-    builder.warnings.push({
-      code: "PHASE_ESTIMATE_UNCERTAIN",
-      message: warningCopy("PHASE_ESTIMATE_UNCERTAIN"),
-    });
-  }
+  const shifting =
+    decision.direction === "advance" || decision.direction === "delay";
+  const direction = decision.shiftDirection;
+  const ctx: PlanContext = {
+    input,
+    opts,
+    phase,
+    trip,
+    direction,
+    shifting,
+    sleepReason:
+      decision.direction === "none"
+        ? () => "SLEEP_LOCAL_TIME"
+        : decision.direction === "short-trip"
+          ? () => "SLEEP_HOME_TIME"
+          : (f) => (f.shift > 0 ? "SLEEP_SHIFTING" : "SLEEP_SETTLED"),
+  };
 
-  let frames: DayFrame[];
-  let sleepReason: (frame: DayFrame) => ReasonCode;
+  const steady = (cbtMin: Instant, index: number): DayFrame => ({
+    index,
+    cbtMin,
+    nextCbtMin: plus(cbtMin, MINUTES_PER_DAY),
+    shift: 0,
+  });
+  const misalignment = (cbtMin: Instant): number =>
+    Math.abs(signedMinutes(clockIn(cbtMin, destinationTz) - target)) / 60;
+
+  const outcomes: DayOutcome[] = [];
   if (decision.direction === "none") {
     // One day: the first night on destination time after the final arrival.
-    const arrival = lastLeg.arr.toZonedDateTimeISO(destinationTz);
+    // The body is still |delta| off; the plan does not model it.
+    const arrival = lastLeg.end.toZonedDateTimeISO(destinationTz);
     let cbtMin = instantAt(arrival.toPlainDate(), target, destinationTz);
-    if (Temporal.Instant.compare(cbtMin, lastLeg.arr) < 0) {
+    if (compare(cbtMin, lastLeg.end) < 0) {
       cbtMin = instantAt(
         arrival.toPlainDate().add({ days: 1 }),
         target,
         destinationTz,
       );
     }
-    frames = steadyFrames(cbtMin, 1);
-    sleepReason = () => "SLEEP_LOCAL_TIME";
+    const body = Math.abs(decision.deltaMinutes) / 60;
+    outcomes.push({
+      day: buildDay(ctx, steady(cbtMin, 0), false),
+      weak: false,
+      before: body,
+      after: body,
+      effective: 0,
+    });
   } else if (decision.direction === "short-trip") {
-    const homeCbtMin = instantAt(departureDate, target, itinerary.homeTz);
-    frames = steadyFrames(homeCbtMin, (itinerary.tripDays ?? 0) + 1);
-    sleepReason = () => "SLEEP_HOME_TIME";
+    const home = instantAt(departureDate, target, itinerary.homeTz);
+    for (let i = 0; i <= (itinerary.tripDays ?? 0); i += 1) {
+      const cbtMin = plus(home, i * MINUTES_PER_DAY);
+      outcomes.push({
+        day: buildDay(ctx, steady(cbtMin, i), false),
+        weak: false,
+        before: misalignment(cbtMin),
+        after: misalignment(cbtMin),
+        effective: 0,
+      });
+    }
   } else {
-    frames = shiftFrames(cbtMin0, decision, destinationTz);
-    sleepReason = (f) => (f.shift > 0 ? "SLEEP_SHIFTING" : "SLEEP_SETTLED");
+    const rate = decision.rateMinutes[direction];
+    const sign = direction === "advance" ? -1 : 1;
+    const initial =
+      direction === "advance" ? decision.advanceMinutes : decision.delayMinutes;
+    let remaining = initial;
+    let cbtMin = cbtMin0;
+    let behindSchedule = false;
+    let forecast: ForecastState = { cbtMin: cbtMin0, remaining: initial };
+    for (let index = 0; ; index += 1) {
+      if (index >= MAX_PLAN_DAYS) {
+        throw new Error(
+          `engine invariant: plan did not converge within ${MAX_PLAN_DAYS} days`,
+        );
+      }
+      const planned = Math.min(rate, remaining);
+      const frameFor = (shift: number): DayFrame => ({
+        index,
+        cbtMin,
+        nextCbtMin: plus(cbtMin, MINUTES_PER_DAY + sign * shift),
+        shift,
+      });
+      let day = buildDay(ctx, frameFor(planned), behindSchedule);
+      let weak = false;
+      if (planned > 0 && !hasLightInZone(day, direction)) {
+        // §2.7 rule 5: half rate today; the plan gets longer accordingly.
+        weak = true;
+        day = buildDay(
+          ctx,
+          frameFor(Math.min(Math.round(rate / 2), remaining)),
+          behindSchedule,
+        );
+      }
+      const step = forecastStep(forecast, {
+        shift: day.frame.shift,
+        bonus:
+          day.frame.shift > 0
+            ? exerciseBonusMinutes(
+                day.filtered.blocks,
+                day.frame.cbtMin,
+                direction,
+              )
+            : 0,
+        rate,
+        sign,
+        destinationTz,
+      });
+      outcomes.push({
+        day,
+        weak,
+        before: misalignment(forecast.cbtMin),
+        after: misalignment(step.next.cbtMin),
+        effective: step.effectiveMinutes / 60,
+      });
+      forecast = step.next;
+      if (planned === 0) break;
+      // A DST change at the destination moves the target in UTC.
+      const offsetChange =
+        offsetMinutes(day.frame.nextCbtMin, destinationTz) -
+        offsetMinutes(cbtMin, destinationTz);
+      remaining = Math.max(
+        0,
+        remaining - day.frame.shift - sign * offsetChange,
+      );
+      cbtMin = day.frame.nextCbtMin;
+      behindSchedule = behindSchedule || weak;
+    }
   }
 
-  const shifting =
-    decision.direction === "advance" || decision.direction === "delay";
-  const direction = decision.shiftDirection;
-  const melatoninAllowed =
-    traveler.useMelatonin && traveler.melatoninContraindicated !== true;
-  const days: PlanDay[] = frames.map((frame) => {
-    builder.blocks = [];
-    const wake = wakeOf(frame.cbtMin, phase);
-    addBlock(
-      builder,
-      "SLEEP",
-      sleepStartOf(frame.cbtMin, phase),
-      wake,
-      sleepReason(frame),
-    );
-    const shiftingToday = shifting && frame.shift > 0;
-    if (shiftingToday) {
-      lightBlocks(builder, frame, direction, phase);
-      if (melatoninAllowed) {
-        melatoninBlock(builder, frame, direction, phase, opts);
-      }
-    }
-    if (shifting && traveler.exercise.enabled) {
-      exerciseBlocks(
-        builder,
-        frame,
-        direction,
-        phase,
-        Math.round(
-          traveler.exercise.preferredMinutes ?? EXERCISE.defaultMinutes,
-        ),
-        shiftingToday,
-      );
-    }
-    symptomBlocks(
-      builder,
-      frame,
-      phase,
-      input,
-      shiftingToday && direction === "advance",
-    );
+  // Assemble.
+  const warnings: PlanWarning[] = [];
+  const warn = (code: PlanWarning["code"], dayIndex?: number): void => {
+    warnings.push({
+      code,
+      message: warningCopy(code),
+      ...(dayIndex === undefined ? {} : { dayIndex }),
+    });
+  };
+  if (phase.uncertain) warn("PHASE_ESTIMATE_UNCERTAIN");
+  if (outcomes.some((o) => o.day.lightShifted)) warn("LIGHT_BLOCK_SHIFTED");
+  if (outcomes.some((o) => o.day.filtered.daylightUnknown)) {
+    warn("DAYLIGHT_UNKNOWN");
+  }
 
-    // Light-touch plans sit on destination time; the body is still |delta| off.
-    const misalignment = (cbtMin: Instant): number =>
-      decision.direction === "none"
-        ? Math.abs(decision.deltaMinutes) / 60
-        : Math.abs(signedMinutes(clockIn(cbtMin, destinationTz) - target)) / 60;
-    return {
-      date: wake.toZonedDateTimeISO(destinationTz).toPlainDate().toString(),
-      localTzAtWake: builder.zoneAt(wake),
-      cbtMinUtc: frame.cbtMin.toString(),
-      blocks: sortBlocks(builder.blocks),
-      misalignmentBefore: misalignment(frame.cbtMin),
-      misalignmentAfter: shifting
-        ? misalignment(frame.nextCbtMin)
-        : misalignment(frame.cbtMin),
-      effectiveShiftHours: frame.shift / 60,
-      flags: [],
-    };
-  });
+  const dropped: PlanResult["droppedBlocks"] = [];
+  const staticAdvice: PlanResult["staticAdvice"] = [];
+  const days: PlanDay[] = outcomes.map(
+    ({ day, weak, before, after, effective }) => {
+      const index = day.frame.index;
+      for (const code of day.filtered.warnings) warn(code, index);
+      if (weak) warn("WEAK_DAY", index);
+      if (day.melatoninDropped) {
+        dropped.push({
+          dayIndex: index,
+          kind: "MELATONIN_WINDOW",
+          reason: droppedCopy("MELATONIN_NO_WINDOW"),
+        });
+      }
+      for (const d of day.filtered.dropped) {
+        dropped.push({
+          dayIndex: index,
+          kind: d.kind,
+          reason: droppedCopy(d.code),
+        });
+      }
+      for (const code of new Set<AdviceCode>(day.filtered.advice)) {
+        staticAdvice.push({
+          dayIndex: index,
+          text: adviceCopy(code),
+          source: "none",
+        });
+      }
+      const flags = [...new Set<DayFlag>(day.filtered.flags)];
+      if (weak) flags.push("WEAK_DAY");
+      const wake = wakeOf(day.frame.cbtMin, phase);
+      return {
+        date: wake.toZonedDateTimeISO(destinationTz).toPlainDate().toString(),
+        localTzAtWake: zoneAt(wake),
+        cbtMinUtc: day.frame.cbtMin.toString(),
+        blocks: day.filtered.blocks.map((b) => finalize(b, zoneAt)),
+        misalignmentBefore: before,
+        misalignmentAfter: after,
+        effectiveShiftHours: effective,
+        flags,
+      };
+    },
+  );
 
   // Days of the plan actually chosen: shift days, the days kept on home
   // time, or none.
   const chosenDays = shifting
-    ? frames.length - 1
+    ? days.length - 1
     : decision.direction === "short-trip"
       ? (itinerary.tripDays ?? 0)
       : 0;
@@ -622,9 +748,9 @@ export function generatePlan(
   return {
     decision: result,
     days,
-    staticAdvice: [],
-    warnings: builder.warnings,
-    droppedBlocks: builder.dropped,
+    staticAdvice,
+    warnings,
+    droppedBlocks: dropped,
     engineVersion: ENGINE_VERSION,
   };
 }
