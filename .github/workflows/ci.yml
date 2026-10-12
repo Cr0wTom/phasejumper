@@ -82,6 +82,9 @@ jobs:
       - name: End-to-end tests
         run: pnpm test:e2e
 
+      - name: Accessibility
+        run: pnpm --filter @phasejumper/web exec node --experimental-strip-types scripts/lighthouse-a11y.ts
+
       # Phase map screenshots: on a missing baseline Playwright writes the new
       # image; on a mismatch it writes actual/diff images. Kept for review.
       - name: Upload phase map screenshots

@@ -15,17 +15,124 @@
  */
 
 @import "tailwindcss";
+@import "./styles/tokens.css";
 
-html {
-  color-scheme: dark;
-  background: #0b0b0d;
+html,
+body {
+  background: var(--bg);
+  color: var(--fg);
 }
 
 body {
   margin: 0;
   min-height: 100vh;
-  background: #0b0b0d;
-  color: #f2f2f0;
+}
+
+/* Geist stays on the app shell. The phase-map harness imports this file and
+   must keep its own font stack. */
+.pj-shell {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  padding-bottom: env(safe-area-inset-bottom);
+  background: var(--bg);
+  color: var(--fg);
+  font-family: Geist, ui-sans-serif, system-ui, sans-serif;
+  --font-mono:
+    "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+}
+
+.pj-page {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+.pj-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--bg);
+  color: var(--fg);
+  padding-top: env(safe-area-inset-top);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+.pj-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 1040px;
+  margin-inline: auto;
+  padding: 8px 16px;
+}
+
+.pj-brand {
+  margin: 0;
+  font-size: var(--text-15);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-display);
+}
+
+.pj-theme {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--fg);
+}
+
+.pj-theme:focus-visible {
+  outline: 2px solid var(--fg);
+  outline-offset: 2px;
+}
+
+.pj-update {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 8px;
+  padding-right: calc(16px + env(safe-area-inset-right));
+  padding-bottom: calc(8px + env(safe-area-inset-bottom));
+  padding-left: calc(16px + env(safe-area-inset-left));
+  border-top: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--fg);
+}
+
+.pj-update p {
+  margin: 0;
+  font-size: var(--text-13);
+  line-height: var(--leading-body);
+}
+
+.pj-update-reload {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--bg);
+  color: var(--fg);
+  font: inherit;
+  font-size: var(--text-13);
+  line-height: var(--leading-body);
+  padding: 6px 10px;
+}
+
+.pj-update-reload:focus-visible {
+  outline: 2px solid var(--fg);
+  outline-offset: 2px;
 }
 
 /* Phase map: rows draw in once, top to bottom (§5 motion). */

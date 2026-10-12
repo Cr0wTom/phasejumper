@@ -14,12 +14,25 @@
  * limitations under the License.
  */
 
+import { AppHeader } from "./components/AppHeader";
+import { UpdatePrompt } from "./components/UpdatePrompt";
 import { PlanPlaceholder } from "./routes/plan/PlanPlaceholder";
 import { TripBuilder } from "./routes/trip/TripBuilder";
 import { useRoute } from "./router";
 
 export function App() {
   const route = useRoute();
-  if (route.name === "plan") return <PlanPlaceholder id={route.id} />;
-  return <TripBuilder />;
+  return (
+    <div className="pj-shell">
+      <AppHeader />
+      <div className="pj-page">
+        {route.name === "plan" ? (
+          <PlanPlaceholder id={route.id} />
+        ) : (
+          <TripBuilder />
+        )}
+      </div>
+      <UpdatePrompt />
+    </div>
+  );
 }

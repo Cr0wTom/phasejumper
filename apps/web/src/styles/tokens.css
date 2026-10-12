@@ -1,0 +1,103 @@
+/*
+ * Copyright 2026 PhaseJumper contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/* Geist and Geist Mono variable fonts from geist@1.7.2 (SIL OFL). */
+@font-face {
+  font-family: Geist;
+  src: url("/fonts/Geist-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Geist Mono";
+  src: url("/fonts/GeistMono-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Dark is the default. Light is an explicit choice. */
+:root {
+  color-scheme: dark;
+  --bg: #0b0b0d;
+  --surface: #141417;
+  --line: #26262b;
+  --fg: #f2f2f0;
+  --fg-muted: #8b8b93;
+  --sleep: #6c7bff;
+  --light: #f6b73c;
+  --dark: #2e2e36;
+  --move: #3fd6a0;
+  --caffeine: #c9915a;
+  --melatonin: #b690ff;
+  /* Hatched in-air band: muted text at 30%. The hatch itself is --flight-hatch. */
+  --flight: color-mix(in srgb, var(--fg-muted) 30%, transparent);
+  --flight-hatch: repeating-linear-gradient(
+    -45deg,
+    var(--flight) 0 2px,
+    transparent 2px 6px
+  );
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+}
+
+[data-theme="light"] {
+  color-scheme: light;
+  --bg: #fafaf9;
+  --surface: #ffffff;
+  --line: #e6e6e3;
+  --fg: #17171a;
+  --fg-muted: #6b6b73;
+  --sleep: #4f5fe6;
+  --light: #d99a1e;
+  --dark: #cfcfd6;
+  --move: #1fa87a;
+  --caffeine: #a7733f;
+  --melatonin: #8c5cf0;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-line: var(--line);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-sleep: var(--sleep);
+  --color-light: var(--light);
+  --color-dark: var(--dark);
+  --color-move: var(--move);
+  --color-caffeine: var(--caffeine);
+  --color-melatonin: var(--melatonin);
+  --color-flight: var(--flight);
+}
+
+/* Theme-independent scales (§5): defined once, as plain values, so Tailwind
+   utilities (rounded-surface, text-15, …) and plain CSS share them. */
+@theme {
+  --radius-surface: 10px;
+  --radius-control: 6px;
+  --text-13: 13px;
+  --text-15: 15px;
+  --text-17: 17px;
+  --text-22: 22px;
+  --text-28: 28px;
+  --text-40: 40px;
+  --leading-body: 1.45;
+  --leading-display: 1.1;
+}

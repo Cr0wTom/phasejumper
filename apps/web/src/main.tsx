@@ -18,7 +18,10 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App";
 import { flags } from "./flags";
+import { applyInitialTheme } from "./theme";
 import "./index.css";
+
+applyInitialTheme();
 
 if (import.meta.env.DEV) {
   // §7.4: log build flags once, at warn level, in development only.

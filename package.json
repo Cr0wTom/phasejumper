@@ -10,7 +10,7 @@
   "scripts": {
     "lint": "eslint . && prettier --check .",
     "typecheck": "pnpm --filter \"./packages/*\" --filter \"./apps/*\" typecheck",
-    "test": "pnpm --filter \"./packages/*\" --filter \"./apps/*\" test",
+    "test": "pnpm --workspace-concurrency=1 --filter \"./packages/*\" --filter \"./apps/*\" test",
     "build": "pnpm --filter @phasejumper/web build",
     "dev": "pnpm --filter @phasejumper/web dev",
     "test:e2e": "pnpm --filter @phasejumper/web test:e2e",

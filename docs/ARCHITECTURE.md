@@ -2,7 +2,7 @@
 
 PhaseJumper is a static web app. GitHub Pages serves the built files; everything — planning, airport lookup, calendar — runs in the browser. There is no server, database, account or telemetry, and nothing a traveler enters leaves their device.
 
-*As built through T08 and the native date and time pickers. Updated with each ticket.*
+*As built through T11 (including the native date and time pickers). Updated with each ticket.*
 
 ## Repository
 
@@ -50,6 +50,10 @@ Testing: unit tests, fast-check property tests over 500 random trips, and eight 
 | `storage/plans.ts` | IndexedDB via `idb-keyval`: `plan:<id>` → `{ id, input, result, engineVersion, createdAt }` |
 | `flags.json` | Build-time flags (§7.4) plus `legal.acceptanceGate` and `melatonin.optIn`, all off |
 | `components/PhaseMap/` | The phase map (§4): `layout.ts` turns a plan into rows of positioned bands (pure, unit-tested); `PhaseMap.tsx` draws them as SVG with the axis toggle, popovers and keyboard navigation |
+| `styles/tokens.css` | The §5 design tokens: colors for dark (default) and light, radii and type scale; Geist and Geist Mono self-hosted from `public/fonts/` |
+| `theme.ts`, `components/AppHeader.tsx` | Dark/light switch in the app header; first visit follows the OS, the choice is remembered on this device (`localStorage`, optional) |
+| `icons.ts` | The fixed Lucide icon mapping (§5); never used inside the phase-map grid |
+| `components/UpdatePrompt.tsx` | "A new version is ready" bar; the app never reloads itself |
 | `messages.ts` | Every user-facing string in the web app |
 
 The phase map draws one row per calendar date in the grid's zone. Destination and home hour scales sit on top, both shown by default and each switchable; the grid reads in the first one switched on. A "now" marker shows the current time on today's row while the plan is underway. Every block is placed by its own UTC instant and split at midnight and at clock changes, so DST days read correctly. Inside the grid there are only bands, glyphs and text; icons live in the legend. A test-only harness (`apps/web/harness/`, built by `vite.harness.config.ts`, never shipped) renders the golden fixtures for Playwright: screenshots at 390 and 1280 px, axe, keyboard, DST and narrow-screen checks.
@@ -61,6 +65,10 @@ The phase map draws one row per calendar date in the grid's zone. Destination an
 `parseItinerary(text, { referenceDate, isAirport })` reads pasted booking-confirmation text and returns `{ legs, confidence, unparsed }`. It is pure (lint-enforced, like the engine): the app passes today's date (to infer a missing year) and an airport check (to reject words like THE or AND). Times are kept as the booking states them; time zones always come from the airport, never from the text. 25 anonymized fixtures cover common confirmation layouts, 12 h and 24 h times, next-day arrivals and multi-leg trips.
 
 In the trip builder, "Read flights" replaces the flight legs with what was found and marks each filled field to check; lines that looked like flight data but couldn't be read are listed under the box. The pasted text is cleared at once and never stored.
+
+## Installable app (PWA)
+
+`vite-plugin-pwa` writes the manifest (standalone, starts at `#/today`, ribbon-mark icons from `public/icons/`, rendered by `scripts/render-icons.ts`) and a Workbox service worker that precaches the app shell, fonts and airport data (≤ 3 MB, enforced at build time) and caches nothing from other origins. Updates wait for the traveler to tap Reload. On iOS the app opens full screen with a translucent status bar; safe-area insets keep content clear of the notch and home indicator.
 
 ## Data flow
 
@@ -74,7 +82,7 @@ No request leaves the page.
 
 ## Build and deploy
 
-- **CI** (`ci.yml`, every pull request): `pnpm install --frozen-lockfile`, lint, typecheck, test, build; a second job runs the Playwright end-to-end tests in Chromium (`pnpm test:e2e`).
+- **CI** (`ci.yml`, every pull request): `pnpm install --frozen-lockfile`, lint, typecheck, test, build; a second job runs the Playwright end-to-end tests in Chromium (`pnpm test:e2e`) and a Lighthouse accessibility check on the trip form (fails below 95).
 - **Pages** (`pages.yml`, push to `main`): build → `actions/upload-pages-artifact` → `actions/deploy-pages`. Site: https://cr0wtom.github.io/phasejumper/
 - The base path comes from `VITE_BASE_PATH` (default `/phasejumper/`); set it to `/` to serve from a custom domain root.
 - Rollback: revert the merge commit; Pages redeploys in about a minute.

@@ -129,15 +129,21 @@ test("completes the form with the keyboard only", async ({ page }) => {
   await chooseAirport(page, messages.fromAirport, "PRG");
   await chooseAirport(page, messages.toAirport, "JFK");
   await tabUntil(page, messages.departureDate);
-  // Native pickers take keyboard input segment by segment, in the browser's
-  // locale (en-GB in playwright.config.ts): dd mm yyyy, then hh mm.
-  await page.keyboard.type("18012027");
+  // Native pickers take keystrokes segment by segment in the BROWSER's UI
+  // order, which differs by platform (day-first or month-first, 12 h or
+  // 24 h). Keep the keystrokes order-proof: day = month (1 Jan), and an
+  // "A" that a 12 h field reads as AM and a 24 h field ignores.
+  await page.keyboard.type("01012027");
   await tabUntil(page, messages.departureTime);
-  await page.keyboard.type("1000");
+  await page.keyboard.type("1000A");
   await tabUntil(page, messages.arrivalDate);
-  await page.keyboard.type("18012027");
+  await page.keyboard.type("01012027");
   await tabUntil(page, messages.arrivalTime);
-  await page.keyboard.type("1300");
+  await page.keyboard.type("1100A");
+  // The fields must hold exactly what was typed, whatever the layout.
+  await expect(labeled(page, messages.departureDate)).toHaveValue("2027-01-01");
+  await expect(labeled(page, messages.departureTime)).toHaveValue("10:00");
+  await expect(labeled(page, messages.arrivalTime)).toHaveValue("11:00");
   await tabUntil(page, messages.generate);
   await page.keyboard.press("Enter");
 

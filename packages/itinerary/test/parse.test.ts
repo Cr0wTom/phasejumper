@@ -211,10 +211,17 @@ Arrives 13:45
     }
     text = text.slice(0, 10_000);
     expect(text.length).toBe(10_000);
-    const start = performance.now();
-    const result = parseItinerary(text);
-    const elapsed = performance.now() - start;
-    expect(result.legs.length).toBeGreaterThan(0);
-    expect(elapsed).toBeLessThan(50);
+    // One warm-up parse (JIT, regex compilation), then the median of 7 runs:
+    // a single cold timing on a shared CI runner measures the runner, not the
+    // parser (it once read 86 ms on CI against ~10 ms locally).
+    expect(parseItinerary(text).legs.length).toBeGreaterThan(0);
+    const runs: number[] = [];
+    for (let i = 0; i < 7; i += 1) {
+      const start = performance.now();
+      parseItinerary(text);
+      runs.push(performance.now() - start);
+    }
+    const median = [...runs].sort((x, y) => x - y)[3] ?? Infinity;
+    expect(median).toBeLessThan(50);
   });
 });
