@@ -45,6 +45,10 @@
   --move: #3fd6a0;
   --caffeine: #c9915a;
   --melatonin: #b690ff;
+  /* Beyond §5, for contrast: errors, and label text on colored bands. */
+  --danger: #ffb4b4;
+  --ink: #0b0b0d;
+  --on-sleep: #0b0b0d;
   /* Hatched in-air band: muted text at 30%. The hatch itself is --flight-hatch. */
   --flight: color-mix(in srgb, var(--fg-muted) 30%, transparent);
   --flight-hatch: repeating-linear-gradient(
@@ -70,6 +74,8 @@
   --move: #1fa87a;
   --caffeine: #a7733f;
   --melatonin: #8c5cf0;
+  --danger: #b42318;
+  --on-sleep: #ffffff;
 }
 
 @theme inline {
@@ -84,6 +90,8 @@
   --color-move: var(--move);
   --color-caffeine: var(--caffeine);
   --color-melatonin: var(--melatonin);
+  --color-danger: var(--danger);
+  --color-ink: var(--ink);
   --color-flight: var(--flight);
 }
 

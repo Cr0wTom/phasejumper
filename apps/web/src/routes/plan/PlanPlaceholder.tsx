@@ -70,7 +70,7 @@ export function PlanPlaceholder({ id }: { id: string }) {
           </section>
           <p>{messages.planDays(state.plan.result.days.length)}</p>
           <p>{messages.planComingLater}</p>
-          <footer className="mt-4 border-t border-[#26262B] pt-4">
+          <footer className="mt-4 border-t border-line pt-4">
             <p>{messages.footer}</p>
           </footer>
         </div>

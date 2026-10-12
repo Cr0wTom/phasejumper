@@ -28,6 +28,7 @@ import {
 } from "react";
 import { Temporal } from "temporal-polyfill";
 import { phaseMapMessages as m } from "../../messages";
+import { ICON_SIZE_RIBBON, Icon, type IconName } from "../../icons";
 import { focusRing } from "../../ui";
 import {
   axisZone,
@@ -38,30 +39,63 @@ import {
 } from "./layout";
 
 const COLOR: Record<BlockKind, string> = {
-  SLEEP: "var(--sleep, #6C7BFF)",
-  SLEEP_INFLIGHT: "var(--sleep, #6C7BFF)",
-  NAP: "var(--sleep, #6C7BFF)",
-  SEEK_LIGHT: "var(--light, #F6B73C)",
-  SEEK_LIGHT_ARTIFICIAL: "var(--light, #F6B73C)",
-  LIGHT_INFLIGHT_WINDOW: "var(--light, #F6B73C)",
-  AVOID_LIGHT: "var(--dark, #2E2E36)",
-  MELATONIN_WINDOW: "var(--melatonin, #B690FF)",
-  EXERCISE_GOOD: "var(--move, #3FD6A0)",
-  EXERCISE_OPTIONAL_WALK: "var(--move, #3FD6A0)",
-  EXERCISE_AVOID: "var(--move, #3FD6A0)",
-  CAFFEINE_OK: "var(--caffeine, #C9915A)",
-  CAFFEINE_LATE_OK: "var(--caffeine, #C9915A)",
-  CAFFEINE_STOP: "var(--caffeine, #C9915A)",
-  MEAL: "var(--fg-muted, #8B8B93)",
-  WIND_DOWN: "var(--fg-muted, #8B8B93)",
-  NSDR: "var(--fg-muted, #8B8B93)",
+  SLEEP: "var(--sleep)",
+  SLEEP_INFLIGHT: "var(--sleep)",
+  NAP: "var(--sleep)",
+  SEEK_LIGHT: "var(--light)",
+  SEEK_LIGHT_ARTIFICIAL: "var(--light)",
+  LIGHT_INFLIGHT_WINDOW: "var(--light)",
+  AVOID_LIGHT: "var(--dark)",
+  MELATONIN_WINDOW: "var(--melatonin)",
+  EXERCISE_GOOD: "var(--move)",
+  EXERCISE_OPTIONAL_WALK: "var(--move)",
+  EXERCISE_AVOID: "var(--move)",
+  CAFFEINE_OK: "var(--caffeine)",
+  CAFFEINE_LATE_OK: "var(--caffeine)",
+  CAFFEINE_STOP: "var(--caffeine)",
+  MEAL: "var(--fg-muted)",
+  WIND_DOWN: "var(--fg-muted)",
+  NSDR: "var(--fg-muted)",
 };
 
-const FG = "var(--fg, #F2F2F0)";
-const MUTED = "var(--fg-muted, #8B8B93)";
-const SURFACE = "var(--surface, #141417)";
-const LINE = "var(--line, #26262B)";
-const INK = "#0B0B0D";
+const FG = "var(--fg)";
+const MUTED = "var(--fg-muted)";
+const SURFACE = "var(--surface)";
+const LINE = "var(--line)";
+/** Legend icons (§5 mapping). Icons live in the legend only, never in the grid (§11.1). */
+const LEGEND_ICON: Partial<Record<BlockKind, IconName>> = {
+  SLEEP: "sleep",
+  SEEK_LIGHT: "seekLight",
+  AVOID_LIGHT: "avoidLight",
+  EXERCISE_GOOD: "exercise",
+  EXERCISE_AVOID: "exercise",
+  CAFFEINE_OK: "caffeine",
+  CAFFEINE_STOP: "caffeine",
+  MELATONIN_WINDOW: "melatonin",
+  MEAL: "meal",
+  WIND_DOWN: "windDown",
+};
+
+/** Keeps legend rows aligned when an item has no icon. */
+function LegendIcon({ name }: { name: IconName | undefined }) {
+  return name === undefined ? (
+    <span className="inline-block w-4" aria-hidden="true" />
+  ) : (
+    <Icon name={name} size={ICON_SIZE_RIBBON} />
+  );
+}
+
+/** Label text on a band: theme-aware, chosen for WCAG contrast. */
+function inkFor(kind: BlockKind): string {
+  if (kind === "AVOID_LIGHT") return FG;
+  if (kind === "SLEEP" || kind === "SLEEP_INFLIGHT" || kind === "NAP") {
+    return "var(--on-sleep)";
+  }
+  return "var(--ink)";
+}
+
+/** Outline around the CBTmin dot so it reads on top of any band. */
+const DOT_OUTLINE = "var(--bg)";
 
 /** Kinds drawn faintly (lighter weight, no text) so stronger bands read on top. */
 const QUIET: ReadonlySet<BlockKind> = new Set([
@@ -276,7 +310,7 @@ export function PhaseMap({
   return (
     <section aria-labelledby={headingId} className="flex flex-col gap-3">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 id={headingId} className="text-[17px] font-medium leading-[1.1]">
+        <h2 id={headingId} className="text-17 font-medium leading-display">
           {m.title}
         </h2>
         <div
@@ -299,10 +333,8 @@ export function PhaseMap({
                   setOpen(null);
                   setScales((cur) => ({ ...cur, [a]: !cur[a] }));
                 }}
-                className={`rounded-md border px-2 py-1 text-[13px] leading-[1.45] ${
-                  on
-                    ? "border-[#F2F2F0] bg-[#F2F2F0] text-[#17171A]"
-                    : "border-[#26262B] text-[#F2F2F0]"
+                className={`rounded-control border px-2 py-1 text-13 leading-body ${
+                  on ? "border-fg bg-fg text-bg" : "border-line text-fg"
                 } ${focusRing}`}
               >
                 {m.scale(m.axis[a], offsetLabel(axisZone(a, input), refUtc))}
@@ -387,7 +419,7 @@ export function PhaseMap({
                 tabIndex={0}
                 aria-label={m.rowLabel(dateLabel(row.date, false), list.length)}
                 onKeyDown={(e) => onRowKey(e, rowIndex)}
-                className="pj-row outline-none focus-visible:[&>rect.pj-row-bg]:stroke-[#F2F2F0]"
+                className="pj-row outline-none focus-visible:[&>rect.pj-row-bg]:stroke-fg"
                 style={{ animationDelay: `${rowIndex * 120}ms` }}
                 data-date={row.date}
               >
@@ -476,7 +508,7 @@ export function PhaseMap({
                       aria-haspopup="dialog"
                       onKeyDown={(e) => onSegKey(e, rowIndex, segIndex)}
                       onClick={() => openFor(seg, rowIndex)}
-                      className="cursor-pointer outline-none focus-visible:[&>.pj-mark]:stroke-[#F2F2F0] focus-visible:[&>.pj-mark]:[stroke-width:2]"
+                      className="cursor-pointer outline-none focus-visible:[&>.pj-mark]:stroke-fg focus-visible:[&>.pj-mark]:[stroke-width:2]"
                       data-kind={seg.block.kind}
                       data-start-min={seg.startMin}
                       data-end-min={seg.endMin}
@@ -543,7 +575,7 @@ export function PhaseMap({
                           x={x0 + 4}
                           y={lane.y + lane.h - Math.round((lane.h - 9) / 2) - 1}
                           fontSize="11"
-                          fill={seg.block.kind === "AVOID_LIGHT" ? FG : INK}
+                          fill={inkFor(seg.block.kind)}
                           aria-hidden="true"
                         >
                           {name}
@@ -598,7 +630,7 @@ export function PhaseMap({
                     cy={g.lanes.sleep.y + g.lanes.sleep.h / 2}
                     r={4.5}
                     fill={FG}
-                    stroke={INK}
+                    stroke={DOT_OUTLINE}
                     strokeWidth={1.5}
                     role="img"
                     aria-label={`${m.cbtMin} ${String(Math.floor(c.min / 60)).padStart(2, "0")}:${String(c.min % 60).padStart(2, "0")}`}
@@ -613,7 +645,7 @@ export function PhaseMap({
           <div
             role="dialog"
             aria-label={m.kinds[openSeg.block.kind]}
-            className="absolute z-10 w-[272px] rounded-[10px] border border-[#26262B] bg-[#141417] p-3 text-[13px] leading-[1.45] shadow-[0_8px_24px_rgba(0,0,0,.35)]"
+            className="absolute z-10 w-[272px] rounded-surface border border-line bg-surface p-3 text-13 leading-body shadow-[0_8px_24px_rgba(0,0,0,.35)]"
             style={{ left: Math.max(0, open.x), top: open.y }}
             onKeyDown={(e) => {
               if (e.key === "Escape") {
@@ -622,20 +654,18 @@ export function PhaseMap({
               }
             }}
           >
-            <p className="text-[15px] font-medium">
-              {m.kinds[openSeg.block.kind]}
-            </p>
-            <p className="font-mono text-[#8B8B93]">
+            <p className="text-15 font-medium">{m.kinds[openSeg.block.kind]}</p>
+            <p className="font-mono text-fg-muted">
               {openSeg.point ? openSeg.from : `${openSeg.from}–${openSeg.to}`}
             </p>
             <p className="mt-2 font-medium">{m.whyHere}</p>
             <p>{openSeg.block.reason}</p>
-            <p className="mt-2 text-[#8B8B93]">
+            <p className="mt-2 text-fg-muted">
               {m.evidence(openSeg.block.confidence, openSeg.block.source)}
             </p>
             <button
               type="button"
-              className={`mt-2 rounded-md border border-[#26262B] px-2 py-1 ${focusRing}`}
+              className={`mt-2 rounded-control border border-line px-2 py-1 ${focusRing}`}
               onClick={() => {
                 setOpen(null);
                 segRefs.current.get(openSeg.id)?.focus();
@@ -649,8 +679,8 @@ export function PhaseMap({
       </div>
 
       <div>
-        <h3 className="text-[13px] font-medium leading-[1.45]">{m.legend}</h3>
-        <ul className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-[13px] leading-[1.45] text-[#8B8B93]">
+        <h3 className="text-13 font-medium leading-body">{m.legend}</h3>
+        <ul className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-13 leading-body text-fg-muted">
           {(
             [
               [
@@ -719,6 +749,7 @@ export function PhaseMap({
             ] as const
           ).map(([k, shape]) => (
             <li key={k} className="flex items-center gap-1">
+              <LegendIcon name={LEGEND_ICON[k]} />
               <svg width="14" height="10" aria-hidden="true">
                 {shape}
               </svg>
@@ -726,18 +757,21 @@ export function PhaseMap({
             </li>
           ))}
           <li className="flex items-center gap-1">
+            <LegendIcon name="flight" />
             <svg width="14" height="10" aria-hidden="true">
               <rect width="14" height="10" fill={`url(#${patternId})`} />
             </svg>
             {m.flight("")}
           </li>
           <li className="flex items-center gap-1">
+            <LegendIcon name="cbtMin" />
             <svg width="14" height="10" aria-hidden="true">
               <circle cx="7" cy="5" r="4" fill={FG} />
             </svg>
             {m.cbtMin}
           </li>
           <li className="flex items-center gap-1">
+            <LegendIcon name={undefined} />
             <svg width="14" height="10" aria-hidden="true">
               <line
                 x1="7"

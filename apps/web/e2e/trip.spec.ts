@@ -15,6 +15,7 @@
  */
 
 import { readFileSync } from "node:fs";
+import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { messages } from "../src/messages";
 
@@ -291,3 +292,18 @@ test("shows a field error when arrival is before departure", async ({
   );
   await expect(page).toHaveURL(/#\/trip$/);
 });
+
+for (const theme of ["dark", "light"] as const) {
+  test(`the trip form has no axe violations in the ${theme} theme`, async ({
+    page,
+  }) => {
+    await page.emulateMedia({ colorScheme: theme });
+    await page.goto("#/trip");
+    await expect(
+      page.getByRole("combobox", { name: messages.fromAirport }),
+    ).toBeEnabled();
+    await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
+    const results = await new AxeBuilder({ page }).analyze();
+    expect(results.violations.map((v) => `${v.id}: ${v.help}`)).toEqual([]);
+  });
+}

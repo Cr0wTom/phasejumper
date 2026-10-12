@@ -164,7 +164,7 @@ export function AirportCombobox({
         className={
           review === undefined
             ? controlClass
-            : `${controlClass} ring-1 ring-inset ring-[#F2F2F0]`
+            : `${controlClass} ring-1 ring-inset ring-fg`
         }
         value={query}
         disabled={disabled}
@@ -208,7 +208,7 @@ export function AirportCombobox({
       {expanded && results.length === 0 ? (
         <p
           aria-hidden="true"
-          className="absolute top-full z-10 mt-1 w-full rounded-[10px] border border-[#26262B] bg-[#141417] p-2 text-[13px] leading-[1.45] text-[#8B8B93] shadow-[0_8px_24px_rgba(0,0,0,.35)]"
+          className="absolute top-full z-10 mt-1 w-full rounded-surface border border-line bg-surface p-2 text-13 leading-body text-fg-muted shadow-[0_8px_24px_rgba(0,0,0,.35)]"
         >
           {messages.comboboxNoMatches}
         </p>
@@ -217,7 +217,7 @@ export function AirportCombobox({
         <ul
           id={listId}
           role="listbox"
-          className="absolute top-full z-10 mt-1 max-h-60 w-full overflow-auto rounded-[10px] border border-[#26262B] bg-[#141417] py-1 shadow-[0_8px_24px_rgba(0,0,0,.35)]"
+          className="absolute top-full z-10 mt-1 max-h-60 w-full overflow-auto rounded-surface border border-line bg-surface py-1 shadow-[0_8px_24px_rgba(0,0,0,.35)]"
         >
           {results.map((airport, index) => {
             const selected = index === active;
@@ -229,7 +229,7 @@ export function AirportCombobox({
                 aria-selected={selected}
                 className={
                   selected
-                    ? "cursor-pointer bg-[#26262B] px-2 py-2 break-words"
+                    ? "cursor-pointer bg-line px-2 py-2 break-words"
                     : "cursor-pointer px-2 py-2 break-words"
                 }
                 onMouseDown={(event) => {
