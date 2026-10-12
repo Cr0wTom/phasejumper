@@ -142,21 +142,24 @@ export function SelectField({
   return (
     <FieldFrame id={id} label={label} hint={hint} error={error}>
       {(described) => (
-        <select
-          id={id}
-          className={controlClass}
-          value={value}
-          onChange={(event) => onChange(event.target.value)}
-          aria-invalid={error === undefined ? undefined : true}
-          aria-describedby={described}
-          aria-required={required ? true : undefined}
-        >
-          {options.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
+        // The wrapper draws the chevron; see .pj-select-wrap in index.css.
+        <div className="pj-select-wrap">
+          <select
+            id={id}
+            className={`${controlClass} pj-select`}
+            value={value}
+            onChange={(event) => onChange(event.target.value)}
+            aria-invalid={error === undefined ? undefined : true}
+            aria-describedby={described}
+            aria-required={required ? true : undefined}
+          >
+            {options.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
       )}
     </FieldFrame>
   );

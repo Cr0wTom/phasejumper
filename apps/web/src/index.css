@@ -231,3 +231,48 @@ body {
 .pj-plan-header {
   top: calc(48px + env(safe-area-inset-top));
 }
+
+/* Form controls: native date, time and select render the same 40 px box,
+   with the same text inset, as text inputs on every engine. WebKit (Safari,
+   every iOS browser) otherwise indents date/time values and draws selects
+   ~24 px tall, ignoring padding. */
+input[type="date"],
+input[type="time"],
+select.pj-select {
+  -webkit-appearance: none;
+  appearance: none;
+  min-height: 40px;
+}
+
+input[type="date"]::-webkit-date-and-time-value,
+input[type="time"]::-webkit-date-and-time-value {
+  margin: 0;
+  text-align: left;
+}
+
+input[type="date"]::-webkit-datetime-edit,
+input[type="time"]::-webkit-datetime-edit {
+  padding: 0;
+}
+
+select.pj-select {
+  padding-right: 32px;
+}
+
+/* A CSS chevron (no image, so a strict CSP needs nothing extra). */
+.pj-select-wrap {
+  position: relative;
+}
+
+.pj-select-wrap::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  width: 7px;
+  height: 7px;
+  border-right: 1.5px solid var(--fg-muted);
+  border-bottom: 1.5px solid var(--fg-muted);
+  transform: translateY(-70%) rotate(45deg);
+  pointer-events: none;
+}
