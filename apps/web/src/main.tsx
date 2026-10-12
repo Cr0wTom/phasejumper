@@ -17,7 +17,14 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App";
+import { flags } from "./flags";
 import "./index.css";
+
+if (import.meta.env.DEV) {
+  // §7.4: log build flags once, at warn level, in development only.
+  // eslint-disable-next-line no-console
+  console.warn("PhaseJumper flags", flags);
+}
 
 const rootElement = document.getElementById("root");
 if (rootElement === null) {

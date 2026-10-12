@@ -1,0 +1,10 @@
+{
+  "engine.exercise": false,
+  "engine.meditation": false,
+  "engine.meals": false,
+  "engine.delayMelatonin": false,
+  "engine.simulate": false,
+  "flights.openskyLive": false,
+  "legal.acceptanceGate": false,
+  "melatonin.optIn": false
+}

@@ -12,7 +12,8 @@
     "typecheck": "pnpm --filter \"./packages/*\" --filter \"./apps/*\" typecheck",
     "test": "pnpm --filter \"./packages/*\" --filter \"./apps/*\" test",
     "build": "pnpm --filter @phasejumper/web build",
-    "dev": "pnpm --filter @phasejumper/web dev"
+    "dev": "pnpm --filter @phasejumper/web dev",
+    "test:e2e": "pnpm --filter @phasejumper/web test:e2e"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

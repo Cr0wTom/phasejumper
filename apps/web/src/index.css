@@ -15,3 +15,15 @@
  */
 
 @import "tailwindcss";
+
+html {
+  color-scheme: dark;
+  background: #0b0b0d;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: #0b0b0d;
+  color: #f2f2f0;
+}
