@@ -43,6 +43,16 @@ export default defineConfig({
       },
     },
     {
+      // WebKit (Safari, every iOS browser) renders native controls
+      // differently; only the cross-engine form checks run here.
+      name: "webkit",
+      testMatch: "controls.spec.ts",
+      use: {
+        ...devices["iPhone 15"],
+        baseURL: "http://127.0.0.1:4173/phasejumper/",
+      },
+    },
+    {
       name: "phasemap",
       testDir: "e2e/phasemap",
       use: {
