@@ -62,3 +62,85 @@ export function bannedCopyPattern(): RegExp {
 export function thirdPartyPattern(): RegExp {
   return new RegExp(THIRD_PARTY_TERMS.map(escape).join("|"), "i");
 }
+
+export const USER_FACING_FILES: readonly string[] = [
+  "apps/web/src/messages.ts",
+  "packages/engine/src/copy.ts",
+  "packages/ical/src/copy.ts",
+  "TERMS.md",
+  "PRIVACY.md",
+  "README.md",
+  "NOTICE",
+  "CONTRIBUTING.md",
+  "apps/web/index.html",
+];
+
+export interface AllowEntry {
+  file: string;
+  contains: string;
+  term: string;
+  justification: string;
+}
+
+export interface CopyFile {
+  file: string;
+  text: string;
+}
+
+export interface CopyHit {
+  file: string;
+  line: number;
+  term: string;
+}
+
+function termMatches(term: string, line: string, asLiteral: boolean): boolean {
+  const source = asLiteral ? escape(term) : term;
+  return new RegExp(source, "i").test(line);
+}
+
+function allowed(
+  hit: CopyHit,
+  line: string,
+  allow: readonly AllowEntry[],
+  used: boolean[],
+): boolean {
+  let ok = false;
+  allow.forEach((entry, index) => {
+    if (entry.file !== hit.file) return;
+    if (entry.term !== hit.term) return;
+    if (!line.includes(entry.contains)) return;
+    used[index] = true;
+    ok = true;
+  });
+  return ok;
+}
+
+/** Scan user-facing copy. Third-party hits are never allow-listed. */
+export function scanUserFacingCopy(
+  files: readonly CopyFile[],
+  healthTerms: readonly string[],
+  thirdPartyTerms: readonly string[],
+  allow: readonly AllowEntry[],
+): { hits: CopyHit[]; unusedAllow: AllowEntry[] } {
+  const used = allow.map(() => false);
+  const hits: CopyHit[] = [];
+
+  for (const { file, text } of files) {
+    const lines = text.split("\n");
+    lines.forEach((line, index) => {
+      const lineNo = index + 1;
+      for (const term of thirdPartyTerms) {
+        if (!termMatches(term, line, true)) continue;
+        hits.push({ file, line: lineNo, term: "(third-party)" });
+      }
+      for (const term of healthTerms) {
+        if (!termMatches(term, line, false)) continue;
+        const hit = { file, line: lineNo, term };
+        if (!allowed(hit, line, allow, used)) hits.push(hit);
+      }
+    });
+  }
+
+  const unusedAllow = allow.filter((_, index) => used[index] !== true);
+  return { hits, unusedAllow };
+}

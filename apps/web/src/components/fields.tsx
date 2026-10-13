@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import type { ReactNode } from "react";
+import { useId, type ReactNode } from "react";
 import {
   controlClass,
   errorClass,
@@ -166,23 +166,39 @@ export function SelectField({
 }
 
 export function CheckboxField({
+  id,
   label,
   checked,
   onChange,
+  hint,
 }: {
+  id?: string;
   label: string;
   checked: boolean;
   onChange: (checked: boolean) => void;
+  hint?: string;
 }) {
+  const generatedId = useId();
+  const boxId = id ?? generatedId;
+  const hintId = hint === undefined ? undefined : `${boxId}-hint`;
   return (
-    <label className="flex items-center gap-2 text-15 leading-body">
-      <input
-        type="checkbox"
-        className={checkClass}
-        checked={checked}
-        onChange={(event) => onChange(event.target.checked)}
-      />
-      <span>{label}</span>
-    </label>
+    <div className="flex flex-col gap-2">
+      <label className="flex items-center gap-2 text-15 leading-body">
+        <input
+          id={boxId}
+          type="checkbox"
+          className={checkClass}
+          checked={checked}
+          onChange={(event) => onChange(event.target.checked)}
+          aria-describedby={hintId}
+        />
+        <span>{label}</span>
+      </label>
+      {hintId === undefined || hint === undefined ? null : (
+        <p id={hintId} className={hintClass}>
+          {hint}
+        </p>
+      )}
+    </div>
   );
 }

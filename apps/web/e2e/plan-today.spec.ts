@@ -18,6 +18,11 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { planMessages } from "../src/messages";
+import { preAcceptTerms } from "./acceptTerms";
+
+test.beforeEach(async ({ page }) => {
+  await preAcceptTerms(page);
+});
 
 // T09 acceptance: share links, Today, offline, regenerate notice.
 
@@ -73,6 +78,7 @@ test("a share link reproduces the plan byte-for-byte in a fresh browser", async 
   const sender = await browser.newContext({
     permissions: ["clipboard-read", "clipboard-write"],
   });
+  await preAcceptTerms(sender);
   const a = await sender.newPage();
   const idA = await openShared(a);
   await a.getByRole("button", { name: planMessages.share }).click();
@@ -83,6 +89,7 @@ test("a share link reproduces the plan byte-for-byte in a fresh browser", async 
 
   // Recipient: a brand-new browser context (no storage) opens the link.
   const recipient = await browser.newContext();
+  await preAcceptTerms(recipient);
   const b = await recipient.newPage();
   await b.goto(link);
   await expect(b).toHaveURL(/#\/plan\/[0-9a-f-]{36}$/i);

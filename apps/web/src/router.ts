@@ -25,6 +25,7 @@ export type Route =
   | { name: "start" }
   | { name: "settings" }
   | { name: "evidence" }
+  | { name: "legal" }
   | { name: "trip"; editId?: string }
   | { name: "plan"; id?: string }
   | { name: "today" }
@@ -45,6 +46,7 @@ export function parseHash(hash: string): Route | null {
   if (path === "/today") return { name: "today" };
   if (path === "/settings") return { name: "settings" };
   if (path === "/evidence") return { name: "evidence" };
+  if (path === "/legal") return { name: "legal" };
   const plan = PLAN_HASH.exec(path);
   if (plan !== null) {
     const id = plan[1];

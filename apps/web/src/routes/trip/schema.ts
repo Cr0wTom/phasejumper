@@ -87,6 +87,9 @@ export const tripFormSchema = z
         return hours > 0 && hours < 24;
       }, messages.sleepNeedInvalid),
     useMelatonin: z.boolean(),
+    melatoninPregnant: z.boolean(),
+    melatoninMedication: z.boolean(),
+    melatoninUnder18: z.boolean(),
     caffeine: z.enum(["none", "normal", "heavy"], {
       error: messages.fieldInvalid,
     }),

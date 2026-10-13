@@ -18,6 +18,11 @@ import { expect, test, type Download, type Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { planMessages } from "../src/messages";
+import { preAcceptTerms } from "./acceptTerms";
+
+test.beforeEach(async ({ page }) => {
+  await preAcceptTerms(page);
+});
 
 // T10: the plan screen downloads a calendar file and bumps SEQUENCE.
 

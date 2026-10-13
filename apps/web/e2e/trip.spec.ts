@@ -18,6 +18,11 @@ import { readFileSync } from "node:fs";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { messages, planMessages } from "../src/messages";
+import { preAcceptTerms } from "./acceptTerms";
+
+test.beforeEach(async ({ page }) => {
+  await preAcceptTerms(page);
+});
 
 const PASTE = readFileSync(
   new URL(

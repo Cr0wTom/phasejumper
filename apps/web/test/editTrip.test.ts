@@ -39,4 +39,27 @@ describe("Edit trip", () => {
       });
     }
   });
+
+  it("reloads a contraindicated plan by checking the medication box", () => {
+    const input = {
+      ...(jfk as unknown as PlanInput),
+      traveler: {
+        ...(jfk as unknown as PlanInput).traveler,
+        useMelatonin: true,
+        melatoninContraindicated: true,
+      },
+    };
+    const form = formFromPlanInput(input, (iata) => iata);
+    expect(form.useMelatonin).toBe(true);
+    expect(form.melatoninMedication).toBe(true);
+    expect(form.melatoninPregnant).toBe(false);
+    expect(form.melatoninUnder18).toBe(false);
+    const parsed = parseTripForm(form);
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    const mapped = mapTripForm(parsed.value, lookup, input.now);
+    expect(mapped.ok).toBe(true);
+    if (!mapped.ok) return;
+    expect(mapped.input.traveler.melatoninContraindicated).toBe(true);
+  });
 });

@@ -17,7 +17,7 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { generatePlan } from "../src/index";
+import { MELATONIN_REASON, generatePlan } from "../src/index";
 import type { PlanInput, PlanResult } from "../src/types";
 
 // Golden fixtures (§9.3). The .expected.json files are written only by
@@ -162,4 +162,40 @@ describe("fixture coverage", () => {
     ).toBe(true);
     expect(p.days[p.days.length - 1]?.misalignmentAfter).toBe(0);
   });
+});
+
+describe("melatonin windows on every fixture (T12)", () => {
+  it.each(NAMES)(
+    "%s: fixed copy, no digits, none when contraindicated",
+    (name) => {
+      const base = load(name);
+      for (const input of [
+        base,
+        {
+          ...base,
+          traveler: { ...base.traveler, useMelatonin: true },
+        },
+      ]) {
+        const result = generatePlan(input);
+        for (const block of result.days.flatMap((day) => day.blocks)) {
+          if (block.kind !== "MELATONIN_WINDOW") continue;
+          expect(block.reason).toBe(MELATONIN_REASON);
+          expect(block.reason).not.toMatch(/\d/);
+        }
+      }
+      const blocked = generatePlan({
+        ...base,
+        traveler: {
+          ...base.traveler,
+          useMelatonin: true,
+          melatoninContraindicated: true,
+        },
+      });
+      expect(
+        blocked.days
+          .flatMap((day) => day.blocks)
+          .filter((block) => block.kind === "MELATONIN_WINDOW"),
+      ).toEqual([]);
+    },
+  );
 });

@@ -195,6 +195,12 @@ export function mapTripForm(
       chronotype: form.chronotype,
       sleepNeedHours: Number(form.sleepNeedHours),
       useMelatonin: form.useMelatonin,
+      ...(form.useMelatonin &&
+      (form.melatoninPregnant ||
+        form.melatoninMedication ||
+        form.melatoninUnder18)
+        ? { melatoninContraindicated: true }
+        : {}),
       caffeine: form.caffeine,
       exercise: { enabled: form.exerciseEnabled },
       meditation: { enabled: form.meditationEnabled },

@@ -42,7 +42,6 @@ export const messages = {
   preAdjust: "Days to shift before you fly",
   preAdjustOption: (days: number): string =>
     days === 1 ? "1 day" : `${days} days`,
-  melatonin: "I already use melatonin and want timing windows for it",
   fromAirport: "From",
   toAirport: "To",
   departureDate: "Departure date",
@@ -119,10 +118,6 @@ export const messages = {
     "The plan could not be built. Check the flights and times, then choose Generate plan again.",
   footer:
     "General wellness information, not medical advice. You use PhaseJumper at your own risk.",
-  legalGateTitle: "Before you generate a plan",
-  legalGateBody:
-    "Confirm you want to generate a plan. The full acceptance step arrives in a later update.",
-  legalGateContinue: "Continue",
   editMissing:
     "That plan could not be opened for editing. Fill in the trip below, or open the plan again.",
 } as const;

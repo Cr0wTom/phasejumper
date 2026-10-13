@@ -26,9 +26,10 @@ describe("parseHash", () => {
     expect(parseHash("#/trip")).toEqual({ name: "trip" });
   });
 
-  it("reads the settings and evidence routes (T13)", () => {
+  it("reads the settings, evidence and legal routes", () => {
     expect(parseHash("#/settings")).toEqual({ name: "settings" });
     expect(parseHash("#/evidence")).toEqual({ name: "evidence" });
+    expect(parseHash("#/legal")).toEqual({ name: "legal" });
     expect(parseHash("#/settings/x")).toBeNull();
   });
 

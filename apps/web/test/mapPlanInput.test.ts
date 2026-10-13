@@ -30,6 +30,9 @@ function form(overrides: Partial<TripFormValues> = {}): TripFormValues {
     chronotype: "intermediate",
     sleepNeedHours: "8",
     useMelatonin: false,
+    melatoninPregnant: false,
+    melatoninMedication: false,
+    melatoninUnder18: false,
     caffeine: "normal",
     exerciseEnabled: false,
     meditationEnabled: false,
@@ -203,5 +206,22 @@ describe("mapTripForm", () => {
     expect(order.fieldErrors["legs.0.arrivalTime"]).toBe(
       messages.arrivalBeforeDeparture,
     );
+  });
+
+  it("maps a melatonin contraindication as a single boolean", () => {
+    const mapped = mapTripForm(
+      form({
+        useMelatonin: true,
+        melatoninPregnant: true,
+        melatoninMedication: false,
+        melatoninUnder18: false,
+      }),
+      lookup,
+      NOW,
+    );
+    expect(mapped.ok).toBe(true);
+    if (!mapped.ok) return;
+    expect(mapped.input.traveler.useMelatonin).toBe(true);
+    expect(mapped.input.traveler.melatoninContraindicated).toBe(true);
   });
 });

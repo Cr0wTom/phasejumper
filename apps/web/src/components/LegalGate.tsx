@@ -14,19 +14,75 @@
  * limitations under the License.
  */
 
-import { messages } from "../messages";
-import { buttonClass, h3Class } from "../ui";
+import { useState } from "react";
+import { legalMessages } from "../messages";
+import { errorClass, h2Class, linkClass, primaryButtonClass } from "../ui";
+import { CheckboxField } from "./fields";
 
-/** Placeholder until T12 replaces it. Shown only when legal.acceptanceGate is on. */
-export function LegalGate({ onContinue }: { onContinue: () => void }) {
+export function LegalGate({
+  outdated,
+  onContinue,
+}: {
+  outdated: boolean;
+  onContinue: () => void;
+}) {
+  const [wellness, setWellness] = useState(false);
+  const [age, setAge] = useState(false);
+  const [needBoth, setNeedBoth] = useState(false);
+
   return (
     <section aria-labelledby="legal-gate-title" className="flex flex-col gap-4">
-      <h3 id="legal-gate-title" className={h3Class}>
-        {messages.legalGateTitle}
-      </h3>
-      <p>{messages.legalGateBody}</p>
-      <button type="button" className={buttonClass} onClick={onContinue}>
-        {messages.legalGateContinue}
+      <h2 id="legal-gate-title" className={h2Class}>
+        {outdated ? legalMessages.updatedHeading : legalMessages.heading}
+      </h2>
+      <p>{outdated ? legalMessages.updatedIntro : legalMessages.intro}</p>
+      <p>
+        <a
+          className={linkClass}
+          href="#/legal"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {legalMessages.readTerms}
+        </a>
+      </p>
+      <p>
+        <a
+          className={linkClass}
+          href="#/legal"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {legalMessages.readPrivacy}
+        </a>
+      </p>
+      <CheckboxField
+        label={legalMessages.acceptWellness}
+        checked={wellness}
+        onChange={setWellness}
+      />
+      <CheckboxField
+        label={legalMessages.acceptAge}
+        checked={age}
+        onChange={setAge}
+      />
+      {needBoth ? (
+        <p role="alert" className={errorClass}>
+          {legalMessages.needBoth}
+        </p>
+      ) : null}
+      <button
+        type="button"
+        className={`${primaryButtonClass} self-start`}
+        onClick={() => {
+          if (!wellness || !age) {
+            setNeedBoth(true);
+            return;
+          }
+          onContinue();
+        }}
+      >
+        {legalMessages.continue}
       </button>
     </section>
   );

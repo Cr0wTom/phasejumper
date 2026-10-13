@@ -32,8 +32,13 @@ import { airportLabel } from "../../airports/searchAirports";
 import { currentInstant, currentPlainDate } from "../../clock";
 import { LegalGate } from "../../components/LegalGate";
 import { flags } from "../../flags";
-import { messages } from "../../messages";
+import { legalMessages, messages } from "../../messages";
 import { goToPlan } from "../../router";
+import {
+  termsAccepted,
+  termsOutdated,
+  writeTermsAcceptance,
+} from "../../terms";
 import { loadPlan, savePlan } from "../../storage/plans";
 import { errorClass, h1Class, pageClass, primaryButtonClass } from "../../ui";
 import { ConstraintsSection } from "./ConstraintsSection";
@@ -118,7 +123,11 @@ export function TripBuilder({ editId }: { editId?: string } = {}) {
   const [formAlert, setFormAlert] = useState<FormAlert | null>(null);
   const [directory, setDirectory] = useState<AirportDirectory | null>(null);
   const [airportsError, setAirportsError] = useState<string | null>(null);
-  const [accepted, setAccepted] = useState(false);
+  const [accepted, setAccepted] = useState(
+    () => !flags["legal.acceptanceGate"] || termsAccepted(),
+  );
+  const [outdated, setOutdated] = useState(() => termsOutdated());
+  const [saveFailed, setSaveFailed] = useState(false);
   const [saving, setSaving] = useState(false);
   const [paste, setPaste] = useState("");
   const [pasteError, setPasteError] = useState<string | null>(null);
@@ -449,16 +458,29 @@ export function TripBuilder({ editId }: { editId?: string } = {}) {
           onChangeWindow={changeWindow}
         />
         {showGate ? (
-          <LegalGate onContinue={() => setAccepted(true)} />
+          <LegalGate
+            outdated={outdated}
+            onContinue={() => {
+              const written = writeTermsAcceptance(currentInstant());
+              setSaveFailed(!written.ok);
+              setOutdated(false);
+              setAccepted(true);
+            }}
+          />
         ) : (
-          <button
-            type="submit"
-            className={`${primaryButtonClass} self-start`}
-            disabled={saving || directory === null}
-            aria-busy={saving ? true : undefined}
-          >
-            {saving ? messages.generating : messages.generate}
-          </button>
+          <>
+            {saveFailed ? (
+              <p role="status">{legalMessages.saveFailed}</p>
+            ) : null}
+            <button
+              type="submit"
+              className={`${primaryButtonClass} self-start`}
+              disabled={saving || directory === null}
+              aria-busy={saving ? true : undefined}
+            >
+              {saving ? messages.generating : messages.generate}
+            </button>
+          </>
         )}
       </form>
     </main>

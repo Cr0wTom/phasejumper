@@ -20,6 +20,7 @@ import { UpdatePrompt } from "./components/UpdatePrompt";
 import { PlanScreen } from "./routes/plan/PlanScreen";
 import { ShareOpen } from "./routes/plan/ShareOpen";
 import { EvidenceScreen } from "./routes/settings/EvidenceScreen";
+import { LegalScreen } from "./routes/settings/LegalScreen";
 import { SettingsScreen } from "./routes/settings/SettingsScreen";
 import { StartScreen } from "./routes/start/StartScreen";
 import { TodayScreen } from "./routes/today/TodayScreen";
@@ -40,6 +41,8 @@ export function App() {
             <SettingsScreen />
           ) : route.name === "evidence" ? (
             <EvidenceScreen />
+          ) : route.name === "legal" ? (
+            <LegalScreen />
           ) : route.name === "plan" ? (
             <PlanScreen id={route.id} />
           ) : route.name === "today" ? (

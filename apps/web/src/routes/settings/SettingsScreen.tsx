@@ -17,15 +17,28 @@
 // Settings (§3.1 #5): appearance, data on this device (export, import,
 // forget all trips) and the evidence page. Nothing here leaves the device.
 
+import { ENGINE_VERSION } from "@phasejumper/engine";
 import { useId, useState, type ChangeEvent } from "react";
 import { currentPlainDate } from "../../clock";
-import { messages, settingsMessages as m } from "../../messages";
+import { legalMessages, messages, settingsMessages as m } from "../../messages";
 import { MAX_IMPORT_BYTES, parseImport } from "../../storage/importPlans";
-import { backupOf, forgetAllPlans, listPlans } from "../../storage/plans";
+import {
+  backupOf,
+  forgetAllPlans,
+  getLastPlanId,
+  listPlans,
+  loadPlan,
+} from "../../storage/plans";
+import {
+  buildTechnicalReport,
+  technicalReportText,
+} from "../../technicalReport";
 import { readTheme, setTheme, type Theme } from "../../theme";
+import { version as appVersion } from "../../../package.json";
 import {
   buttonClass,
   checkClass,
+  controlClass,
   errorClass,
   h1Class,
   h2Class,
@@ -66,9 +79,12 @@ function download(name: string, text: string): void {
 export function SettingsScreen() {
   const [theme, setThemeState] = useState<Theme>(readTheme);
   const [dataNotice, setDataNotice] = useState<Notice>(null);
+  const [reportNotice, setReportNotice] = useState<Notice>(null);
+  const [reportManual, setReportManual] = useState<string | null>(null);
   const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState(false);
   const importId = useId();
+  const reportId = useId();
 
   async function onExport(): Promise<void> {
     try {
@@ -123,6 +139,31 @@ export function SettingsScreen() {
     } finally {
       input.value = "";
       setBusy(false);
+    }
+  }
+
+  async function onReport(): Promise<void> {
+    setReportNotice(null);
+    setReportManual(null);
+    try {
+      const lastId = await getLastPlanId();
+      const plan = lastId === undefined ? undefined : await loadPlan(lastId);
+      const report = await buildTechnicalReport({
+        engineVersion: ENGINE_VERSION,
+        appVersion,
+        userAgent: navigator.userAgent,
+        input: plan?.input,
+        warnings: (plan?.result.warnings ?? []).map((warning) => warning.code),
+      });
+      const text = technicalReportText(report);
+      try {
+        await navigator.clipboard.writeText(text);
+        setReportNotice({ tone: "ok", text: legalMessages.reportCopied });
+      } catch {
+        setReportManual(text);
+      }
+    } catch {
+      setReportNotice({ tone: "error", text: legalMessages.reportFailed });
     }
   }
 
@@ -251,7 +292,40 @@ export function SettingsScreen() {
             {m.evidenceLink}
           </a>
         </p>
+        <p>
+          <a className={linkClass} href="#/legal">
+            {legalMessages.legalLink}
+          </a>
+        </p>
         <p className="text-fg-muted">{m.licence}</p>
+        <div className="flex flex-col gap-2">
+          <button
+            type="button"
+            className={buttonClass}
+            aria-describedby={`${reportId}-hint`}
+            onClick={() => void onReport()}
+          >
+            {legalMessages.reportButton}
+          </button>
+          <p id={`${reportId}-hint`} className={hintClass}>
+            {legalMessages.reportHint}
+          </p>
+          <NoticeLine notice={reportNotice} />
+          {reportManual === null ? null : (
+            <div className="flex flex-col gap-2">
+              <label htmlFor={reportId} className={labelClass}>
+                {legalMessages.reportManual}
+              </label>
+              <textarea
+                id={reportId}
+                className={controlClass}
+                readOnly
+                rows={12}
+                value={reportManual}
+              />
+            </div>
+          )}
+        </div>
       </section>
 
       <footer className="mt-8 border-t border-line pt-4 text-13 leading-body text-fg-muted">

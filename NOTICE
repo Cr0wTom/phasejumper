@@ -1,0 +1,58 @@
+PhaseJumper
+Copyright 2026 PhaseJumper contributors
+
+This product is licensed under the Apache License, Version 2.0.
+See the LICENSE file.
+
+This product includes:
+
+OurAirports airport data
+Public domain.
+
+Geist and Geist Mono fonts
+Copyright (c) 2023 Vercel, in collaboration with basement.studio
+SIL Open Font License 1.1
+
+Lucide icons
+ISC License
+
+Runtime dependencies:
+
+@phasejumper/airports
+Apache-2.0
+
+@phasejumper/engine
+Apache-2.0
+
+@phasejumper/ical
+Apache-2.0
+
+@phasejumper/itinerary
+Apache-2.0
+
+ical-generator
+MIT
+
+idb-keyval
+Apache-2.0
+
+lucide-react
+ISC
+
+react
+MIT
+
+react-dom
+MIT
+
+suncalc
+BSD-2-Clause
+
+temporal-polyfill
+MIT
+
+workbox-window
+MIT
+
+zod
+MIT

@@ -1,0 +1,98 @@
+[
+  {
+    "file": "docs/CONTRIBUTING.md",
+    "contains": "never a prescription",
+    "term": "prescri",
+    "justification": "The contributing guide states the product is never a prescription."
+  },
+  {
+    "file": "docs/CONTRIBUTING.md",
+    "contains": "treat, treatment, cure, diagnos-",
+    "term": "treat",
+    "justification": "The contributing guide lists the banned words so contributors know what not to write."
+  },
+  {
+    "file": "docs/CONTRIBUTING.md",
+    "contains": "treat, treatment, cure, diagnos-",
+    "term": "cure",
+    "justification": "The contributing guide lists the banned words so contributors know what not to write."
+  },
+  {
+    "file": "docs/CONTRIBUTING.md",
+    "contains": "treat, treatment, cure, diagnos-",
+    "term": "diagnos",
+    "justification": "The contributing guide lists the banned words so contributors know what not to write."
+  },
+  {
+    "file": "docs/CONTRIBUTING.md",
+    "contains": "treat, treatment, cure, diagnos-",
+    "term": "prescri",
+    "justification": "The contributing guide lists the banned words so contributors know what not to write."
+  },
+  {
+    "file": "docs/CONTRIBUTING.md",
+    "contains": "treat, treatment, cure, diagnos-",
+    "term": "therap",
+    "justification": "The contributing guide lists the banned words so contributors know what not to write."
+  },
+  {
+    "file": "docs/CONTRIBUTING.md",
+    "contains": "treat, treatment, cure, diagnos-",
+    "term": "disorder",
+    "justification": "The contributing guide lists the banned words so contributors know what not to write."
+  },
+  {
+    "file": "docs/CONTRIBUTING.md",
+    "contains": "treat, treatment, cure, diagnos-",
+    "term": "patient",
+    "justification": "The contributing guide lists the banned words so contributors know what not to write."
+  },
+  {
+    "file": "docs/CONTRIBUTING.md",
+    "contains": "treat, treatment, cure, diagnos-",
+    "term": "dose",
+    "justification": "The contributing guide lists the banned words so contributors know what not to write."
+  },
+  {
+    "file": "docs/CONTRIBUTING.md",
+    "contains": "treat, treatment, cure, diagnos-",
+    "term": "dosage",
+    "justification": "The contributing guide lists the banned words so contributors know what not to write."
+  },
+  {
+    "file": "docs/CONTRIBUTING.md",
+    "contains": "treat, treatment, cure, diagnos-",
+    "term": "\\bmg\\b",
+    "justification": "The contributing guide lists the banned words so contributors know what not to write."
+  },
+  {
+    "file": "docs/CONTRIBUTING.md",
+    "contains": "treat, treatment, cure, diagnos-",
+    "term": "notification",
+    "justification": "The contributing guide lists the banned words so contributors know what not to write."
+  },
+  {
+    "file": "docs/CONTRIBUTING.md",
+    "contains": "treat, treatment, cure, diagnos-",
+    "term": "reminder",
+    "justification": "The contributing guide lists the banned words so contributors know what not to write."
+  },
+  {
+    "file": "docs/CONTRIBUTING.md",
+    "contains": "treat, treatment, cure, diagnos-",
+    "term": "guarantee",
+    "justification": "The contributing guide lists the banned words so contributors know what not to write."
+  },
+  {
+    "file": "docs/CONTRIBUTING.md",
+    "contains": "treat, treatment, cure, diagnos-",
+    "term": "clinically proven",
+    "justification": "The contributing guide lists the banned words so contributors know what not to write."
+  },
+  {
+    "file": "docs/CONTRIBUTING.md",
+    "contains": "treat, treatment, cure, diagnos-",
+    "term": "medical-grade",
+    "justification": "The contributing guide lists the banned words so contributors know what not to write."
+  }
+]

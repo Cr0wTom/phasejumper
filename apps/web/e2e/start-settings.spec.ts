@@ -22,6 +22,11 @@ import {
   settingsMessages as s,
   startMessages,
 } from "../src/messages";
+import { preAcceptTerms } from "./acceptTerms";
+
+test.beforeEach(async ({ page }) => {
+  await preAcceptTerms(page);
+});
 
 // T13 acceptance: Start, Settings (theme, export, import, forget) and the
 // evidence page; no network calls; axe clean in both themes.
