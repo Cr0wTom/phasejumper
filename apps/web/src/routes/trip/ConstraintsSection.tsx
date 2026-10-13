@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { TimeField } from "../../components/TimeField";
 import { SelectField, TextField } from "../../components/fields";
 import { messages } from "../../messages";
 import { buttonClass, h2Class, h3Class, surfaceClass } from "../../ui";
@@ -100,10 +101,9 @@ export function ConstraintsSection({
                   required
                   onChange={(startDate) => onChangeEvent(index, { startDate })}
                 />
-                <TextField
+                <TimeField
                   id={fieldDomId(`mustBeAwake.${index}.startTime`)}
                   label={messages.startTime}
-                  type="time"
                   value={event.startTime}
                   error={errors[`mustBeAwake.${index}.startTime`]}
                   required
@@ -118,10 +118,9 @@ export function ConstraintsSection({
                   required
                   onChange={(endDate) => onChangeEvent(index, { endDate })}
                 />
-                <TextField
+                <TimeField
                   id={fieldDomId(`mustBeAwake.${index}.endTime`)}
                   label={messages.endTime}
-                  type="time"
                   value={event.endTime}
                   error={errors[`mustBeAwake.${index}.endTime`]}
                   required
@@ -179,10 +178,9 @@ export function ConstraintsSection({
                   required
                   onChange={(startDate) => onChangeWindow(index, { startDate })}
                 />
-                <TextField
+                <TimeField
                   id={fieldDomId(`noWorkoutWindows.${index}.startTime`)}
                   label={messages.startTime}
-                  type="time"
                   value={window.startTime}
                   error={errors[`noWorkoutWindows.${index}.startTime`]}
                   required
@@ -197,10 +195,9 @@ export function ConstraintsSection({
                   required
                   onChange={(endDate) => onChangeWindow(index, { endDate })}
                 />
-                <TextField
+                <TimeField
                   id={fieldDomId(`noWorkoutWindows.${index}.endTime`)}
                   label={messages.endTime}
-                  type="time"
                   value={window.endTime}
                   error={errors[`noWorkoutWindows.${index}.endTime`]}
                   required

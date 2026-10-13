@@ -28,7 +28,7 @@ function describedBy(ids: Array<string | undefined>): string | undefined {
   return present.length === 0 ? undefined : present.join(" ");
 }
 
-function FieldFrame({
+export function FieldFrame({
   id,
   label,
   hint,

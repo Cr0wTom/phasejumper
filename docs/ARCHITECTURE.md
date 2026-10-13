@@ -51,6 +51,7 @@ Testing: unit tests, fast-check property tests over 500 random trips, and eight 
 | `routes/today/` + `today.ts` | Today: where you are and the local time, the current and next block with countdowns (recomputed every 30 s and on returning to the tab), today's ribbon |
 | `components/NavBar.tsx` | Plan · Today · New trip · Settings: bottom tab bar on phones, left rail from 768 px |
 | `components/AirportCombobox.tsx` | WAI-ARIA combobox over the airport list (top 12 matches shown, full list searched) |
+| `components/TimeField.tsx` | Time entry: typed text parsed by `timeText.ts`, a 15-minute list on a fine pointer; phones and tablets keep the native time input |
 | `airports/` | Lazy-loads `airports.json` as its own chunk; search by IATA, city, name |
 | `storage/plans.ts` | IndexedDB via `idb-keyval`: `plan:<id>` → `{ id, input, result, engineVersion, createdAt }`, plus the last opened plan id; listing, a JSON backup format (`phasejumper-plans`, version 1, inputs only) and forget-all; plans from an older engine are rebuilt on open with a one-line notice |
 | `storage/shareLink.ts` | Share links: the `PlanInput` (never the result) as base64url JSON in the URL fragment, never sent to the host; the recipient's browser regenerates the plan |

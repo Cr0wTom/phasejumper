@@ -51,8 +51,13 @@ test("text, date, time and select controls share one box size", async ({
       }),
   );
   const kinds = new Set(boxes.map((b) => b.kind));
-  for (const kind of ["text", "time", "date", "select"])
-    expect(kinds).toContain(kind);
+  for (const kind of ["text", "date", "select"]) expect(kinds).toContain(kind);
+  // Phones keep a native time input. Desktop (fine pointer) uses a text combobox.
+  const coarse = await page.evaluate(
+    () => window.matchMedia("(pointer: coarse)").matches,
+  );
+  if (coarse) expect(kinds).toContain("time");
+  else expect(kinds.has("time")).toBe(false);
   const reference = boxes.find((b) => b.kind === "text");
   expect(reference).toBeDefined();
   for (const box of boxes) {
