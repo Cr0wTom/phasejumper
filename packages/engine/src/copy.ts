@@ -86,6 +86,8 @@ export function warningCopy(code: WarningCode): string {
       return "Your sleep times don't match your chronotype, so the plan uses your sleep times and keeps wider margins around light.";
     case "LIGHT_BLOCK_SHIFTED":
       return "The best light time falls while you sleep, so light windows sit just before your sleep instead.";
+    case "SLEEP_BEFORE_FLIGHT":
+      return "Your night ends 3 hours before your flight so you have time to get to the airport. Bedtime moves up to an hour earlier, and if the night is still short the plan adds a nap.";
     case "SHORT_SLEEP_DAY":
       return "Your sleep window is short today, so the plan adds a nap.";
     case "MELATONIN_MOVED":
