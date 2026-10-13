@@ -91,6 +91,8 @@ export const messages = {
     "Enter a time like 07:45 or 7:45 pm, or pick one from the list.",
   timeOptions: (label: string): string => `${label} options`,
   dateInvalid: "Choose a date.",
+  dateIncomplete: "Finish the date: day, month and a 4-digit year.",
+  dateYear: "Check the year: use 4 digits, like 2027.",
   timesSame: "Bedtime and wake time are the same. Enter two different times.",
   sleepNeedInvalid:
     "Enter the hours of sleep you need as a number greater than 0 and less than 24.",
