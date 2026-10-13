@@ -5,6 +5,6 @@
   "engine.delayMelatonin": false,
   "engine.simulate": false,
   "flights.openskyLive": false,
-  "legal.acceptanceGate": false,
-  "melatonin.optIn": false
+  "legal.acceptanceGate": true,
+  "melatonin.optIn": true
 }

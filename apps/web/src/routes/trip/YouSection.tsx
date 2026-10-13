@@ -15,8 +15,8 @@
  */
 
 import { CheckboxField, SelectField, TextField } from "../../components/fields";
-import { messages } from "../../messages";
-import { h2Class, surfaceClass } from "../../ui";
+import { legalMessages, messages } from "../../messages";
+import { h2Class, labelClass, surfaceClass } from "../../ui";
 import { isCaffeine, isChronotype, isPreAdjust } from "./formState";
 import { fieldDomId, type FieldErrors, type TripFormValues } from "./schema";
 
@@ -117,8 +117,10 @@ export function YouSection({
         />
       </div>
       <CheckboxField
+        id={fieldDomId("exerciseEnabled")}
         label={messages.exercise}
         checked={form.exerciseEnabled}
+        hint={form.exerciseEnabled ? legalMessages.exerciseNotice : undefined}
         onChange={(exerciseEnabled) => onChange({ exerciseEnabled })}
       />
       <CheckboxField
@@ -132,11 +134,49 @@ export function YouSection({
         onChange={(mealTimingEnabled) => onChange({ mealTimingEnabled })}
       />
       {showMelatonin ? (
-        <CheckboxField
-          label={messages.melatonin}
-          checked={form.useMelatonin}
-          onChange={(useMelatonin) => onChange({ useMelatonin })}
-        />
+        <>
+          <CheckboxField
+            label={legalMessages.melatoninQuestion}
+            checked={form.useMelatonin}
+            onChange={(useMelatonin) => onChange({ useMelatonin })}
+          />
+          {form.useMelatonin ? (
+            <>
+              <p>{legalMessages.melatoninNotice}</p>
+              <fieldset className="flex flex-col gap-2">
+                <legend className={labelClass}>
+                  {legalMessages.melatoninCheckHeading}
+                </legend>
+                <CheckboxField
+                  label={legalMessages.melatoninPregnant}
+                  checked={form.melatoninPregnant}
+                  onChange={(melatoninPregnant) =>
+                    onChange({ melatoninPregnant })
+                  }
+                />
+                <CheckboxField
+                  label={legalMessages.melatoninMedication}
+                  checked={form.melatoninMedication}
+                  onChange={(melatoninMedication) =>
+                    onChange({ melatoninMedication })
+                  }
+                />
+                <CheckboxField
+                  label={legalMessages.melatoninUnder18}
+                  checked={form.melatoninUnder18}
+                  onChange={(melatoninUnder18) =>
+                    onChange({ melatoninUnder18 })
+                  }
+                />
+              </fieldset>
+              {form.melatoninPregnant ||
+              form.melatoninMedication ||
+              form.melatoninUnder18 ? (
+                <p role="status">{legalMessages.melatoninBlocked}</p>
+              ) : null}
+            </>
+          ) : null}
+        </>
       ) : null}
     </section>
   );

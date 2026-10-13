@@ -17,7 +17,7 @@
 import { describe, expect, it } from "vitest";
 import { bannedCopyPattern } from "../../../scripts/banned-terms";
 import flags from "../src/flags.json";
-import { messages } from "../src/messages";
+import { legalMessages, messages } from "../src/messages";
 
 // §11.4 health words + encoded third-party terms (scripts/banned-terms.ts).
 const BANNED = bannedCopyPattern();
@@ -34,7 +34,7 @@ function stringsIn(value: unknown): string[] {
 }
 
 describe("flags and copy", () => {
-  it("ships every rollout flag off", () => {
+  it("keeps non-T12 rollout flags off", () => {
     expect(flags).toEqual({
       "engine.exercise": false,
       "engine.meditation": false,
@@ -42,8 +42,8 @@ describe("flags and copy", () => {
       "engine.delayMelatonin": false,
       "engine.simulate": false,
       "flights.openskyLive": false,
-      "legal.acceptanceGate": false,
-      "melatonin.optIn": false,
+      "legal.acceptanceGate": true,
+      "melatonin.optIn": true,
     });
   });
 
@@ -56,7 +56,7 @@ describe("flags and copy", () => {
     expect(messages.footer).toBe(
       "General wellness information, not medical advice. You use PhaseJumper at your own risk.",
     );
-    expect(messages.melatonin).toBe(
+    expect(legalMessages.melatoninQuestion).toBe(
       "I already use melatonin and want timing windows for it",
     );
   });

@@ -22,7 +22,7 @@ import { useEffect, useMemo, useState } from "react";
 import { PhaseMap } from "../../components/PhaseMap/PhaseMap";
 import { EXAMPLE_TRIP } from "../../exampleTrip";
 import { shortDate } from "../../format";
-import { messages, startMessages as m } from "../../messages";
+import { legalMessages, messages, startMessages as m } from "../../messages";
 import { planHash } from "../../router";
 import { listPlans, type StoredPlan } from "../../storage/plans";
 import {
@@ -121,6 +121,11 @@ export function StartScreen() {
 
       <footer className="mt-8 flex flex-col gap-2 border-t border-line pt-4 text-13 leading-body text-fg-muted">
         <p>{messages.footer}</p>
+        <p>
+          <a className={linkClass} href="#/legal">
+            {legalMessages.legalLink}
+          </a>
+        </p>
         <p>
           <a className={linkClass} href="#/evidence">
             {m.evidenceLink}

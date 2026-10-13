@@ -20,16 +20,30 @@
 import { ENGINE_VERSION, generatePlan } from "@phasejumper/engine";
 import { useEffect, useState } from "react";
 import { currentInstant } from "../../clock";
-import { planMessages as m } from "../../messages";
+import { LegalGate } from "../../components/LegalGate";
+import { flags } from "../../flags";
+import { legalMessages, planMessages as m } from "../../messages";
 import { replaceWithPlan } from "../../router";
 import { decodeShareLink } from "../../storage/shareLink";
 import { savePlan, setLastPlanId } from "../../storage/plans";
+import {
+  termsAccepted,
+  termsOutdated,
+  writeTermsAcceptance,
+} from "../../terms";
 import { errorClass, h1Class, linkClass, pageClass } from "../../ui";
 
 export function ShareOpen({ payload }: { payload: string }) {
   const [error, setError] = useState<string | null>(null);
+  const [accepted, setAccepted] = useState(
+    () => !flags["legal.acceptanceGate"] || termsAccepted(),
+  );
+  const [outdated, setOutdated] = useState(() => termsOutdated());
+  const [saveFailed, setSaveFailed] = useState(false);
+  const showGate = flags["legal.acceptanceGate"] && !accepted;
 
   useEffect(() => {
+    if (showGate) return;
     let cancelled = false;
     void (async () => {
       const decoded = decodeShareLink(payload);
@@ -62,13 +76,28 @@ export function ShareOpen({ payload }: { payload: string }) {
     return () => {
       cancelled = true;
     };
-  }, [payload]);
+  }, [payload, showGate]);
 
   return (
     <main className={pageClass}>
       <h1 className={h1Class}>{m.planHeading}</h1>
-      {error === null ? (
-        <p className="mt-8">{m.shareOpening}</p>
+      {showGate ? (
+        <div className="mt-8">
+          <LegalGate
+            outdated={outdated}
+            onContinue={() => {
+              const written = writeTermsAcceptance(currentInstant());
+              setSaveFailed(!written.ok);
+              setOutdated(false);
+              setAccepted(true);
+            }}
+          />
+        </div>
+      ) : error === null ? (
+        <div className="mt-8 flex flex-col gap-4">
+          <p>{m.shareOpening}</p>
+          {saveFailed ? <p role="status">{legalMessages.saveFailed}</p> : null}
+        </div>
       ) : (
         <div className="mt-8 flex flex-col gap-4">
           <p role="alert" className={errorClass}>

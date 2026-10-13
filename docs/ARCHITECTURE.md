@@ -2,7 +2,7 @@
 
 PhaseJumper is a static web app. GitHub Pages serves the built files; everything — planning, airport lookup, calendar — runs in the browser. There is no server, database, account or telemetry, and nothing a traveler enters leaves their device.
 
-*As built through T09. Updated with each ticket.*
+*As built through T12. Updated with each ticket.*
 
 ## Repository
 
@@ -42,10 +42,10 @@ Testing: unit tests, fast-check property tests over 500 random trips, and eight 
 
 | Path | Role |
 |---|---|
-| `router.ts` | Hash routing: `#/` (Start), `#/settings`, `#/evidence`, `#/trip[/<id>]` (new trip, or edit a saved one), `#/plan[/<id>]` (a plan, or the last opened), `#/today`, and share links `#p=<base64url PlanInput>`; anything else goes to `#/` |
-| `routes/start/` + `exampleTrip.ts` | Start: a live phase map of a fixed example trip (PRG → SFO, planned on the device), Plan a trip, the plans saved on this device, footer |
-| `routes/settings/` | Settings: dark/light, export plans as JSON, import (`storage/importPlans.ts` checks every trip with the engine, a file with any bad trip imports nothing; `importAll.ts` rolls back partial saves), forget all trips (two-step confirmation), and the evidence page |
-| `components/Markdown.tsx` | Renders `docs/EVIDENCE.md` (bundled at build time) as React elements: headings, paragraphs, lists, bold, https links, rules; never injects HTML |
+| `router.ts` | Hash routing: `#/` (Start), `#/settings`, `#/evidence`, `#/legal` (terms and privacy), `#/trip[/<id>]` (new trip, or edit a saved one), `#/plan[/<id>]` (a plan, or the last opened), `#/today`, and share links `#p=<base64url PlanInput>`; anything else goes to `#/` |
+| `routes/start/` + `exampleTrip.ts` | Start: a live phase map of a fixed example trip (PRG → SFO, planned on the device), Plan a trip, the plans saved on this device, footer, link to `#/legal` |
+| `routes/settings/` | Settings: dark/light, export plans as JSON, import (`storage/importPlans.ts` checks every trip with the engine, a file with any bad trip imports nothing; `importAll.ts` rolls back partial saves), forget all trips (two-step confirmation), the evidence page, terms and privacy, and Copy technical report (`technicalReport.ts`) |
+| `components/Markdown.tsx` | Renders bundled Markdown (evidence, terms, privacy) as React elements: headings, paragraphs, lists, bold, https links, rules; never injects HTML |
 | `routes/trip/` | Trip builder: You, Flights, Constraints; zod schema (`schema.ts`), form → `PlanInput` (`mapPlanInput.ts`) |
 | `routes/plan/` | Plan screen: decision header with the progress curve, share link and Edit trip, the phase map with a now marker, and the per-day detail list (icons allowed here); opening share links |
 | `routes/today/` + `today.ts` | Today: where you are and the local time, the current and next block with countdowns (recomputed every 30 s and on returning to the tab), today's ribbon |
@@ -54,7 +54,10 @@ Testing: unit tests, fast-check property tests over 500 random trips, and eight 
 | `airports/` | Lazy-loads `airports.json` as its own chunk; search by IATA, city, name |
 | `storage/plans.ts` | IndexedDB via `idb-keyval`: `plan:<id>` → `{ id, input, result, engineVersion, createdAt }`, plus the last opened plan id; listing, a JSON backup format (`phasejumper-plans`, version 1, inputs only) and forget-all; plans from an older engine are rebuilt on open with a one-line notice |
 | `storage/shareLink.ts` | Share links: the `PlanInput` (never the result) as base64url JSON in the URL fragment, never sent to the host; the recipient's browser regenerates the plan |
-| `flags.json` | Build-time flags (§7.4) plus `legal.acceptanceGate` and `melatonin.optIn`, all off |
+| `flags.json` | Build-time flags (§7.4). `legal.acceptanceGate` and `melatonin.optIn` are on; the others stay off as kill switches |
+| `terms.ts` | `TERMS_VERSION` and localStorage `pj.terms` (`{ acceptedTermsVersion, at }`); a failed write stays in memory for the page session |
+| `components/LegalGate.tsx` | First-use / terms-changed acceptance: wellness + 18+ checkboxes, links to `#/legal`, Continue; shown on the trip form and on share links until accepted |
+| `routes/settings/LegalScreen.tsx` | `#/legal`: `TERMS.md` then `PRIVACY.md`, rendered with `Markdown.tsx` (`headingOffset={1}`) |
 | `components/PhaseMap/` | The phase map (§4): `layout.ts` turns a plan into rows of positioned bands (pure, unit-tested); `PhaseMap.tsx` draws them as SVG with the axis toggle, popovers and keyboard navigation |
 | `styles/tokens.css` | The §5 design tokens: colors for dark (default) and light, radii and type scale; Geist and Geist Mono self-hosted from `public/fonts/` |
 | `theme.ts` | Dark/light, chosen in Settings; first visit follows the OS, the choice is remembered on this device (`localStorage`, optional) |
@@ -64,7 +67,7 @@ Testing: unit tests, fast-check property tests over 500 random trips, and eight 
 
 The phase map draws one row per calendar date in the grid's zone. Destination and home hour scales sit on top, both shown by default and each switchable; the grid reads in the first one switched on. A "now" marker shows the current time on today's row while the plan is underway. Every block is placed by its own UTC instant and split at midnight and at clock changes, so DST days read correctly. Inside the grid there are only bands, glyphs and text; icons live in the legend. A test-only harness (`apps/web/harness/`, built by `vite.harness.config.ts`, never shipped) renders the golden fixtures for Playwright: screenshots at 390 and 1280 px, axe, keyboard, DST and narrow-screen checks.
 
-"Generate plan" validates the form, maps it to `PlanInput` (zones and coordinates from `airports.json`), runs `generatePlan` in the browser, saves the result to IndexedDB and opens `#/plan/<id>`. The melatonin toggle and the legal gate stay hidden until T12 turns their flags on.
+"Generate plan" validates the form, maps it to `PlanInput` (zones and coordinates from `airports.json`), runs `generatePlan` in the browser, saves the result to IndexedDB and opens `#/plan/<id>`. Until the traveler accepts the current terms version, the legal gate stands in place of that button (and in front of opening a share link). Melatonin timing is an opt-in with a contraindication checklist; exercise is opt-in with a one-line notice. `scripts/check-terms.ts` scans the repository for third-party names and user-facing copy for banned health words (`scripts/banned-terms.ts`, allow-list `scripts/banned-terms-allow.json`). `NOTICE` lists third-party data, fonts, icons and runtime dependency licences.
 
 ## Itinerary parser (`packages/itinerary`)
 
@@ -88,7 +91,7 @@ No request leaves the page.
 
 ## Build and deploy
 
-- **CI** (`ci.yml`, every pull request): `pnpm install --frozen-lockfile`, lint, typecheck, test, build; a second job runs the Playwright end-to-end tests in Chromium (`pnpm test:e2e`) and a Lighthouse accessibility check on the trip form (fails below 95).
+- **CI** (`ci.yml`, every pull request): `pnpm install --frozen-lockfile`, `check:terms`, lint, typecheck, test, build; a second job runs the Playwright end-to-end tests in Chromium (`pnpm test:e2e`) and a Lighthouse accessibility check on the trip form (fails below 95).
 - **Pages** (`pages.yml`, push to `main`): build → `actions/upload-pages-artifact` → `actions/deploy-pages`. Site: https://cr0wtom.github.io/phasejumper/
 - The base path comes from `VITE_BASE_PATH` (default `/phasejumper/`); set it to `/` to serve from a custom domain root.
 - Rollback: revert the merge commit; Pages redeploys in about a minute.

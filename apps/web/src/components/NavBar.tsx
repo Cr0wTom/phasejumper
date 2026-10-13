@@ -31,7 +31,7 @@ export function NavBar({ route }: { route: Route }) {
   const active =
     route.name === "share"
       ? "plan"
-      : route.name === "evidence"
+      : route.name === "evidence" || route.name === "legal"
         ? "settings"
         : route.name;
   return (
