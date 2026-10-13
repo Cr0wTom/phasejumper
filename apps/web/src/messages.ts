@@ -367,3 +367,23 @@ export const legalMessages = {
   reportFailed:
     "The technical report could not be created. Reload the page and try again.",
 } as const;
+
+/** Feedback by email (Settings). Written by the maintainer; wire, never edit. */
+export const feedbackMessages = {
+  heading: "Feedback",
+  intro:
+    "Found a bug or missing something? Write to us. These links open your own email app; nothing is sent until you press send.",
+  address: "feedback@phasejumper.world",
+  bugLink: "Report a bug",
+  featureLink: "Request a feature",
+  bugSubject: "PhaseJumper bug report",
+  featureSubject: "PhaseJumper feature request",
+  bugBody: (report: string): string =>
+    `What happened?\n\n\nWhat did you expect instead?\n\n\nSteps to reproduce:\n1. \n2. \n\n---\nTechnical report (no trip details; delete it if you prefer):\n${report}\n`,
+  featureBody:
+    "What would you like PhaseJumper to do?\n\n\nWhy would it help on your trips?\n\n",
+  privacy:
+    "Your email address and message are used only to answer your feedback. See the",
+  privacyLink: "privacy notice",
+  reportUnavailable: "(not available)",
+} as const;

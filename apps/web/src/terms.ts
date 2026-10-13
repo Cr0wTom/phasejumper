@@ -15,7 +15,7 @@
  */
 
 /** Bump when TERMS.md or PRIVACY.md change; the gate re-prompts. */
-export const TERMS_VERSION = 1;
+export const TERMS_VERSION = 2;
 
 export const TERMS_STORAGE_KEY = "pj.terms";
 
