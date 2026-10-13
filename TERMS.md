@@ -46,7 +46,7 @@ When these terms change, the version number goes up and PhaseJumper asks you to 
 
 ## Governing law
 
-These terms are governed by the law of the Czech Republic. If you live in another country, its mandatory consumer protections still apply to you.
+These terms are governed by the law of the Federal Republic of Germany. If you live elsewhere in the European Union or in another country, the mandatory consumer protections of the country where you live still apply to you, and you can bring a claim in its courts.
 
 ## Changelog
 
