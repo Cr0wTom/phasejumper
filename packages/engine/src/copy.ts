@@ -53,6 +53,8 @@ export function reasonCopy(code: ReasonCode): string {
       return "Exercise now would nudge your clock the wrong way.";
     case "EXERCISE_AVOID_BEDTIME":
       return "Exercise this close to bedtime can make it harder to fall asleep.";
+    case "EXERCISE_AVOID_EVENING":
+      return "Exercise now would nudge your clock the wrong way, and later it can make it harder to fall asleep.";
     case "CAFFEINE_OK":
       return "Caffeine fits in this window.";
     case "CAFFEINE_STOP":

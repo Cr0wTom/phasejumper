@@ -98,7 +98,7 @@ import type {
 } from "./types";
 
 /** Bumped whenever plan output changes (§7.4). */
-export const ENGINE_VERSION = "0.3.0";
+export const ENGINE_VERSION = "0.4.0";
 
 /** Guard against a non-terminating loop; weak days at half rate stay far below. */
 const MAX_PLAN_DAYS = 60;
