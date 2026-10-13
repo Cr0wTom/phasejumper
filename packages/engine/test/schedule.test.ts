@@ -210,6 +210,6 @@ describe("contract", () => {
   });
 
   it("stamps the engine version", () => {
-    expect(generatePlan(prgTyo()).engineVersion).toBe("0.2.0");
+    expect(generatePlan(prgTyo()).engineVersion).toBe("0.3.0");
   });
 });

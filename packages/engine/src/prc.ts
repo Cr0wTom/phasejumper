@@ -141,6 +141,18 @@ export const FEASIBILITY = {
   walkMinutes: 30,
   /** The walk must end this long before sleep (exercise sleep hygiene). */
   walkBeforeSleepHours: 3,
+  /**
+   * Awake before every departure: getting to the airport plus check-in and
+   * security. A sleep that would run into it ends here instead.
+   */
+  awakeBeforeDepartureHours: 3,
+  /**
+   * When that cuts a night short, bedtime may move this much earlier. Not
+   * more: falling asleep well before the usual bedtime is hard (the evening
+   * "wake maintenance zone"; Lavie 1986, Strogatz et al. 1987), so the rest
+   * of the lost sleep is recovered with a nap instead (R1).
+   */
+  earlierBedtimeMaxMinutes: 60,
 } as const;
 
 /** Daylight check (§2.7 rule 3), via suncalc. */

@@ -27,14 +27,18 @@ import { formatTimeForDisplay, parseTimeText } from "../timeText";
 import { controlClass } from "../ui";
 import { FieldFrame, TextField } from "./fields";
 
-const QUARTER_HOURS: readonly string[] = Array.from(
-  { length: 96 },
-  (_, index) => {
-    const hour = Math.floor(index / 4);
-    const minute = (index % 4) * 15;
-    return `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
-  },
-);
+/** Every 5 minutes: flight times are almost always on a 5-minute step. */
+const STEPS: readonly string[] = Array.from({ length: 288 }, (_, index) => {
+  const hour = Math.floor(index / 12);
+  const minute = (index % 12) * 5;
+  return `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+});
+
+/** The 5-minute steps, plus the typed time when it is not one of them. */
+function optionsWith(typed: string | null): readonly string[] {
+  if (typed === null || STEPS.includes(typed)) return STEPS;
+  return [...STEPS, typed].sort();
+}
 
 function useCoarsePointer(): boolean {
   const [coarse, setCoarse] = useState(
@@ -61,19 +65,15 @@ function displayValue(value: string): string {
   return parsed === null ? "" : formatTimeForDisplay(parsed);
 }
 
-/** Index of the option at `value`, or the next 15-minute slot after it. */
-function indexAtOrAfter(value: string): number {
-  const [hourText, minuteText] = value.split(":");
-  const total = Number(hourText) * 60 + Number(minuteText);
-  const index = Math.ceil(total / 15);
-  if (index >= QUARTER_HOURS.length) return QUARTER_HOURS.length - 1;
-  if (index < 0) return 0;
-  return index;
+/** Index of the option at `value` ("HH:MM"), or the next one after it. */
+function indexAtOrAfter(options: readonly string[], value: string): number {
+  const index = options.findIndex((option) => option >= value);
+  return index === -1 ? options.length - 1 : index;
 }
 
 function indexFor(text: string): number {
   const parsed = parseTimeText(text);
-  return parsed === null ? 0 : indexAtOrAfter(parsed);
+  return parsed === null ? 0 : indexAtOrAfter(optionsWith(parsed), parsed);
 }
 
 export function TimeField({
@@ -144,6 +144,7 @@ function TimeCombobox({
   const listRef = useRef<HTMLUListElement>(null);
   const emitted = useRef(value);
   const [text, setText] = useState(() => displayValue(value));
+  const options = optionsWith(parseTimeText(text));
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [localError, setLocalError] = useState<string | null>(null);
@@ -217,7 +218,7 @@ function TimeCombobox({
     const parsed = parseTimeText(next);
     if (parsed !== null) {
       commit(parsed);
-      if (open) setActiveIndex(indexAtOrAfter(parsed));
+      if (open) setActiveIndex(indexAtOrAfter(optionsWith(parsed), parsed));
       return;
     }
     if (next.trim() === "") commit("");
@@ -230,7 +231,7 @@ function TimeCombobox({
         openList(text);
         return;
       }
-      setActiveIndex((index) => Math.min(index + 1, QUARTER_HOURS.length - 1));
+      setActiveIndex((index) => Math.min(index + 1, options.length - 1));
       return;
     }
     if (event.key === "ArrowUp") {
@@ -256,7 +257,7 @@ function TimeCombobox({
         return;
       }
       event.preventDefault();
-      const chosen = QUARTER_HOURS[activeIndex];
+      const chosen = options[activeIndex];
       if (chosen !== undefined) select(chosen);
     }
   }
@@ -309,7 +310,7 @@ function TimeCombobox({
           aria-label={messages.timeOptions(label)}
           className="pj-card absolute top-full z-10 mt-1 max-h-60 w-full overflow-auto text-15 text-fg"
         >
-          {QUARTER_HOURS.map((option, index) => {
+          {options.map((option, index) => {
             const selected = index === activeIndex;
             return (
               <li

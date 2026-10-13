@@ -200,6 +200,7 @@ export const WARNING_CODES = [
   "MELATONIN_MOVED",
   "WEAK_DAY",
   "DAYLIGHT_UNKNOWN",
+  "SLEEP_BEFORE_FLIGHT",
 ] as const;
 
 export type WarningCode = (typeof WARNING_CODES)[number];
