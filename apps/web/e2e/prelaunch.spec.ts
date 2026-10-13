@@ -1,0 +1,53 @@
+/*
+ * Copyright 2026 PhaseJumper contributors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import { expect, test } from "@playwright/test";
+import { messages } from "../src/messages";
+import { preAcceptTerms } from "./acceptTerms";
+
+test.beforeEach(async ({ page }) => {
+  await preAcceptTerms(page);
+});
+
+for (const width of [390, 1280]) {
+  for (const hash of ["#/plan", "#/today"]) {
+    test(`${hash} with no plan does not scroll at ${width} px`, async ({
+      page,
+    }) => {
+      await page.setViewportSize({ width, height: 800 });
+      await page.goto(hash);
+      await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+      const overflow = await page.evaluate(
+        () => document.documentElement.scrollHeight - window.innerHeight,
+      );
+      expect(overflow).toBeLessThanOrEqual(0);
+    });
+  }
+}
+
+test("a field's error clears as soon as the field is corrected", async ({
+  page,
+}) => {
+  await page.goto("#/trip");
+  const bedtime = page.getByLabel(messages.bedtime, { exact: true });
+  const wake = page.getByLabel(messages.wake, { exact: true });
+  await bedtime.fill("07:00");
+  await wake.fill("07:00");
+  await page.getByRole("button", { name: messages.generate }).click();
+  await expect(page.getByText(messages.timesSame)).toBeVisible();
+  await bedtime.fill("23:00");
+  await expect(page.getByText(messages.timesSame)).toHaveCount(0);
+});

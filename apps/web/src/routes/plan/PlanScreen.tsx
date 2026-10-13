@@ -167,7 +167,7 @@ export function PlanScreen({ id }: { id?: string }) {
 
   return (
     <main className={pageClass}>
-      <header className="pj-plan-header pj-card pj-glass sticky z-10 flex flex-col gap-3 p-5">
+      <header className="pj-plan-header pj-card pj-glass z-10 flex md:sticky flex-col gap-3 p-5">
         <h1 className={h1Class}>{m.planHeading}</h1>
         <p className="text-17 leading-body">
           {plan.result.decision.explanation}

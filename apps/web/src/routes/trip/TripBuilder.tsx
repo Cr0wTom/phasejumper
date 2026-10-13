@@ -184,11 +184,23 @@ export function TripBuilder({ editId }: { editId?: string } = {}) {
     if (formAlert !== null) formAlertRef.current?.focus();
   }, [formAlert]);
 
+  /** An edited field's error goes away at once; Generate plan checks again. */
+  function clearErrors(keys: readonly string[]): void {
+    setFieldErrors((current) => {
+      if (!keys.some((key) => key in current)) return current;
+      const next = { ...current };
+      for (const key of keys) delete next[key];
+      return next;
+    });
+  }
+
   function patch(next: Partial<TripFormValues>): void {
+    clearErrors(Object.keys(next));
     setForm((current) => ({ ...current, ...next }));
   }
 
   function changeLeg(index: number, legPatch: Partial<LegForm>): void {
+    clearErrors(Object.keys(legPatch).map((field) => `legs.${index}.${field}`));
     const id = form.legs[index]?.id;
     if (id !== undefined) {
       setReview((current) =>
@@ -250,6 +262,9 @@ export function TripBuilder({ editId }: { editId?: string } = {}) {
   }
 
   function changeEvent(index: number, eventPatch: Partial<AwakeForm>): void {
+    clearErrors(
+      Object.keys(eventPatch).map((field) => `mustBeAwake.${index}.${field}`),
+    );
     setForm((current) => ({
       ...current,
       mustBeAwake: current.mustBeAwake.map((event, eventIndex) =>
@@ -259,6 +274,11 @@ export function TripBuilder({ editId }: { editId?: string } = {}) {
   }
 
   function changeWindow(index: number, windowPatch: Partial<WindowForm>): void {
+    clearErrors(
+      Object.keys(windowPatch).map(
+        (field) => `noWorkoutWindows.${index}.${field}`,
+      ),
+    );
     setForm((current) => ({
       ...current,
       noWorkoutWindows: current.noWorkoutWindows.map((window, windowIndex) =>

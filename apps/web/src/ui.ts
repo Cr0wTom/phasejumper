@@ -18,7 +18,7 @@ export const focusRing =
   "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
 
 export const pageClass =
-  "mx-auto min-h-screen w-full max-w-[1040px] px-4 pb-8 pt-6 text-15 leading-body text-fg md:px-6 md:pt-10";
+  "mx-auto w-full max-w-[1040px] px-4 pb-8 pt-6 text-15 leading-body text-fg md:px-6 md:pt-10";
 
 /** A raised card: hairline border, inner top highlight, soft drop shadow. */
 export const surfaceClass = "pj-card flex flex-col gap-4 p-5";
