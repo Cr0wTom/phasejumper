@@ -383,6 +383,7 @@ export const feedbackMessages = {
   featureBody:
     "What would you like PhaseJumper to do?\n\n\nWhy would it help on your trips?\n\n",
   privacy:
-    "Your email address and message are used only to answer your feedback. See the privacy notice.",
+    "Your email address and message are used only to answer your feedback. See the",
+  privacyLink: "privacy notice",
   reportUnavailable: "(not available)",
 } as const;

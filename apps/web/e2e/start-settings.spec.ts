@@ -18,6 +18,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import {
+  feedbackMessages,
   planMessages,
   settingsMessages as s,
   startMessages,
@@ -66,6 +67,13 @@ async function savedKeys(page: Page): Promise<string[]> {
 async function openShared(page: Page): Promise<void> {
   await page.goto(SHARE);
   await expect(page).toHaveURL(/#\/plan\/[0-9a-f-]{36}$/i);
+}
+
+function decodeMailtoBody(href: string): string {
+  const marker = "&body=";
+  const at = href.indexOf(marker);
+  if (at < 0) throw new Error("Feedback mailto URL has no body.");
+  return decodeURIComponent(href.slice(at + marker.length));
 }
 
 test("Start shows the example ribbon, Plan a trip and the footer", async ({
@@ -171,6 +179,46 @@ test("import explains a bad file and saves nothing", async ({ page }) => {
   expect((await savedKeys(page)).filter((k) => k.startsWith("plan:"))).toEqual(
     [],
   );
+});
+
+test("Settings feedback links are mailto and omit the trip", async ({
+  page,
+}) => {
+  await openShared(page);
+  await page.goto("#/settings");
+
+  const bug = page.getByRole("link", {
+    name: feedbackMessages.bugLink,
+    exact: true,
+  });
+  const feature = page.getByRole("link", {
+    name: feedbackMessages.featureLink,
+    exact: true,
+  });
+  const prefix = `mailto:${feedbackMessages.address}?subject=`;
+  await expect(bug).toBeVisible();
+  await expect(feature).toBeVisible();
+  await expect(bug).toHaveAttribute("href", /engineVersion/);
+
+  const bugHref = await bug.getAttribute("href");
+  const featureHref = await feature.getAttribute("href");
+  if (bugHref === null || featureHref === null) {
+    throw new Error("Feedback link is missing an href.");
+  }
+  expect(bugHref.startsWith(prefix)).toBe(true);
+  expect(featureHref.startsWith(prefix)).toBe(true);
+
+  const body = decodeMailtoBody(bugHref);
+  expect(body).toContain("engineVersion");
+  const plan = JSON.parse(SFO) as {
+    itinerary: {
+      legs: Array<{ departureAirport: string; arrivalAirport: string }>;
+    };
+  };
+  for (const leg of plan.itinerary.legs) {
+    expect(body).not.toContain(leg.departureAirport);
+    expect(body).not.toContain(leg.arrivalAirport);
+  }
 });
 
 test("the evidence page renders from docs/EVIDENCE.md", async ({ page }) => {

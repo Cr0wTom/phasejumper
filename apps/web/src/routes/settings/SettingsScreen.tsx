@@ -15,12 +15,19 @@
  */
 
 // Settings (§3.1 #5): appearance, data on this device (export, import,
-// forget all trips) and the evidence page. Nothing here leaves the device.
+// forget all trips), feedback by email and the evidence page. Nothing
+// here leaves the device until the traveler sends their own email.
 
 import { ENGINE_VERSION } from "@phasejumper/engine";
-import { useId, useState, type ChangeEvent } from "react";
+import { useEffect, useId, useState, type ChangeEvent } from "react";
 import { currentPlainDate } from "../../clock";
-import { legalMessages, messages, settingsMessages as m } from "../../messages";
+import { feedbackMailto } from "../../feedback";
+import {
+  feedbackMessages,
+  legalMessages,
+  messages,
+  settingsMessages as m,
+} from "../../messages";
 import { MAX_IMPORT_BYTES, parseImport } from "../../storage/importPlans";
 import {
   backupOf,
@@ -63,6 +70,19 @@ function NoticeLine({ notice }: { notice: Notice }) {
   );
 }
 
+async function currentTechnicalReportText(): Promise<string> {
+  const lastId = await getLastPlanId();
+  const plan = lastId === undefined ? undefined : await loadPlan(lastId);
+  const report = await buildTechnicalReport({
+    engineVersion: ENGINE_VERSION,
+    appVersion,
+    userAgent: navigator.userAgent,
+    input: plan?.input,
+    warnings: (plan?.result.warnings ?? []).map((warning) => warning.code),
+  });
+  return technicalReportText(report);
+}
+
 function download(name: string, text: string): void {
   const url = URL.createObjectURL(
     new Blob([text], { type: "application/json" }),
@@ -81,10 +101,26 @@ export function SettingsScreen() {
   const [dataNotice, setDataNotice] = useState<Notice>(null);
   const [reportNotice, setReportNotice] = useState<Notice>(null);
   const [reportManual, setReportManual] = useState<string | null>(null);
+  const [bugReport, setBugReport] = useState<string | null>(null);
   const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState(false);
   const importId = useId();
   const reportId = useId();
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        const text = await currentTechnicalReportText();
+        if (!cancelled) setBugReport(text);
+      } catch {
+        if (!cancelled) setBugReport(null);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   async function onExport(): Promise<void> {
     try {
@@ -146,16 +182,7 @@ export function SettingsScreen() {
     setReportNotice(null);
     setReportManual(null);
     try {
-      const lastId = await getLastPlanId();
-      const plan = lastId === undefined ? undefined : await loadPlan(lastId);
-      const report = await buildTechnicalReport({
-        engineVersion: ENGINE_VERSION,
-        appVersion,
-        userAgent: navigator.userAgent,
-        input: plan?.input,
-        warnings: (plan?.result.warnings ?? []).map((warning) => warning.code),
-      });
-      const text = technicalReportText(report);
+      const text = await currentTechnicalReportText();
       try {
         await navigator.clipboard.writeText(text);
         setReportNotice({ tone: "ok", text: legalMessages.reportCopied });
@@ -278,6 +305,31 @@ export function SettingsScreen() {
           )}
         </div>
         <NoticeLine notice={dataNotice} />
+      </section>
+
+      <section
+        aria-labelledby="settings-feedback"
+        className={`mt-6 ${surfaceClass}`}
+      >
+        <h2 id="settings-feedback" className={h2Class}>
+          {feedbackMessages.heading}
+        </h2>
+        <p className="text-fg-muted">{feedbackMessages.intro}</p>
+        <div className="flex flex-wrap gap-2">
+          <a className={buttonClass} href={feedbackMailto("bug", bugReport)}>
+            {feedbackMessages.bugLink}
+          </a>
+          <a className={buttonClass} href={feedbackMailto("feature", null)}>
+            {feedbackMessages.featureLink}
+          </a>
+        </div>
+        <p className="text-fg-muted">
+          {feedbackMessages.privacy}{" "}
+          <a className={linkClass} href="#/legal">
+            {feedbackMessages.privacyLink}
+          </a>
+          .
+        </p>
       </section>
 
       <section
