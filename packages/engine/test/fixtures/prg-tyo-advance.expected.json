@@ -758,21 +758,10 @@
         {
           "kind": "EXERCISE_AVOID",
           "startUtc": "2027-01-18T10:30:00Z",
-          "endUtc": "2027-01-18T11:00:00Z",
-          "localTz": "Asia/Tokyo",
-          "reasonCode": "EXERCISE_AVOID_DIRECTION",
-          "reason": "Exercise now would nudge your clock the wrong way.",
-          "source": "R9",
-          "confidence": "B",
-          "movable": false
-        },
-        {
-          "kind": "EXERCISE_AVOID",
-          "startUtc": "2027-01-18T11:00:00Z",
           "endUtc": "2027-01-18T14:00:00Z",
           "localTz": "Asia/Tokyo",
-          "reasonCode": "EXERCISE_AVOID_BEDTIME",
-          "reason": "Exercise this close to bedtime can make it harder to fall asleep.",
+          "reasonCode": "EXERCISE_AVOID_EVENING",
+          "reason": "Exercise now would nudge your clock the wrong way, and later it can make it harder to fall asleep.",
           "source": "R9",
           "confidence": "B",
           "movable": false
@@ -984,5 +973,5 @@
   ],
   "warnings": [],
   "droppedBlocks": [],
-  "engineVersion": "0.3.0"
+  "engineVersion": "0.4.0"
 }

@@ -515,6 +515,39 @@ export function feasibilityPass(
   const flights = applyFlights(raw, day, trip, out);
   const awake = applyMustBeAwake(flights.blocks, day, trip, flights.clip, out);
   const lit = applyDaylight(awake.blocks, trip, out);
-  out.blocks = applyCollisions(lit, out);
+  out.blocks = mergeNoExercise(applyCollisions(lit, out));
   return out;
+}
+
+/**
+ * A wrong-direction no-exercise window that runs straight into the
+ * before-bedtime one is shown as one block: two touching "No exercise"
+ * entries read as a mistake.
+ */
+function mergeNoExercise(blocks: RawBlock[]): RawBlock[] {
+  const bedtime = blocks.find(
+    (b) =>
+      b.kind === "EXERCISE_AVOID" && b.reasonCode === "EXERCISE_AVOID_BEDTIME",
+  );
+  if (bedtime === undefined) return blocks;
+  const touching = blocks.find(
+    (b) =>
+      b.kind === "EXERCISE_AVOID" &&
+      b.reasonCode === "EXERCISE_AVOID_DIRECTION" &&
+      compare(b.end, bedtime.start) >= 0 &&
+      compare(b.start, bedtime.start) < 0,
+  );
+  if (touching === undefined) return blocks;
+  return blocks
+    .filter((b) => b !== touching)
+    .map((b) =>
+      b === bedtime
+        ? {
+            ...b,
+            start: touching.start,
+            end: later(b.end, touching.end),
+            reasonCode: "EXERCISE_AVOID_EVENING" as const,
+          }
+        : b,
+    );
 }
