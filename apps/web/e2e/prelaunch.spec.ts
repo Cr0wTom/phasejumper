@@ -51,3 +51,17 @@ test("a field's error clears as soon as the field is corrected", async ({
   await bedtime.fill("23:00");
   await expect(page.getByText(messages.timesSame)).toHaveCount(0);
 });
+
+for (const hash of ["#/", "#/trip", "#/settings", "#/evidence", "#/legal"]) {
+  test(`${hash} is never wider than a phone screen`, async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(hash);
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    const extra = await page.evaluate(
+      () =>
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
+    );
+    expect(extra).toBe(0);
+  });
+}

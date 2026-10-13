@@ -62,6 +62,7 @@ const FG = "var(--fg)";
 const MUTED = "var(--fg-muted)";
 const SURFACE = "var(--surface)";
 const LINE = "var(--line)";
+const ACCENT = "var(--accent)";
 
 /** Keeps legend rows aligned when an item has no icon. */
 function LegendIcon({ name }: { name: IconName | undefined }) {
@@ -163,6 +164,8 @@ export function PhaseMap({
   now,
   onlyDate,
   compact = false,
+  selectedDate,
+  onSelectDate,
 }: {
   input: PlanInput;
   result: PlanResult;
@@ -172,6 +175,10 @@ export function PhaseMap({
   onlyDate?: string;
   /** No title, scale switches or legend: a single ribbon inside another screen. */
   compact?: boolean;
+  /** The row whose day sheet is open (YYYY-MM-DD in the grid's zone). */
+  selectedDate?: string;
+  /** Choosing a row (its date, empty space, or Enter on the row) calls this. */
+  onSelectDate?: (date: string) => void;
 }) {
   // Both scales show by default; the grid reads in the first one switched on.
   const [scales, setScales] = useState<Record<Axis, boolean>>({
@@ -263,6 +270,14 @@ export function PhaseMap({
     } else if (event.key === "ArrowRight" && list[0] !== undefined) {
       event.preventDefault();
       segRefs.current.get(list[0].id)?.focus();
+    } else if (
+      (event.key === "Enter" || event.key === " ") &&
+      onSelectDate !== undefined
+    ) {
+      const date = rows[rowIndex]?.date;
+      if (date === undefined) return;
+      event.preventDefault();
+      onSelectDate(date);
     }
   }
 
@@ -434,16 +449,37 @@ export function PhaseMap({
                   y={2}
                   width={g.ribbon}
                   height={g.rowH - 4}
-                  rx={6}
+                  rx={10}
                   fill={SURFACE}
-                  stroke={LINE}
-                  strokeWidth={1}
+                  stroke={row.date === selectedDate ? ACCENT : LINE}
+                  strokeWidth={row.date === selectedDate ? 1.5 : 1}
+                  onClick={
+                    onSelectDate === undefined
+                      ? undefined
+                      : () => onSelectDate(row.date)
+                  }
+                  style={
+                    onSelectDate === undefined
+                      ? undefined
+                      : { cursor: "pointer" }
+                  }
                 />
                 <text
                   x={0}
                   y={g.lanes.sleep.y + g.lanes.sleep.h - 3}
                   fontSize="13"
+                  fontWeight={row.date === selectedDate ? 600 : 400}
                   fill={FG}
+                  onClick={
+                    onSelectDate === undefined
+                      ? undefined
+                      : () => onSelectDate(row.date)
+                  }
+                  style={
+                    onSelectDate === undefined
+                      ? undefined
+                      : { cursor: "pointer" }
+                  }
                 >
                   {dateLabel(row.date, g.compact)}
                 </text>
@@ -458,6 +494,7 @@ export function PhaseMap({
                     y1={4}
                     y2={g.rowH - 4}
                     stroke={LINE}
+                    strokeOpacity={0.6}
                     strokeWidth={1}
                     aria-hidden="true"
                   />
@@ -567,7 +604,7 @@ export function PhaseMap({
                           y={lane.y}
                           width={w}
                           height={lane.h}
-                          rx={Math.min(4, lane.h / 2)}
+                          rx={Math.min(6, lane.h / 2)}
                           fill={color}
                           fillOpacity={quiet ? 0.55 : 1}
                         />
@@ -621,10 +658,11 @@ export function PhaseMap({
                       x2={x(nowAt.min)}
                       y1={1}
                       y2={g.rowH - 1}
-                      stroke={FG}
+                      stroke={ACCENT}
                       strokeWidth={2}
+                      className="pj-now-line"
                     />
-                    <circle cx={x(nowAt.min)} cy={2} r={3} fill={FG} />
+                    <circle cx={x(nowAt.min)} cy={2} r={3.5} fill={ACCENT} />
                   </g>
                 ) : null}
 
