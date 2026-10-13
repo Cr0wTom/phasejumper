@@ -85,8 +85,8 @@ test("manifest, icons, and safe area are installable from the sub-path", async (
   expect(manifest.name).toBe("PhaseJumper");
   expect(manifest.short_name).toBe("PhaseJumper");
   expect(manifest.display).toBe("standalone");
-  expect(manifest.theme_color).toBe("#0B0B0D");
-  expect(manifest.background_color).toBe("#0B0B0D");
+  expect(manifest.theme_color).toBe("#07080A");
+  expect(manifest.background_color).toBe("#07080A");
   expect(manifest.start_url).toBe("./#/today");
   expect(manifest.scope).toBe("./");
   expect(manifest.icons).toEqual([
