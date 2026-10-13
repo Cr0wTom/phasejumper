@@ -31,6 +31,8 @@ export interface StoredPlan {
   outboundPlanId?: string;
   /** "shared": saved by the traveler from someone else's share link. */
   source?: "shared";
+  /** The traveler's own name for the trip. Never part of a share link. */
+  name?: string;
 }
 
 export function planKey(id: string): string {
@@ -77,6 +79,7 @@ export function isStoredPlan(value: unknown): value is StoredPlan {
   ) {
     return false;
   }
+  if ("name" in value && typeof value.name !== "string") delete value.name;
   // An unknown source is treated as the traveler's own plan.
   if ("source" in value && value.source !== "shared") delete value.source;
   return true;

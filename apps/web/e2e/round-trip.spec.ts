@@ -101,9 +101,8 @@ async function fillLeg(
 async function generate(page: Page): Promise<void> {
   await page.getByRole("button", { name: messages.generate }).click();
   await expect(page).toHaveURL(/#\/plan\/[0-9a-f-]{36}$/i);
-  await expect(
-    page.getByRole("heading", { name: planMessages.planHeading, level: 1 }),
-  ).toBeVisible();
+  // The title is the trip name when one was given, else "Your plan".
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
 }
 
 async function planCount(page: Page): Promise<number> {
@@ -311,3 +310,41 @@ for (const theme of ["dark", "light"] as const) {
     expect(results.violations.map((v) => `${v.id}: ${v.help}`)).toEqual([]);
   });
 }
+
+test("a trip name titles both halves and the list, never the share link", async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  await openTrip(page);
+  await page
+    .getByLabel(messages.tripName, { exact: true })
+    .fill("Seoul conference");
+  const flights = page.getByRole("region", { name: messages.flightsHeading });
+  await fillLeg(page, flights, 0, OUTBOUND);
+  await page.getByRole("button", { name: returnMessages.add }).click();
+  const returning = page.getByRole("region", { name: returnMessages.heading });
+  await fillLeg(page, returning, 0, homeLeg("2027-01-23", "2027-01-24"));
+  await generate(page);
+  await expect(
+    page.getByRole("heading", { name: "Seoul conference", level: 1 }),
+  ).toBeVisible();
+  await page
+    .getByRole("group", { name: returnMessages.partsLabel })
+    .getByRole("button", { name: returnMessages.return })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "Seoul conference", level: 1 }),
+  ).toBeVisible();
+
+  await page.getByRole("button", { name: planMessages.share }).click();
+  const link = await page.evaluate(() => navigator.clipboard.readText());
+  const payload = link.split("#p=")[1] ?? "";
+  expect(Buffer.from(payload, "base64url").toString("utf8")).not.toContain(
+    "Seoul",
+  );
+
+  await page.goto("#/");
+  await expect(page.getByText("Seoul conference")).toHaveCount(1);
+  await expect(page.getByText(/PRG to SFO and back/)).toBeVisible();
+});
