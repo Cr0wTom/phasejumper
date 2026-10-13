@@ -20,6 +20,7 @@
 import { generatePlan } from "@phasejumper/engine";
 import { CalendarArrowDown, ChevronRight, Lock, Sun } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { BrandMark } from "../../components/BrandMark";
 import { PhaseMap } from "../../components/PhaseMap/PhaseMap";
 import { ICON_STROKE } from "../../icons";
 import { EXAMPLE_TRIP } from "../../exampleTrip";
@@ -79,6 +80,9 @@ export function StartScreen() {
     <main className={pageClass}>
       <section className="pj-hero flex flex-col items-center pt-6 text-center md:pt-14">
         <div className="pj-hero-glow" aria-hidden="true" />
+        <div className="pj-hero-mark mb-6">
+          <BrandMark size={64} />
+        </div>
         <p className="pj-chip">{m.eyebrow}</p>
         <h1 className="mt-5 max-w-[16ch] text-40 font-semibold leading-[1.02] tracking-[-0.04em] md:text-56">
           {m.headingStart}

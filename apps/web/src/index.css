@@ -353,6 +353,15 @@ body {
   box-decoration-break: clone;
 }
 
+/* The large mark above the Start headline, lifted off the page. */
+.pj-hero-mark img {
+  display: block;
+  border-radius: 16px;
+  box-shadow:
+    0 0 0 1px var(--line-strong),
+    0 18px 50px -12px var(--glow-1);
+}
+
 /* A small square tile holding a feature icon. */
 .pj-icon-tile {
   display: inline-flex;

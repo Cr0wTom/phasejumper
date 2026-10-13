@@ -118,7 +118,7 @@ export default defineConfig(() => {
           runtimeCaching: [],
           // Relative to the service worker, so it stays under the Pages base.
           navigateFallback: "index.html",
-          globPatterns: ["**/*.{js,wasm,css,html,woff2,png,webmanifest}"],
+          globPatterns: ["**/*.{js,wasm,css,html,woff2,png,svg,webmanifest}"],
         },
       }),
       precacheBudget(base),
