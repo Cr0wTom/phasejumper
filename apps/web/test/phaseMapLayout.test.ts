@@ -46,6 +46,35 @@ function lastSleep(input: PlanInput, axis: "destination" | "home") {
 }
 
 describe("phase map layout", () => {
+  it("a flight far from the planned days adds no empty rows", () => {
+    // A return home entered as more legs: the trip ends where it began, so
+    // the plan covers only the last days, not the week in between.
+    const outbound = sfo.itinerary.legs[0];
+    if (outbound === undefined) throw new Error("fixture leg");
+    const roundTrip: PlanInput = {
+      ...sfo,
+      itinerary: {
+        ...sfo.itinerary,
+        legs: [
+          outbound,
+          {
+            ...outbound,
+            departureAirport: "SFO",
+            arrivalAirport: "PRG",
+            departureLocal: "2027-01-24T14:45",
+            arrivalLocal: "2027-01-25T10:30",
+            departureTz: "America/Los_Angeles",
+            arrivalTz: "Europe/Prague",
+          },
+        ],
+        destinationTz: "Europe/Prague",
+      },
+    };
+    const rows = layoutPlan(roundTrip, generatePlan(roundTrip), "destination");
+    expect(rows.length).toBeLessThanOrEqual(4);
+    expect(rows.some((r) => r.date === "2027-01-15")).toBe(false);
+  });
+
   it("rows are consecutive calendar dates, none skipped or repeated", () => {
     for (const axis of ["destination", "home"] as const) {
       const rows = layoutPlan(sfo, generatePlan(sfo), axis);

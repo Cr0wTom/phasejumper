@@ -229,6 +229,27 @@ export function layoutPlan(
     });
   });
 
+  // Flights add rows only next to the plan's own days: a flight days away
+  // from them (e.g. a return home entered with the outbound legs) would
+  // otherwise fill the map with empty rows.
+  const planDates = [...rows.keys()].sort();
+  const planFirst = planDates[0];
+  const planLast = planDates[planDates.length - 1];
+  const nearPlan = (date: string): boolean => {
+    if (planFirst === undefined || planLast === undefined) return true;
+    const d = Temporal.PlainDate.from(date);
+    return (
+      Temporal.PlainDate.compare(
+        d,
+        Temporal.PlainDate.from(planFirst).subtract({ days: 1 }),
+      ) >= 0 &&
+      Temporal.PlainDate.compare(
+        d,
+        Temporal.PlainDate.from(planLast).add({ days: 1 }),
+      ) <= 0
+    );
+  };
+
   input.itinerary.legs.forEach((leg, index) => {
     const start = Temporal.PlainDateTime.from(leg.departureLocal)
       .toZonedDateTime(leg.departureTz)
@@ -238,6 +259,7 @@ export function layoutPlan(
       .toInstant();
     const zone = axisZone(axis, input);
     pieces(start, end, zone).forEach((p, pieceIndex) => {
+      if (!nearPlan(p.date)) return;
       row(p.date, zone).flights.push({
         id: `f${index}-p${pieceIndex}`,
         label: legLabel(input, index),
