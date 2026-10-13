@@ -83,8 +83,8 @@ export default defineConfig(() => {
           name: "PhaseJumper",
           short_name: "PhaseJumper",
           display: "standalone",
-          theme_color: "#0B0B0D",
-          background_color: "#0B0B0D",
+          theme_color: "#07080A",
+          background_color: "#07080A",
           start_url: "./#/today",
           scope: "./",
           icons: [
