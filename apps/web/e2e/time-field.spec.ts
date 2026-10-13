@@ -123,13 +123,13 @@ test("ArrowDown opens the list, Enter and click select, Escape closes", async ({
   const list = page.getByRole("listbox", { name: listName });
   await expect(list).toBeVisible();
   await expect(bedtime).toHaveAttribute("aria-expanded", "true");
-  await expect(list.getByRole("option")).toHaveCount(96);
+  await expect(list.getByRole("option")).toHaveCount(288);
   await expect(list.getByRole("option").first()).toHaveText("00:00");
-  await expect(list.getByRole("option").last()).toHaveText("23:45");
+  await expect(list.getByRole("option").last()).toHaveText("23:55");
   await page.keyboard.press("ArrowDown");
   await page.keyboard.press("Enter");
   await expect(page.getByRole("listbox")).toHaveCount(0);
-  await expect(bedtime).toHaveValue("23:15");
+  await expect(bedtime).toHaveValue("23:05");
 
   await bedtime.click();
   await page.getByRole("option", { name: "23:30", exact: true }).click();
@@ -137,15 +137,32 @@ test("ArrowDown opens the list, Enter and click select, Escape closes", async ({
   await expect(bedtime).toHaveValue("23:30");
 });
 
-test("typing highlights the next quarter hour", async ({ page }) => {
+test("a typed time on a 5-minute step is highlighted and picked", async ({
+  page,
+}) => {
   await page.goto("#/trip");
   const departure = labeled(page, messages.departureTime);
   await departure.click();
-  await page.keyboard.type("7:50");
-  await expect(departure).toHaveValue("7:50");
+  await page.keyboard.type("7:05");
   await expect(
     page.getByRole("listbox").getByRole("option", { selected: true }),
-  ).toHaveText("08:00");
+  ).toHaveText("07:05");
+  await page.keyboard.press("Enter");
+  await expect(departure).toHaveValue("07:05");
+});
+
+test("a typed time between steps is offered exactly", async ({ page }) => {
+  await page.goto("#/trip");
+  const departure = labeled(page, messages.departureTime);
+  await departure.click();
+  await page.keyboard.type("7:07");
+  const list = page.getByRole("listbox");
+  await expect(list.getByRole("option", { selected: true })).toHaveText(
+    "07:07",
+  );
+  await expect(list.getByRole("option")).toHaveCount(289);
+  await page.keyboard.press("Enter");
+  await expect(departure).toHaveValue("07:07");
 });
 
 for (const theme of ["dark", "light"] as const) {
