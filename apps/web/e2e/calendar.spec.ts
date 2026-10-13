@@ -17,7 +17,7 @@
 import { expect, test, type Download, type Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
-import { planMessages } from "../src/messages";
+import { planMessages, sharedMessages } from "../src/messages";
 import { preAcceptTerms } from "./acceptTerms";
 
 test.beforeEach(async ({ page }) => {
@@ -37,6 +37,8 @@ const SHARE = `#p=${Buffer.from(JSON.stringify(JSON.parse(SFO))).toString("base6
 
 async function openShared(page: Page): Promise<string> {
   await page.goto(SHARE);
+  // Shared links open in view mode; save to keep the plan on this device.
+  await page.getByRole("button", { name: sharedMessages.save }).click();
   await expect(page).toHaveURL(/#\/plan\/[0-9a-f-]{36}$/i);
   await expect(
     page.getByRole("heading", { name: planMessages.planHeading, level: 1 }),

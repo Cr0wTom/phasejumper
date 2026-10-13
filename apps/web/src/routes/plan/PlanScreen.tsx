@@ -21,7 +21,12 @@ import type { PlanInput } from "@phasejumper/engine";
 import { toIcs } from "@phasejumper/ical";
 import { useRef, useState } from "react";
 import { PhaseMap } from "../../components/PhaseMap/PhaseMap";
-import { messages, planMessages as m, returnMessages } from "../../messages";
+import {
+  messages,
+  planMessages as m,
+  returnMessages,
+  sharedMessages,
+} from "../../messages";
 import { goToPlan } from "../../router";
 import { savePlan, type StoredPlan } from "../../storage/plans";
 import { shareUrl } from "../../storage/shareLink";
@@ -31,6 +36,7 @@ import {
   h1Class,
   linkClass,
   pageClass,
+  primaryButtonClass,
 } from "../../ui";
 import { useNow } from "../../useNow";
 import { DaySheet } from "./DaySheet";
@@ -129,17 +135,6 @@ function dayForDate(
 
 export function PlanScreen({ id }: { id?: string }) {
   const state = usePlan(id);
-  const now = useNow();
-  const [share, setShare] = useState<{ copied: boolean; url: string } | null>(
-    null,
-  );
-  const [downloadError, setDownloadError] = useState<{
-    id: string;
-    text: string;
-  } | null>(null);
-  const [dayIndex, setDayIndex] = useState<number | null>(null);
-  const sequenceRef = useRef<{ id: string; sequence: number } | null>(null);
-  const saveChain = useRef(Promise.resolve());
 
   if (state.status === "loading") {
     return (
@@ -174,8 +169,38 @@ export function PlanScreen({ id }: { id?: string }) {
     );
   }
 
-  const { plan, regenerated } = state;
-  const parts = linkedIds(plan);
+  return <PlanView plan={state.plan} regenerated={state.regenerated} />;
+}
+
+/** A shared plan shown from its link: not stored until the traveler saves it. */
+export interface SharedPreview {
+  onSave: () => void;
+  saving: boolean;
+  error: string | null;
+}
+
+export function PlanView({
+  plan,
+  regenerated,
+  preview,
+}: {
+  plan: StoredPlan;
+  regenerated: boolean;
+  preview?: SharedPreview;
+}) {
+  const now = useNow();
+  const [share, setShare] = useState<{ copied: boolean; url: string } | null>(
+    null,
+  );
+  const [downloadError, setDownloadError] = useState<{
+    id: string;
+    text: string;
+  } | null>(null);
+  const [dayIndex, setDayIndex] = useState<number | null>(null);
+  const sequenceRef = useRef<{ id: string; sequence: number } | null>(null);
+  const saveChain = useRef(Promise.resolve());
+
+  const parts = preview === undefined ? linkedIds(plan) : undefined;
   const editId =
     plan.outboundPlanId !== undefined && plan.outboundPlanId.length > 0
       ? plan.outboundPlanId
@@ -230,6 +255,8 @@ export function PlanScreen({ id }: { id?: string }) {
     downloadBlob(ics, calendarFilename(plan.input));
     const next = current + 1;
     sequenceRef.current = { id: plan.id, sequence: next };
+    // A shared plan that is not saved stays off this device's storage.
+    if (preview !== undefined) return;
     const saved = { ...plan, icsSequence: next };
     // Writes run in order so a second download cannot be overwritten by the first.
     // A failed write shows nothing: the file is already on disk.
@@ -242,7 +269,32 @@ export function PlanScreen({ id }: { id?: string }) {
   return (
     <main className={pageClass}>
       <header className="pj-card flex flex-col gap-3 p-5">
-        <h1 className={h1Class}>{m.planHeading}</h1>
+        {preview === undefined ? null : (
+          <p className="pj-chip w-fit">{sharedMessages.label}</p>
+        )}
+        <h1 className={h1Class}>{plan.name ?? m.planHeading}</h1>
+        {preview === undefined ? null : (
+          <div className="flex flex-col gap-3">
+            <p role="status" className="text-15 leading-body text-fg-muted">
+              {sharedMessages.notice}
+            </p>
+            <div>
+              <button
+                type="button"
+                className={primaryButtonClass}
+                disabled={preview.saving}
+                onClick={preview.onSave}
+              >
+                {preview.saving ? sharedMessages.saving : sharedMessages.save}
+              </button>
+            </div>
+            {preview.error === null ? null : (
+              <p role="alert" className={errorClass}>
+                {preview.error}
+              </p>
+            )}
+          </div>
+        )}
         {parts === undefined ? null : (
           <PlanParts
             currentId={plan.id}
@@ -275,12 +327,14 @@ export function PlanScreen({ id }: { id?: string }) {
           <button type="button" className={buttonClass} onClick={onDownload}>
             {m.downloadCalendar}
           </button>
-          <a
-            className={buttonClass}
-            href={`#/trip/${encodeURIComponent(editId)}`}
-          >
-            {m.editTrip}
-          </a>
+          {preview === undefined ? (
+            <a
+              className={buttonClass}
+              href={`#/trip/${encodeURIComponent(editId)}`}
+            >
+              {m.editTrip}
+            </a>
+          ) : null}
         </div>
         {share === null ? null : share.copied ? (
           <p role="status" className="text-13 leading-body text-fg-muted">

@@ -102,13 +102,3 @@ export function planHash(id: string): string {
 export function goToPlan(id: string): void {
   window.location.hash = planHash(id);
 }
-
-/** Replaces the current history entry (used after opening a share link). */
-export function replaceWithPlan(id: string): void {
-  window.history.replaceState(
-    null,
-    "",
-    `${window.location.pathname}${window.location.search}${planHash(id)}`,
-  );
-  window.dispatchEvent(new HashChangeEvent("hashchange"));
-}

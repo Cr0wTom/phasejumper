@@ -18,7 +18,12 @@ import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
-import { legalMessages, messages, planMessages } from "../src/messages";
+import {
+  legalMessages,
+  messages,
+  planMessages,
+  sharedMessages,
+} from "../src/messages";
 import { TERMS_STORAGE_KEY } from "../src/terms";
 import { preAcceptTerms } from "./acceptTerms";
 
@@ -133,6 +138,10 @@ test("a share link waits for the gate and saves nothing until accepting", async 
   expect(await planKeys(page)).toEqual([]);
 
   await acceptGate(page);
+  // Accepting shows the shared plan; it is still not saved.
+  await expect(page.getByText(sharedMessages.notice)).toBeVisible();
+  expect(await planKeys(page)).toEqual([]);
+  await page.getByRole("button", { name: sharedMessages.save }).click();
   await expect(page).toHaveURL(/#\/plan\/[0-9a-f-]{36}$/i);
   expect((await planKeys(page)).length).toBe(1);
 });
@@ -176,6 +185,7 @@ test("the technical report copies the six keys and no airport code", async ({
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   await preAcceptTerms(page);
   await page.goto(SHARE);
+  await page.getByRole("button", { name: sharedMessages.save }).click();
   await expect(page).toHaveURL(/#\/plan\/[0-9a-f-]{36}$/i);
   await page.goto("#/settings");
   await page.getByRole("button", { name: legalMessages.reportButton }).click();

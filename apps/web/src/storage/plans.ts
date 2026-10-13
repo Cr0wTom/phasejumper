@@ -29,6 +29,10 @@ export interface StoredPlan {
   returnPlanId?: string;
   /** Set on the return half. Start hides these; Edit trip opens the outbound plan. */
   outboundPlanId?: string;
+  /** "shared": saved by the traveler from someone else's share link. */
+  source?: "shared";
+  /** The traveler's own name for the trip. Never part of a share link. */
+  name?: string;
 }
 
 export function planKey(id: string): string {
@@ -75,6 +79,9 @@ export function isStoredPlan(value: unknown): value is StoredPlan {
   ) {
     return false;
   }
+  if ("name" in value && typeof value.name !== "string") delete value.name;
+  // An unknown source is treated as the traveler's own plan.
+  if ("source" in value && value.source !== "shared") delete value.source;
   return true;
 }
 
@@ -165,6 +172,19 @@ export async function listPlans(): Promise<StoredPlan[]> {
   return plans
     .filter((p): p is StoredPlan => p !== undefined)
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
+/**
+ * Deletes one plan and its linked round-trip half, and forgets it as the
+ * last opened plan so Plan and Today do not point at nothing.
+ */
+export async function deletePlanAndLinked(plan: StoredPlan): Promise<void> {
+  const ids = [plan.id, plan.returnPlanId, plan.outboundPlanId].filter(
+    (id): id is string => id !== undefined && id.length > 0,
+  );
+  await Promise.all(ids.map((id) => del(planKey(id))));
+  const last = await getLastPlanId();
+  if (last !== undefined && ids.includes(last)) await del(LAST_PLAN_KEY);
 }
 
 export async function deletePlan(id: string): Promise<void> {

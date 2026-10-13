@@ -17,7 +17,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
-import { planMessages } from "../src/messages";
+import { planMessages, sharedMessages } from "../src/messages";
 import { preAcceptTerms } from "./acceptTerms";
 
 test.beforeEach(async ({ page }) => {
@@ -64,6 +64,8 @@ async function storedPlan(page: Page, id: string): Promise<Stored> {
 
 async function openShared(page: Page): Promise<string> {
   await page.goto(SHARE);
+  // Shared links open in view mode; save to keep the plan on this device.
+  await page.getByRole("button", { name: sharedMessages.save }).click();
   await expect(page).toHaveURL(/#\/plan\/[0-9a-f-]{36}$/i);
   await expect(
     page.getByRole("heading", { name: planMessages.planHeading, level: 1 }),
@@ -92,6 +94,7 @@ test("a share link reproduces the plan byte-for-byte in a fresh browser", async 
   await preAcceptTerms(recipient);
   const b = await recipient.newPage();
   await b.goto(link);
+  await b.getByRole("button", { name: sharedMessages.save }).click();
   await expect(b).toHaveURL(/#\/plan\/[0-9a-f-]{36}$/i);
   const idB = decodeURIComponent(b.url().split("#/plan/")[1] ?? "");
   const planB = await storedPlan(b, idB);
