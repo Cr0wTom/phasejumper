@@ -10,7 +10,7 @@ PhaseJumper is a static web app. GitHub Pages serves the built files; everything
 phasejumper/                pnpm workspace, TypeScript strict, Node 22
 ├─ packages/engine/         @phasejumper/engine — the planner (pure)
 ├─ packages/airports/       OurAirports → airports.json + lookup(iata)
-├─ packages/itinerary/      pasted booking text → flight legs (pure)
+├─ packages/itinerary/      booking-text parser, kept but not used by the app
 ├─ packages/ical/           plan → .ics (placeholder until T10)
 ├─ apps/web/                Vite 6 + React 19 + Tailwind v4 + vite-plugin-pwa: trip builder, plan placeholder
 ├─ docs/                    this documentation (CC BY 4.0)
@@ -46,7 +46,7 @@ Testing: unit tests, fast-check property tests over 500 random trips, and eight 
 | `routes/start/` + `exampleTrip.ts` | Start: a live phase map of a fixed example trip (PRG → SFO, planned on the device), Plan a trip, the plans saved on this device, footer, link to `#/legal` |
 | `routes/settings/` | Settings: dark/light, export plans as JSON, import (`storage/importPlans.ts` checks every trip with the engine, a file with any bad trip imports nothing; `importAll.ts` rolls back partial saves), forget all trips (two-step confirmation), Feedback mailto links (`feedback.ts`) for a bug (technical report only, no trip) or a feature request, the evidence page, terms and privacy, and Copy technical report (`technicalReport.ts`) |
 | `components/Markdown.tsx` | Renders bundled Markdown (evidence, terms, privacy) as React elements: headings, paragraphs, lists, bold, https links, rules; never injects HTML |
-| `routes/trip/` | Trip builder: You, Flights, Constraints; zod schema (`schema.ts`), form → `PlanInput` (`mapPlanInput.ts`) |
+| `routes/trip/` | Trip builder, manual entry only: You, Flights, Constraints; zod schema (`schema.ts`), form → `PlanInput` (`mapPlanInput.ts`) |
 | `routes/plan/` | Plan screen: decision header with the progress curve, share link and Edit trip, the phase map with a now marker, and the per-day detail list (icons allowed here); opening share links |
 | `routes/today/` + `today.ts` | Today: where you are and the local time, the current and next block with countdowns (recomputed every 30 s and on returning to the tab), today's ribbon |
 | `components/NavBar.tsx` | Plan · Today · New trip · Settings: bottom tab bar on phones, left rail from 768 px |
@@ -71,9 +71,9 @@ The phase map draws one row per calendar date in the grid's zone. Destination an
 
 ## Itinerary parser (`packages/itinerary`)
 
-`parseItinerary(text, { referenceDate, isAirport })` reads pasted booking-confirmation text and returns `{ legs, confidence, unparsed }`. It is pure (lint-enforced, like the engine): the app passes today's date (to infer a missing year) and an airport check (to reject words like THE or AND). Times are kept as the booking states them; time zones always come from the airport, never from the text. 25 anonymized fixtures cover common confirmation layouts, 12 h and 24 h times, next-day arrivals and multi-leg trips.
+The trip builder is manual entry only. Each flight is typed in by hand.
 
-In the trip builder, "Read flights" replaces the flight legs with what was found and marks each filled field to check; lines that looked like flight data but couldn't be read are listed under the box. The pasted text is cleared at once and never stored.
+`packages/itinerary` is kept but not used by the app. `parseItinerary(text, { referenceDate, isAirport })` reads booking-confirmation text and returns `{ legs, confidence, unparsed }`. It is pure (lint-enforced, like the engine). A reference date infers a missing year, and an airport check rejects words like THE or AND. Times are kept as the booking states them; time zones always come from the airport, never from the text. 25 anonymized fixtures cover common confirmation layouts, 12 h and 24 h times, next-day arrivals and multi-leg trips.
 
 ## Installable app (PWA)
 

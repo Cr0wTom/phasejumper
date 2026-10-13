@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import type { Airport } from "@phasejumper/airports";
 import {
   ENGINE_VERSION,
   EngineInputError,
@@ -22,14 +21,13 @@ import {
   validatePlanInput,
   type PlanResult,
 } from "@phasejumper/engine";
-import { parseItinerary, type ParsedLeg } from "@phasejumper/itinerary";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import {
   loadAirportDirectory,
   type AirportDirectory,
 } from "../../airports/loadAirports";
 import { airportLabel } from "../../airports/searchAirports";
-import { currentInstant, currentPlainDate } from "../../clock";
+import { currentInstant } from "../../clock";
 import { LegalGate } from "../../components/LegalGate";
 import { flags } from "../../flags";
 import { legalMessages, messages } from "../../messages";
@@ -46,7 +44,6 @@ import { FlightsSection } from "./FlightsSection";
 import {
   createDefaultForm,
   formFromPlanInput,
-  createId,
   emptyAwake,
   emptyLeg,
   emptyWindow,
@@ -68,53 +65,10 @@ interface FormAlert {
   issues: readonly string[];
 }
 
-const REVIEW_FIELDS = [
-  "fromIata",
-  "toIata",
-  "departureDate",
-  "departureTime",
-  "arrivalDate",
-  "arrivalTime",
-] as const;
-
 function focusFirst(errors: FieldErrors): void {
   const first = Object.keys(errors)[0];
   if (first === undefined) return;
   document.getElementById(fieldDomId(first))?.focus();
-}
-
-function legFormFromParsed(
-  leg: ParsedLeg,
-  lookup: (iata: string) => Airport | undefined,
-): LegForm {
-  const from = lookup(leg.departureAirport);
-  const to = lookup(leg.arrivalAirport);
-  return {
-    id: createId(),
-    fromQuery: from === undefined ? leg.departureAirport : airportLabel(from),
-    fromIata: from === undefined ? "" : from.iata,
-    toQuery: to === undefined ? leg.arrivalAirport : airportLabel(to),
-    toIata: to === undefined ? "" : to.iata,
-    departureDate: leg.departureDate,
-    departureTime: leg.departureTime,
-    arrivalDate: leg.arrivalDate,
-    arrivalTime: leg.arrivalTime,
-    flightNumber: leg.flightNumber ?? "",
-  };
-}
-
-function dropReview(
-  current: Readonly<Record<string, true>>,
-  keys: readonly string[],
-): Readonly<Record<string, true>> {
-  let changed = false;
-  const next: Record<string, true> = { ...current };
-  for (const key of keys) {
-    if (next[key] !== true) continue;
-    delete next[key];
-    changed = true;
-  }
-  return changed ? next : current;
 }
 
 export function TripBuilder({ editId }: { editId?: string } = {}) {
@@ -129,10 +83,6 @@ export function TripBuilder({ editId }: { editId?: string } = {}) {
   const [outdated, setOutdated] = useState(() => termsOutdated());
   const [saveFailed, setSaveFailed] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [paste, setPaste] = useState("");
-  const [pasteError, setPasteError] = useState<string | null>(null);
-  const [unparsed, setUnparsed] = useState<readonly string[]>([]);
-  const [review, setReview] = useState<Readonly<Record<string, true>>>({});
   const savingRef = useRef(false);
   const formAlertRef = useRef<HTMLDivElement>(null);
   const showMelatonin = flags["melatonin.optIn"];
@@ -201,64 +151,12 @@ export function TripBuilder({ editId }: { editId?: string } = {}) {
 
   function changeLeg(index: number, legPatch: Partial<LegForm>): void {
     clearErrors(Object.keys(legPatch).map((field) => `legs.${index}.${field}`));
-    const id = form.legs[index]?.id;
-    if (id !== undefined) {
-      setReview((current) =>
-        dropReview(
-          current,
-          Object.keys(legPatch).map((field) => `${id}:${field}`),
-        ),
-      );
-    }
     setForm((current) => ({
       ...current,
       legs: current.legs.map((leg, legIndex) =>
         legIndex === index ? { ...leg, ...legPatch } : leg,
       ),
     }));
-  }
-
-  function onReadFlights(): void {
-    if (directory === null) return;
-    const text = paste;
-    const result = parseItinerary(text, {
-      referenceDate: currentPlainDate(),
-      isAirport: (iata) => directory.lookup(iata) !== undefined,
-    });
-    setPaste("");
-    if (result.legs.length === 0) {
-      setPasteError(messages.pasteUnread);
-      setUnparsed([]);
-      return;
-    }
-    const legs = result.legs.map((leg) =>
-      legFormFromParsed(leg, directory.lookup),
-    );
-    const nextReview: Record<string, true> = {};
-    for (const leg of legs) {
-      for (const field of REVIEW_FIELDS)
-        nextReview[`${leg.id}:${field}`] = true;
-      if (leg.flightNumber.length > 0) {
-        nextReview[`${leg.id}:flightNumber`] = true;
-      }
-    }
-    setPasteError(null);
-    setUnparsed(result.unparsed);
-    setReview(nextReview);
-    setFormAlert(null);
-    setForm((current) => ({ ...current, legs }));
-    setFieldErrors((current) => {
-      let changed = false;
-      const next: Record<string, string> = {};
-      for (const [key, value] of Object.entries(current)) {
-        if (key === "legs" || key.startsWith("legs.")) {
-          changed = true;
-          continue;
-        }
-        next[key] = value;
-      }
-      return changed ? next : current;
-    });
   }
 
   function changeEvent(index: number, eventPatch: Partial<AwakeForm>): void {
@@ -411,13 +309,6 @@ export function TripBuilder({ editId }: { editId?: string } = {}) {
           errors={fieldErrors}
           airports={directory === null ? null : directory.airports}
           airportsError={airportsError}
-          paste={paste}
-          pasteError={pasteError}
-          unparsed={unparsed}
-          readDisabled={directory === null}
-          reviewed={(legId, field) => review[`${legId}:${field}`] === true}
-          onPaste={setPaste}
-          onRead={onReadFlights}
           onChangeLeg={changeLeg}
           onAdd={() =>
             setForm((current) => ({
@@ -425,21 +316,12 @@ export function TripBuilder({ editId }: { editId?: string } = {}) {
               legs: [...current.legs, emptyLeg()],
             }))
           }
-          onRemove={(index) => {
-            const id = form.legs[index]?.id;
+          onRemove={(index) =>
             setForm((current) => ({
               ...current,
               legs: current.legs.filter((_, legIndex) => legIndex !== index),
-            }));
-            if (id === undefined) return;
-            setReview((current) => {
-              const prefix = `${id}:`;
-              const keys = Object.keys(current).filter((key) =>
-                key.startsWith(prefix),
-              );
-              return dropReview(current, keys);
-            });
-          }}
+            }))
+          }
         />
         <ConstraintsSection
           form={form}
