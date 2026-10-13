@@ -1,13 +1,37 @@
-# PhaseJumper
+<p align="center">
+  <img src="apps/web/public/icons/icon-192.png" width="96" height="96" alt="PhaseJumper icon">
+</p>
 
-Jump zones. Keep your phase.
+<h1 align="center">PhaseJumper</h1>
 
-[![CI](https://github.com/Cr0wTom/phasejumper/actions/workflows/ci.yml/badge.svg?event=pull_request)](https://github.com/Cr0wTom/phasejumper/actions/workflows/ci.yml)
-[![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+<p align="center">
+  <strong>Arrive on local time.</strong><br>
+  A free, private jet-lag planner that runs entirely in your browser.
+</p>
 
-PhaseJumper is a free jet-lag planner that runs entirely in your browser.
-Enter your flights and sleep habits, and it lays out day by day when to sleep, seek light and avoid it so your body clock lands on destination time.
+<p align="center">
+  <a href="https://phasejumper.world/"><strong>phasejumper.world</strong></a> ·
+  <a href="docs/README.md">Docs</a> ·
+  <a href="CONTRIBUTING.md">Contributing</a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/Cr0wTom/phasejumper/actions/workflows/ci.yml"><img src="https://github.com/Cr0wTom/phasejumper/actions/workflows/ci.yml/badge.svg?event=pull_request" alt="CI"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-blue.svg" alt="License: Apache-2.0"></a>
+</p>
+
+![PhaseJumper start screen with an example Prague to San Francisco plan](docs/assets/start.png)
+
+Enter your flights and sleep habits, and PhaseJumper lays out day by day when to sleep, seek light and avoid it so your body clock lands on destination time.
 No account, no server, no tracking: your trip never leaves your device.
+
+<p align="center">
+  <img src="docs/assets/plan-phone.png" width="250" alt="The plan on a phone">
+  &nbsp;
+  <img src="docs/assets/today-phone.png" width="250" alt="Today on a phone">
+  &nbsp;
+  <img src="docs/assets/trip-phone.png" width="250" alt="Planning a trip on a phone">
+</p>
 
 ## Quick start
 
