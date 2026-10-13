@@ -66,6 +66,22 @@ for (const hash of ["#/", "#/trip", "#/settings", "#/evidence", "#/legal"]) {
   });
 }
 
+test("the arrival date follows the departure date until it is changed", async ({
+  page,
+}) => {
+  await page.goto("#/trip");
+  const departure = page.getByLabel(messages.departureDate, { exact: true });
+  const arrival = page.getByLabel(messages.arrivalDate, { exact: true });
+  await departure.fill("2027-01-15");
+  await expect(arrival).toHaveValue("2027-01-15");
+  await departure.fill("2027-01-20");
+  await expect(arrival).toHaveValue("2027-01-20");
+  // An overnight flight: once the traveler moves arrival, it stays put.
+  await arrival.fill("2027-01-21");
+  await departure.fill("2027-01-22");
+  await expect(arrival).toHaveValue("2027-01-21");
+});
+
 test("a half-typed date says what is missing; a 2-digit year is refused", async ({
   page,
 }) => {
