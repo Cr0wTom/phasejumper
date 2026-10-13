@@ -87,6 +87,9 @@ export const messages = {
     `Showing ${count} matching airports.`,
   chooseAirport: "Choose an airport from the list.",
   timeInvalid: "Choose a time.",
+  timeUnreadable:
+    "Enter a time like 07:45 or 7:45 pm, or pick one from the list.",
+  timeOptions: (label: string): string => `${label} options`,
   dateInvalid: "Choose a date.",
   timesSame: "Bedtime and wake time are the same. Enter two different times.",
   sleepNeedInvalid:
