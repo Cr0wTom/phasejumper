@@ -24,6 +24,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type CSSProperties,
   type KeyboardEvent,
 } from "react";
 import { Temporal } from "temporal-polyfill";
@@ -132,6 +133,15 @@ function dateLabel(date: string, compact: boolean): string {
   });
 }
 
+/** Two-line row label: a small weekday over the date. */
+function dateParts(date: string): { weekday: string; day: string } {
+  const d = Temporal.PlainDate.from(date);
+  return {
+    weekday: d.toLocaleString("en-GB", { weekday: "short" }),
+    day: d.toLocaleString("en-GB", { day: "numeric", month: "short" }),
+  };
+}
+
 function offsetLabel(zone: string, atUtc: string): string {
   const offset = Temporal.Instant.from(atUtc).toZonedDateTimeISO(zone).offset;
   if (offset === "+00:00") return "UTC";
@@ -197,6 +207,7 @@ export function PhaseMap({
   const segRefs = useRef(new Map<string, SVGGElement>());
   const headingId = useId();
   const patternId = `${useId().replace(/:/g, "")}-hatch`;
+  const sheenId = `${patternId}-sheen`;
 
   useEffect(() => {
     const el = containerRef.current;
@@ -228,6 +239,21 @@ export function PhaseMap({
           return rowIndex < 0 ? undefined : { ...p, rowIndex };
         })();
   const x = (min: number): number => g.gutter + (min / 1440) * g.ribbon;
+  // Joins consecutive low-point dots; a jump of more than half a day means
+  // the dot wrapped past midnight, so the line breaks there.
+  const trajectory = rows
+    .flatMap((row, rowIndex) =>
+      row.cbtMin.map((c) => ({
+        x: x(c.min),
+        y: g.header + rowIndex * g.rowH + g.lanes.sleep.y + g.lanes.sleep.h / 2,
+      })),
+    )
+    .map((p, i, all) => {
+      const prev = all[i - 1];
+      const jump = prev === undefined || Math.abs(p.x - prev.x) > g.ribbon / 2;
+      return `${jump ? "M" : "L"}${p.x.toFixed(1)} ${p.y.toFixed(1)}`;
+    })
+    .join(" ");
   const segmentsOf = (rowIndex: number): Segment[] =>
     rows[rowIndex]?.segments ?? [];
   const allSegments = useMemo(
@@ -375,6 +401,11 @@ export function PhaseMap({
           data-testid="phase-map"
         >
           <defs>
+            {/* A soft top-lit sheen laid over the main bands. */}
+            <linearGradient id={sheenId} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stopColor="#ffffff" stopOpacity="0.28" />
+              <stop offset="0.6" stopColor="#ffffff" stopOpacity="0" />
+            </linearGradient>
             <pattern
               id={patternId}
               width="6"
@@ -427,6 +458,7 @@ export function PhaseMap({
 
           {rows.map((row, rowIndex) => {
             const y0 = g.header + rowIndex * g.rowH;
+            const past = nowAt !== undefined && rowIndex < nowAt.rowIndex;
             const list = row.segments;
             return (
               <g
@@ -440,7 +472,14 @@ export function PhaseMap({
                 aria-label={m.rowLabel(dateLabel(row.date, false), list.length)}
                 onKeyDown={(e) => onRowKey(e, rowIndex)}
                 className="pj-row outline-none focus-visible:[&>rect.pj-row-bg]:stroke-fg"
-                style={{ animationDelay: `${rowIndex * 120}ms` }}
+                style={
+                  {
+                    animationDelay: `${rowIndex * 120}ms`,
+                    // While the plan is underway, days already lived recede.
+                    "--pj-row-opacity": past ? 0.5 : 1,
+                    opacity: past ? 0.5 : undefined,
+                  } as CSSProperties
+                }
                 data-date={row.date}
               >
                 <rect
@@ -451,6 +490,7 @@ export function PhaseMap({
                   height={g.rowH - 4}
                   rx={10}
                   fill={SURFACE}
+                  data-today={nowAt?.rowIndex === rowIndex ? "" : undefined}
                   stroke={row.date === selectedDate ? ACCENT : LINE}
                   strokeWidth={row.date === selectedDate ? 1.5 : 1}
                   onClick={
@@ -466,9 +506,28 @@ export function PhaseMap({
                 />
                 <text
                   x={0}
-                  y={g.lanes.sleep.y + g.lanes.sleep.h - 3}
+                  y={g.lanes.sleep.y + 8}
+                  fontSize="11"
+                  fill={nowAt?.rowIndex === rowIndex ? ACCENT : MUTED}
+                  fontWeight={nowAt?.rowIndex === rowIndex ? 600 : 400}
+                  onClick={
+                    onSelectDate === undefined
+                      ? undefined
+                      : () => onSelectDate(row.date)
+                  }
+                  style={
+                    onSelectDate === undefined
+                      ? undefined
+                      : { cursor: "pointer" }
+                  }
+                >
+                  {dateParts(row.date).weekday}
+                </text>
+                <text
+                  x={0}
+                  y={g.lanes.sleep.y + 24}
                   fontSize="13"
-                  fontWeight={row.date === selectedDate ? 600 : 400}
+                  fontWeight={row.date === selectedDate ? 600 : 500}
                   fill={FG}
                   onClick={
                     onSelectDate === undefined
@@ -481,7 +540,9 @@ export function PhaseMap({
                       : { cursor: "pointer" }
                   }
                 >
-                  {dateLabel(row.date, g.compact)}
+                  {g.compact
+                    ? dateParts(row.date).day.split(" ")[0]
+                    : dateParts(row.date).day}
                 </text>
                 {Array.from(
                   { length: 24 / g.tickEvery - 1 },
@@ -580,8 +641,9 @@ export function PhaseMap({
                             className="pj-mark"
                             cx={x0}
                             cy={lane.y + lane.h / 2}
-                            r={3.5}
+                            r={3}
                             fill={color}
+                            fillOpacity={seg.block.kind === "MEAL" ? 0.55 : 1}
                           />
                         )
                       ) : seg.block.kind === "EXERCISE_AVOID" ? (
@@ -594,20 +656,34 @@ export function PhaseMap({
                           rx={2}
                           fill="none"
                           stroke={color}
-                          strokeOpacity={0.6}
+                          strokeOpacity={0.35}
                           strokeDasharray="3 2"
                         />
                       ) : (
-                        <rect
-                          className="pj-mark"
-                          x={x0}
-                          y={lane.y}
-                          width={w}
-                          height={lane.h}
-                          rx={Math.min(6, lane.h / 2)}
-                          fill={color}
-                          fillOpacity={quiet ? 0.55 : 1}
-                        />
+                        <>
+                          <rect
+                            className="pj-mark"
+                            x={x0}
+                            y={lane.y}
+                            width={w}
+                            height={lane.h}
+                            rx={Math.min(6, lane.h / 2)}
+                            fill={color}
+                            fillOpacity={quiet ? 0.35 : 1}
+                          />
+                          {quiet || lane.h < 8 ? null : (
+                            <rect
+                              x={x0}
+                              y={lane.y}
+                              width={w}
+                              height={lane.h}
+                              rx={Math.min(6, lane.h / 2)}
+                              fill={`url(#${sheenId})`}
+                              pointerEvents="none"
+                              aria-hidden="true"
+                            />
+                          )}
+                        </>
                       )}
                       {!seg.point &&
                       !quiet &&
@@ -682,6 +758,22 @@ export function PhaseMap({
               </g>
             );
           })}
+
+          {/* The body clock's path: each night's low point joined to the
+              next, so the drift toward the target reads as one shape. */}
+          <path
+            d={trajectory}
+            fill="none"
+            stroke={ACCENT}
+            strokeOpacity={0.55}
+            strokeWidth={1.5}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeDasharray="1 4"
+            pointerEvents="none"
+            aria-hidden="true"
+            data-testid="phase-trajectory"
+          />
         </svg>
 
         {openSeg === undefined || open === null ? null : (

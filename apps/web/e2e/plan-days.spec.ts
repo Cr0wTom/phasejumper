@@ -106,3 +106,18 @@ for (const theme of ["dark", "light"] as const) {
     expect(results.violations.map((v) => `${v.id}: ${v.help}`)).toEqual([]);
   });
 }
+
+test("the map joins the body-clock dots and marks today", async ({ page }) => {
+  await page.clock.install({ time: new Date("2027-01-17T20:00:00Z") });
+  await openPlan(page);
+  const path = page.getByTestId("phase-trajectory");
+  // At least two joined segments: the drift reads as one line.
+  await expect(path).toHaveAttribute("d", /L.*L/);
+  const today = page.locator('[data-date="2027-01-17"]');
+  await expect(today.locator("[data-today]")).toHaveCount(1);
+  await expect(page.locator('[data-date="2027-01-15"]')).toHaveCSS(
+    "opacity",
+    "0.5",
+  );
+  await expect(today).toHaveCSS("opacity", "1");
+});

@@ -502,12 +502,13 @@ body {
   animation: pj-row-in 360ms ease-out both;
 }
 
+/* Ends at the row's own opacity, so days already lived stay dimmed. */
 @keyframes pj-row-in {
   from {
     opacity: 0;
   }
   to {
-    opacity: 1;
+    opacity: var(--pj-row-opacity, 1);
   }
 }
 
