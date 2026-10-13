@@ -15,7 +15,6 @@
  */
 
 import { AppHeader } from "./components/AppHeader";
-import { NavBar } from "./components/NavBar";
 import { UpdatePrompt } from "./components/UpdatePrompt";
 import { PlanScreen } from "./routes/plan/PlanScreen";
 import { ShareOpen } from "./routes/plan/ShareOpen";
@@ -31,9 +30,8 @@ export function App() {
   const route = useRoute();
   return (
     <div className="pj-shell">
-      <AppHeader />
+      <AppHeader route={route} />
       <div className="pj-body">
-        <NavBar route={route} />
         <div className="pj-page">
           {route.name === "start" ? (
             <StartScreen />

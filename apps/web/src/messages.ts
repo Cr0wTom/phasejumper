@@ -249,7 +249,10 @@ export const planMessages = {
 
 /** Start, Settings and the evidence page (T13). */
 export const startMessages = {
+  eyebrow: "Free · Private · Works offline",
   heading: "Arrive on local time",
+  headingStart: "Arrive on ",
+  headingAccent: "local time",
   lede: "PhaseJumper turns your flights and usual sleep into a day-by-day plan for light, sleep and caffeine. Everything stays on this device.",
   exampleHeading: "Example: Prague to San Francisco",
   planTrip: "Plan a trip",
@@ -261,6 +264,22 @@ export const startMessages = {
   savedTrip: (from: string, to: string, date: string): string =>
     `${from} to ${to}, ${date}`,
   evidenceLink: "The research behind your plan",
+  researchButton: "How it works",
+  features: [
+    {
+      title: "Timed to your body clock",
+      body: "Light, sleep, caffeine and naps, placed day by day around where your clock is, not where your watch is.",
+    },
+    {
+      title: "Nothing leaves your device",
+      body: "No account, no tracking, no server. Plans live in this browser and open offline at the gate.",
+    },
+    {
+      title: "In your calendar",
+      body: "Download the plan as a calendar file, or share it with a link that never touches a server.",
+    },
+  ],
+  featuresHeading: "Why PhaseJumper",
 } as const;
 
 export const settingsMessages = {

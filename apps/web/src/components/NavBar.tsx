@@ -14,18 +14,36 @@
  * limitations under the License.
  */
 
-// Navigation (§5): a bottom tab bar on phones, a left rail from 768 px.
-// Plan, Today, New trip and Settings.
+// Navigation (§5): a bottom tab bar on phones, inline in the header bar from
+// 768 px. Plan, Today, New trip and Settings.
 
+import {
+  CalendarRange,
+  Clock,
+  Plus,
+  Settings,
+  type LucideIcon,
+} from "lucide-react";
+import { ICON_STROKE } from "../icons";
 import { planMessages as m } from "../messages";
 import type { Route } from "../router";
 
-const ITEMS = [
-  { key: "plan", href: "#/plan", label: m.nav.plan },
-  { key: "today", href: "#/today", label: m.nav.today },
-  { key: "trip", href: "#/trip", label: m.nav.newTrip },
-  { key: "settings", href: "#/settings", label: m.nav.settings },
-] as const;
+const ITEMS: ReadonlyArray<{
+  key: string;
+  href: string;
+  label: string;
+  icon: LucideIcon;
+}> = [
+  { key: "plan", href: "#/plan", label: m.nav.plan, icon: CalendarRange },
+  { key: "today", href: "#/today", label: m.nav.today, icon: Clock },
+  { key: "trip", href: "#/trip", label: m.nav.newTrip, icon: Plus },
+  {
+    key: "settings",
+    href: "#/settings",
+    label: m.nav.settings,
+    icon: Settings,
+  },
+];
 
 export function NavBar({ route }: { route: Route }) {
   const active =
@@ -44,7 +62,13 @@ export function NavBar({ route }: { route: Route }) {
               aria-current={active === item.key ? "page" : undefined}
               className="pj-nav-link"
             >
-              {item.label}
+              <item.icon
+                className="pj-nav-icon"
+                size={18}
+                strokeWidth={ICON_STROKE}
+                aria-hidden="true"
+              />
+              <span>{item.label}</span>
             </a>
           </li>
         ))}

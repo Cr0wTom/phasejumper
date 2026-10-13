@@ -18,16 +18,18 @@
 // this device, and the required footer.
 
 import { generatePlan } from "@phasejumper/engine";
+import { CalendarArrowDown, ChevronRight, Lock, Sun } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { PhaseMap } from "../../components/PhaseMap/PhaseMap";
+import { ICON_STROKE } from "../../icons";
 import { EXAMPLE_TRIP } from "../../exampleTrip";
 import { shortDate } from "../../format";
 import { legalMessages, messages, startMessages as m } from "../../messages";
 import { planHash } from "../../router";
 import { listPlans, type StoredPlan } from "../../storage/plans";
 import {
+  buttonClass,
   errorClass,
-  h1Class,
   h2Class,
   linkClass,
   pageClass,
@@ -71,35 +73,80 @@ export function StartScreen() {
     };
   }, []);
 
+  const featureIcons = [Sun, Lock, CalendarArrowDown] as const;
+
   return (
     <main className={pageClass}>
-      <h1 className={h1Class}>{m.heading}</h1>
-      <p className="mt-2 max-w-[60ch] text-fg-muted">{m.lede}</p>
-      <div className="mt-6">
-        <a className={`${primaryButtonClass} inline-block`} href="#/trip">
-          {m.planTrip}
-        </a>
-      </div>
+      <section className="pj-hero flex flex-col items-center pt-6 text-center md:pt-14">
+        <div className="pj-hero-glow" aria-hidden="true" />
+        <p className="pj-chip">{m.eyebrow}</p>
+        <h1 className="mt-5 max-w-[16ch] text-40 font-semibold leading-[1.02] tracking-[-0.04em] md:text-56">
+          {m.headingStart}
+          <span className="pj-accent-word">{m.headingAccent}</span>
+        </h1>
+        <p className="mt-4 max-w-[52ch] text-17 leading-body text-fg-muted">
+          {m.lede}
+        </p>
+        <div className="mt-7 flex flex-wrap justify-center gap-3">
+          <a className={primaryButtonClass} href="#/trip">
+            {m.planTrip}
+          </a>
+          <a className={buttonClass} href="#/evidence">
+            {m.researchButton}
+          </a>
+        </div>
+      </section>
 
       <section
         aria-labelledby="start-example"
-        className={`mt-8 ${surfaceClass}`}
+        className="pj-card mt-12 overflow-hidden md:mt-16"
       >
-        <h2 id="start-example" className={h2Class}>
-          {m.exampleHeading}
+        <div className="pj-window-bar">
+          <span className="pj-window-dot" aria-hidden="true" />
+          <span className="pj-window-dot" aria-hidden="true" />
+          <span className="pj-window-dot" aria-hidden="true" />
+          <h2 id="start-example" className="ml-2 text-13 font-medium">
+            {m.exampleHeading}
+          </h2>
+        </div>
+        <div className="p-4 md:p-5">
+          <PhaseMap input={EXAMPLE_TRIP} result={example} compact />
+        </div>
+      </section>
+
+      <section aria-labelledby="start-features" className="mt-12">
+        <h2 id="start-features" className="sr-only">
+          {m.featuresHeading}
         </h2>
-        <PhaseMap input={EXAMPLE_TRIP} result={example} compact />
+        <ul className="grid gap-3 md:grid-cols-3">
+          {m.features.map((feature, i) => {
+            const Glyph = featureIcons[i] ?? Sun;
+            return (
+              <li key={feature.title} className={surfaceClass}>
+                <span className="pj-icon-tile" aria-hidden="true">
+                  <Glyph size={18} strokeWidth={ICON_STROKE} />
+                </span>
+                <h3 className="text-15 font-semibold tracking-[-0.01em]">
+                  {feature.title}
+                </h3>
+                <p className="text-13 leading-body text-fg-muted">
+                  {feature.body}
+                </p>
+              </li>
+            );
+          })}
+        </ul>
       </section>
 
       <section
         aria-labelledby="start-saved"
-        className="mt-8 flex flex-col gap-3"
+        className="mt-12 flex flex-col gap-3"
       >
         <h2 id="start-saved" className={h2Class}>
           {m.savedHeading}
         </h2>
         {saved.status === "loading" ? (
-          <p>{m.savedLoading}</p>
+          <p className="text-fg-muted">{m.savedLoading}</p>
         ) : saved.status === "failed" ? (
           <p role="alert" className={errorClass}>
             {m.savedFailed}
@@ -107,11 +154,16 @@ export function StartScreen() {
         ) : saved.plans.length === 0 ? (
           <p className="text-fg-muted">{m.savedNone}</p>
         ) : (
-          <ul className="flex flex-col gap-2">
+          <ul className="pj-card divide-y divide-line overflow-hidden p-0">
             {saved.plans.map((plan) => (
               <li key={plan.id}>
-                <a className={linkClass} href={planHash(plan.id)}>
-                  {tripLabel(plan)}
+                <a className="pj-list-link" href={planHash(plan.id)}>
+                  <span>{tripLabel(plan)}</span>
+                  <ChevronRight
+                    size={16}
+                    strokeWidth={ICON_STROKE}
+                    aria-hidden="true"
+                  />
                 </a>
               </li>
             ))}
@@ -119,14 +171,12 @@ export function StartScreen() {
         )}
       </section>
 
-      <footer className="mt-8 flex flex-col gap-2 border-t border-line pt-4 text-13 leading-body text-fg-muted">
+      <footer className="mt-12 flex flex-col gap-2 border-t border-line pt-5 text-13 leading-body text-fg-muted md:flex-row md:items-center md:justify-between">
         <p>{messages.footer}</p>
-        <p>
+        <p className="flex gap-4">
           <a className={linkClass} href="#/legal">
             {legalMessages.legalLink}
           </a>
-        </p>
-        <p>
           <a className={linkClass} href="#/evidence">
             {m.evidenceLink}
           </a>

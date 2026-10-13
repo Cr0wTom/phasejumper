@@ -335,8 +335,10 @@ export function PhaseMap({
                     setOpen(null);
                     setScales((cur) => ({ ...cur, [a]: !cur[a] }));
                   }}
-                  className={`rounded-control border px-2 py-1 text-13 leading-body ${
-                    on ? "border-fg bg-fg text-bg" : "border-line text-fg"
+                  className={`rounded-full border px-3 py-1 text-13 leading-body transition-colors ${
+                    on
+                      ? "border-accent/50 bg-accent/15 text-fg"
+                      : "border-line text-fg-muted hover:text-fg"
                   } ${focusRing}`}
                 >
                   {m.scale(m.axis[a], offsetLabel(axisZone(a, input), refUtc))}

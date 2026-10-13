@@ -34,11 +34,31 @@
 /* Dark is the default. Light is an explicit choice. */
 :root {
   color-scheme: dark;
-  --bg: #0b0b0d;
-  --surface: #141417;
-  --line: #26262b;
-  --fg: #f2f2f0;
-  --fg-muted: #8b8b93;
+  --bg: #07080a;
+  --surface: #0f1013;
+  --surface-2: #16171b;
+  --line: #222328;
+  --line-strong: #34353c;
+  --fg: #f4f4f5;
+  --fg-muted: #9b9ba4;
+  /* Brand: day amber into night indigo, the shape of a phase shift. */
+  --accent: #8b93ff;
+  --brand-gradient: linear-gradient(
+    120deg,
+    #f6b73c 0%,
+    #ff7a59 38%,
+    #b06cff 70%,
+    #6c7bff 100%
+  );
+  --glow-1: rgb(108 123 255 / 0.32);
+  --glow-2: rgb(255 122 89 / 0.2);
+  --card-highlight: rgb(255 255 255 / 0.05);
+  --card-shadow: 0 1px 2px rgb(0 0 0 / 0.5), 0 16px 40px -16px rgb(0 0 0 / 0.7);
+  --glass: rgb(15 16 19 / 0.72);
+  --glass-solid: rgb(15 16 19 / 0.96);
+  --control-fill: rgb(255 255 255 / 0.03);
+  --primary-bg: #f4f4f5;
+  --primary-fg: #07080a;
   --sleep: #6c7bff;
   --light: #f6b73c;
   --dark: #2e2e36;
@@ -47,8 +67,8 @@
   --melatonin: #b690ff;
   /* Beyond §5, for contrast: errors, and label text on colored bands. */
   --danger: #ffb4b4;
-  --ink: #0b0b0d;
-  --on-sleep: #0b0b0d;
+  --ink: #07080a;
+  --on-sleep: #07080a;
   /* Hatched in-air band: muted text at 30%. The hatch itself is --flight-hatch. */
   --flight: color-mix(in srgb, var(--fg-muted) 30%, transparent);
   --flight-hatch: repeating-linear-gradient(
@@ -63,11 +83,24 @@
 
 [data-theme="light"] {
   color-scheme: light;
-  --bg: #fafaf9;
+  --bg: #f6f6f7;
   --surface: #ffffff;
-  --line: #e6e6e3;
-  --fg: #17171a;
-  --fg-muted: #6b6b73;
+  --surface-2: #fbfbfc;
+  --line: #e4e4e8;
+  --line-strong: #d2d2d8;
+  --fg: #121214;
+  --fg-muted: #5e5e67;
+  --accent: #4f5fe6;
+  --glow-1: rgb(79 95 230 / 0.16);
+  --glow-2: rgb(255 122 89 / 0.14);
+  --card-highlight: rgb(255 255 255 / 0.9);
+  --card-shadow:
+    0 1px 2px rgb(18 18 20 / 0.06), 0 12px 32px -16px rgb(18 18 20 / 0.18);
+  --glass: rgb(255 255 255 / 0.72);
+  --glass-solid: rgb(255 255 255 / 0.97);
+  --control-fill: #ffffff;
+  --primary-bg: #121214;
+  --primary-fg: #ffffff;
   --sleep: #4f5fe6;
   --light: #d99a1e;
   --dark: #cfcfd6;
@@ -81,6 +114,9 @@
 @theme inline {
   --color-bg: var(--bg);
   --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
   --color-line: var(--line);
   --color-fg: var(--fg);
   --color-fg-muted: var(--fg-muted);
@@ -98,14 +134,15 @@
 /* Theme-independent scales (§5): defined once, as plain values, so Tailwind
    utilities (rounded-surface, text-15, …) and plain CSS share them. */
 @theme {
-  --radius-surface: 10px;
-  --radius-control: 6px;
+  --radius-surface: 16px;
+  --radius-control: 10px;
   --text-13: 13px;
   --text-15: 15px;
   --text-17: 17px;
   --text-22: 22px;
   --text-28: 28px;
   --text-40: 40px;
+  --text-56: 56px;
   --leading-body: 1.45;
   --leading-display: 1.1;
 }
