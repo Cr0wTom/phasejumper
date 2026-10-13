@@ -28,6 +28,7 @@ import {
 } from "../../airports/loadAirports";
 import { airportLabel } from "../../airports/searchAirports";
 import { currentInstant } from "../../clock";
+import { TextField } from "../../components/fields";
 import { LegalGate } from "../../components/LegalGate";
 import { flags } from "../../flags";
 import { legalMessages, messages, returnMessages } from "../../messages";
@@ -44,6 +45,7 @@ import {
   h1Class,
   pageClass,
   primaryButtonClass,
+  surfaceClass,
 } from "../../ui";
 import { ConstraintsSection } from "./ConstraintsSection";
 import { FlightsSection } from "./FlightsSection";
@@ -100,7 +102,11 @@ export function withFollowedArrival(
   return next;
 }
 
+/** Trip names are short labels for the saved-plans list. */
+const NAME_MAX = 60;
+
 export function TripBuilder({ editId }: { editId?: string } = {}) {
+  const [name, setName] = useState("");
   const [form, setForm] = useState<TripFormValues>(createDefaultForm);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [formAlert, setFormAlert] = useState<FormAlert | null>(null);
@@ -143,6 +149,7 @@ export function TripBuilder({ editId }: { editId?: string } = {}) {
           setFormAlert({ title: messages.editMissing, issues: [] });
           return;
         }
+        setName(plan.name ?? "");
         setForm(
           formFromPlanInput(plan.input, (iata) => {
             const airport = directory.lookup(iata);
@@ -344,6 +351,8 @@ export function TripBuilder({ editId }: { editId?: string } = {}) {
 
       const id = crypto.randomUUID();
       const returnId = crypto.randomUUID();
+      const trimmedName = name.trim().slice(0, NAME_MAX);
+      const named = trimmedName === "" ? {} : { name: trimmedName };
       const createdAt = currentInstant();
       const savedIds: string[] = [];
       try {
@@ -353,6 +362,7 @@ export function TripBuilder({ editId }: { editId?: string } = {}) {
           result,
           engineVersion: ENGINE_VERSION,
           createdAt,
+          ...named,
           ...(returnResult === undefined ? {} : { returnPlanId: returnId }),
         });
         savedIds.push(id);
@@ -363,6 +373,7 @@ export function TripBuilder({ editId }: { editId?: string } = {}) {
             result: returnResult,
             engineVersion: ENGINE_VERSION,
             createdAt,
+            ...named,
             outboundPlanId: id,
           });
           savedIds.push(returnId);
@@ -453,6 +464,15 @@ export function TripBuilder({ editId }: { editId?: string } = {}) {
             {messages.fieldSummary}
           </p>
         )}
+        <div className={surfaceClass}>
+          <TextField
+            id="trip-name"
+            label={messages.tripName}
+            hint={messages.tripNameHint}
+            value={name}
+            onChange={(value) => setName(value.slice(0, NAME_MAX))}
+          />
+        </div>
         <YouSection
           form={form}
           errors={fieldErrors}

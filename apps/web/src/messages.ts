@@ -19,6 +19,9 @@ export const messages = {
   updateReady: "A new version is ready.",
   updateReload: "Reload",
   tripHeading: "Plan a trip",
+  tripName: "Trip name",
+  tripNameHint:
+    "Optional, to find it in your list, like “Seoul conference”. It is not included in share links.",
   youHeading: "You",
   flightsHeading: "Flights",
   constraintsHeading: "Constraints",

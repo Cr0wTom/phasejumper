@@ -272,7 +272,7 @@ export function PlanView({
         {preview === undefined ? null : (
           <p className="pj-chip w-fit">{sharedMessages.label}</p>
         )}
-        <h1 className={h1Class}>{m.planHeading}</h1>
+        <h1 className={h1Class}>{plan.name ?? m.planHeading}</h1>
         {preview === undefined ? null : (
           <div className="flex flex-col gap-3">
             <p role="status" className="text-15 leading-body text-fg-muted">

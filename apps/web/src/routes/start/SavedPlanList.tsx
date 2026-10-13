@@ -86,7 +86,16 @@ export function SavedPlanList({
                   className="pj-list-link min-w-0 flex-1"
                   href={planHash(plan.id)}
                 >
-                  <span>{label(plan)}</span>
+                  {plan.name === undefined ? (
+                    <span>{label(plan)}</span>
+                  ) : (
+                    <span className="flex min-w-0 flex-col">
+                      <span className="truncate font-medium">{plan.name}</span>
+                      <span className="text-13 text-fg-muted">
+                        {label(plan)}
+                      </span>
+                    </span>
+                  )}
                   <ChevronRight
                     size={16}
                     strokeWidth={ICON_STROKE}
@@ -96,7 +105,7 @@ export function SavedPlanList({
                 <button
                   type="button"
                   className={`mr-2 inline-flex size-10 shrink-0 items-center justify-center rounded-full text-fg-muted hover:text-fg ${focusRing}`}
-                  aria-label={s.delete(label(plan))}
+                  aria-label={s.delete(plan.name ?? label(plan))}
                   onClick={() => {
                     setFailed(false);
                     setConfirming(plan.id);
