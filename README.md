@@ -11,7 +11,7 @@ No account, no server, no tracking: your trip never leaves your device.
 
 ## Quick start
 
-Try it at **https://cr0wtom.github.io/phasejumper/**, or run it locally (Node 22, pnpm):
+Try it at **https://phasejumper.world/**, or run it locally (Node 22, pnpm):
 
 ```bash
 git clone https://github.com/Cr0wTom/phasejumper.git
