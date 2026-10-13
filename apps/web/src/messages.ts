@@ -311,3 +311,45 @@ export const settingsMessages = {
     "PhaseJumper is open source under the Apache License 2.0. The evidence page is licensed under CC BY 4.0.",
   backToSettings: "Back to Settings",
 } as const;
+
+/**
+ * Legal copy (T12). Written by the maintainer; implementers wire it, never
+ * edit it. TERMS_VERSION lives in terms.ts; acceptance text is fixed (§11.3).
+ */
+export const legalMessages = {
+  heading: "Before your first plan",
+  intro:
+    "PhaseJumper is free and runs only in your browser. Please confirm both points to continue.",
+  acceptWellness:
+    "I understand this is general wellness information, not medical advice, and I use it at my own risk.",
+  acceptAge: "I am 18 or older.",
+  continue: "Continue",
+  needBoth: "Confirm both points to continue.",
+  saveFailed:
+    "This browser could not store your answer, so you will be asked again next time. You can continue now.",
+  readTerms: "Terms of use",
+  readPrivacy: "Privacy notice",
+  updatedHeading: "The terms have changed",
+  updatedIntro:
+    "The terms of use or privacy notice changed since you last accepted them. Please read them and confirm again to continue.",
+  pageHeading: "Terms and privacy",
+  legalLink: "Terms and privacy",
+  melatoninQuestion: "I already use melatonin and want timing windows for it",
+  melatoninNotice:
+    "PhaseJumper only shows when research suggests melatonin can help move your body clock. It never suggests whether to use it, which product, or how much. In some countries melatonin is sold only with a doctor's order; follow the advice of whoever provided it.",
+  melatoninCheckHeading: "Do any of these apply to you?",
+  melatoninPregnant: "I am pregnant or might be pregnant",
+  melatoninMedication: "I take other medication",
+  melatoninUnder18: "I am under 18",
+  melatoninBlocked:
+    "Melatonin timing is not shown when any of these apply. Talk to a clinician before using melatonin.",
+  exerciseNotice:
+    "Check with a clinician before changing your exercise routine if you have a health condition.",
+  reportButton: "Copy technical report",
+  reportHint:
+    "Copies the app and planner versions, your browser, the feature switches, a fingerprint of your latest trip (not the trip itself) and any planner warnings, for a bug report.",
+  reportCopied: "Technical report copied.",
+  reportManual: "Copy this report:",
+  reportFailed:
+    "The technical report could not be created. Reload the page and try again.",
+} as const;
