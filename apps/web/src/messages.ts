@@ -211,6 +211,13 @@ export const planMessages = {
   timeRange: (from: string, to: string, zone: string): string =>
     `${from}–${to} (${zone})`,
   timePoint: (at: string, zone: string): string => `${at} (${zone})`,
+  daysHeading: "Days",
+  daysHint: "Choose a day, or a row on the map, to see what to do and why.",
+  dayChip: (index: number, date: string): string =>
+    `Day ${index + 1} · ${date}`,
+  previousDay: "Previous day",
+  nextDay: "Next day",
+  closeDay: "Close",
   adviceHeading: "On the plane",
   droppedHeading: "Left out today",
   shareOpening: "Opening the shared plan.",

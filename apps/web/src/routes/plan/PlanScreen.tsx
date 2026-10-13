@@ -32,7 +32,8 @@ import {
   pageClass,
 } from "../../ui";
 import { useNow } from "../../useNow";
-import { DayList } from "./DayList";
+import { DaySheet } from "./DaySheet";
+import { shortDate } from "../../format";
 import { ProgressCurve } from "./ProgressCurve";
 import { usePlan } from "./usePlan";
 
@@ -63,6 +64,17 @@ function downloadBlob(contents: string, filename: string): void {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
+/** The plan day for a phase-map row: same date, else the next day, else the last. */
+function dayForDate(
+  result: { days: ReadonlyArray<{ date: string }> },
+  date: string,
+): number {
+  const exact = result.days.findIndex((d) => d.date === date);
+  if (exact !== -1) return exact;
+  const after = result.days.findIndex((d) => d.date > date);
+  return after === -1 ? result.days.length - 1 : after;
+}
+
 export function PlanScreen({ id }: { id?: string }) {
   const state = usePlan(id);
   const now = useNow();
@@ -73,6 +85,7 @@ export function PlanScreen({ id }: { id?: string }) {
     id: string;
     text: string;
   } | null>(null);
+  const [dayIndex, setDayIndex] = useState<number | null>(null);
   const sequenceRef = useRef<{ id: string; sequence: number } | null>(null);
   const saveChain = useRef(Promise.resolve());
 
@@ -167,7 +180,7 @@ export function PlanScreen({ id }: { id?: string }) {
 
   return (
     <main className={pageClass}>
-      <header className="pj-plan-header pj-card pj-glass z-10 flex md:sticky flex-col gap-3 p-5">
+      <header className="pj-card flex flex-col gap-3 p-5">
         <h1 className={h1Class}>{m.planHeading}</h1>
         <p className="text-17 leading-body">
           {plan.result.decision.explanation}
@@ -234,13 +247,45 @@ export function PlanScreen({ id }: { id?: string }) {
         </section>
       )}
 
-      <div className="mt-6">
-        <PhaseMap input={plan.input} result={plan.result} now={now} />
-      </div>
-
-      <section className="mt-8" aria-label={m.planHeading}>
-        <DayList result={plan.result} />
+      <section className="pj-card mt-6 p-4 md:p-5">
+        <PhaseMap
+          input={plan.input}
+          result={plan.result}
+          now={now}
+          selectedDate={
+            dayIndex === null ? undefined : plan.result.days[dayIndex]?.date
+          }
+          onSelectDate={(date) => setDayIndex(dayForDate(plan.result, date))}
+        />
       </section>
+
+      <nav className="mt-6 flex flex-col gap-3" aria-labelledby="plan-days">
+        <h2 id="plan-days" className="text-15 font-semibold">
+          {m.daysHeading}
+        </h2>
+        <p className="text-13 leading-body text-fg-muted">{m.daysHint}</p>
+        <ul className="flex flex-wrap gap-2">
+          {plan.result.days.map((day, index) => (
+            <li key={day.date + index}>
+              <button
+                type="button"
+                className="pj-day-chip"
+                aria-current={dayIndex === index ? "date" : undefined}
+                onClick={() => setDayIndex(index)}
+              >
+                {m.dayChip(index, shortDate(day.date))}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <DaySheet
+        result={plan.result}
+        index={dayIndex}
+        onIndex={setDayIndex}
+        onClose={() => setDayIndex(null)}
+      />
 
       <footer className="mt-8 border-t border-line pt-4 text-13 leading-body text-fg-muted">
         <p>{messages.footer}</p>
