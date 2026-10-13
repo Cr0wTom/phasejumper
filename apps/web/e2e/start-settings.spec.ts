@@ -22,6 +22,7 @@ import {
   planMessages,
   settingsMessages as s,
   startMessages,
+  sharedMessages,
 } from "../src/messages";
 import { preAcceptTerms } from "./acceptTerms";
 
@@ -66,6 +67,8 @@ async function savedKeys(page: Page): Promise<string[]> {
 
 async function openShared(page: Page): Promise<void> {
   await page.goto(SHARE);
+  // Shared links open in view mode; save to keep the plan on this device.
+  await page.getByRole("button", { name: sharedMessages.save }).click();
   await expect(page).toHaveURL(/#\/plan\/[0-9a-f-]{36}$/i);
 }
 

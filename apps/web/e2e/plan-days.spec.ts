@@ -17,7 +17,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
-import { planMessages as m } from "../src/messages";
+import { planMessages as m, sharedMessages } from "../src/messages";
 import { preAcceptTerms } from "./acceptTerms";
 
 // The plan page shows the map and day chips; a day's detail opens in a sheet.
@@ -34,6 +34,8 @@ const SHARE = `#p=${Buffer.from(JSON.stringify(JSON.parse(SFO))).toString("base6
 async function openPlan(page: Page): Promise<void> {
   await preAcceptTerms(page);
   await page.goto(SHARE);
+  // Shared links open in view mode; save to keep the plan on this device.
+  await page.getByRole("button", { name: sharedMessages.save }).click();
   await expect(page).toHaveURL(/#\/plan\//);
 }
 
