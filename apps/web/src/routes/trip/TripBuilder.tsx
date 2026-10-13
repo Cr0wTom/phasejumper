@@ -71,6 +71,27 @@ function focusFirst(errors: FieldErrors): void {
   document.getElementById(fieldDomId(first))?.focus();
 }
 
+/**
+ * Applies a leg edit. The arrival date follows the departure date while it
+ * is empty or still equal to it; once the traveler sets another day (an
+ * overnight flight), it is left alone.
+ */
+export function withFollowedArrival(
+  leg: LegForm,
+  legPatch: Partial<LegForm>,
+): LegForm {
+  const next = { ...leg, ...legPatch };
+  const departure = legPatch.departureDate;
+  if (
+    departure !== undefined &&
+    legPatch.arrivalDate === undefined &&
+    (leg.arrivalDate === "" || leg.arrivalDate === leg.departureDate)
+  ) {
+    next.arrivalDate = departure;
+  }
+  return next;
+}
+
 export function TripBuilder({ editId }: { editId?: string } = {}) {
   const [form, setForm] = useState<TripFormValues>(createDefaultForm);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
@@ -154,7 +175,7 @@ export function TripBuilder({ editId }: { editId?: string } = {}) {
     setForm((current) => ({
       ...current,
       legs: current.legs.map((leg, legIndex) =>
-        legIndex === index ? { ...leg, ...legPatch } : leg,
+        legIndex === index ? withFollowedArrival(leg, legPatch) : leg,
       ),
     }));
   }
