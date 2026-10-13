@@ -48,8 +48,11 @@ body {
   --font-mono:
     "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
     "Liberation Mono", "Courier New", monospace;
-  --header-h: 72px;
   isolation: isolate;
+  /* Decorative glows may extend past the edges; never let them make the
+     page wider than the screen (sideways wobble while scrolling on phones).
+     clip, unlike hidden, keeps the sticky header working. */
+  overflow-x: clip;
 }
 
 /* A faint dusk glow at the top of every screen. Decorative only. */
