@@ -98,6 +98,7 @@ export const tripFormSchema = z
     mealTimingEnabled: z.boolean(),
     preAdjustDays,
     legs: z.array(legSchema).min(1, messages.legsRequired),
+    returnLegs: z.array(legSchema),
     mustBeAwake: z.array(awakeSchema),
     noWorkoutWindows: z.array(windowSchema),
     tripDays: z

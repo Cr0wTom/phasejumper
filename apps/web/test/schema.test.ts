@@ -49,6 +49,7 @@ function validForm(): TripFormValues {
     ],
     mustBeAwake: [],
     noWorkoutWindows: [],
+    returnLegs: [],
     tripDays: "",
   };
 }

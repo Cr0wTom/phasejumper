@@ -25,6 +25,10 @@ export interface StoredPlan {
   createdAt: string;
   /** Re-export counter for the calendar file. Absent means 0. */
   icsSequence?: number;
+  /** Set on the outbound half of a round trip. */
+  returnPlanId?: string;
+  /** Set on the return half. Start hides these; Edit trip opens the outbound plan. */
+  outboundPlanId?: string;
 }
 
 export function planKey(id: string): string {
@@ -39,7 +43,11 @@ function isIcsSequence(value: unknown): value is number {
   return typeof value === "number" && Number.isInteger(value) && value >= 0;
 }
 
-function isStoredPlan(value: unknown): value is StoredPlan {
+function isLinkId(value: unknown): value is string {
+  return typeof value === "string";
+}
+
+export function isStoredPlan(value: unknown): value is StoredPlan {
   if (!isRecord(value)) return false;
   if (typeof value.id !== "string" || value.id.length === 0) return false;
   if (typeof value.engineVersion !== "string") return false;
@@ -52,6 +60,20 @@ function isStoredPlan(value: unknown): value is StoredPlan {
   // A damaged counter must not hide the plan. The next download starts at 0.
   if ("icsSequence" in value && !isIcsSequence(value.icsSequence)) {
     delete value.icsSequence;
+  }
+  if (
+    "returnPlanId" in value &&
+    value.returnPlanId !== undefined &&
+    !isLinkId(value.returnPlanId)
+  ) {
+    return false;
+  }
+  if (
+    "outboundPlanId" in value &&
+    value.outboundPlanId !== undefined &&
+    !isLinkId(value.outboundPlanId)
+  ) {
+    return false;
   }
   return true;
 }
@@ -154,7 +176,11 @@ export async function forgetAllPlans(): Promise<void> {
   await clear();
 }
 
-/** Backup file format: inputs only; plans are regenerated on import (§3.3). */
+/**
+ * Backup file format: inputs only; plans are regenerated on import (§3.3).
+ * A round trip is two entries. The file has no returnPlanId or outboundPlanId,
+ * so import does not re-link the pair.
+ */
 export interface PlansBackup {
   format: "phasejumper-plans";
   version: 1;

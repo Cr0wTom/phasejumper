@@ -30,15 +30,21 @@ import { airportLabel } from "../../airports/searchAirports";
 import { currentInstant } from "../../clock";
 import { LegalGate } from "../../components/LegalGate";
 import { flags } from "../../flags";
-import { legalMessages, messages } from "../../messages";
+import { legalMessages, messages, returnMessages } from "../../messages";
 import { goToPlan } from "../../router";
 import {
   termsAccepted,
   termsOutdated,
   writeTermsAcceptance,
 } from "../../terms";
-import { loadPlan, savePlan } from "../../storage/plans";
-import { errorClass, h1Class, pageClass, primaryButtonClass } from "../../ui";
+import { deletePlan, loadPlan, savePlan } from "../../storage/plans";
+import {
+  buttonClass,
+  errorClass,
+  h1Class,
+  pageClass,
+  primaryButtonClass,
+} from "../../ui";
 import { ConstraintsSection } from "./ConstraintsSection";
 import { FlightsSection } from "./FlightsSection";
 import {
@@ -48,7 +54,9 @@ import {
   emptyLeg,
   emptyWindow,
 } from "./formState";
-import { mapTripForm, zonesForLegs } from "./mapPlanInput";
+import { mapTripForm, returnPlanInput, zonesForLegs } from "./mapPlanInput";
+import { returnSplitIndex, stayDays } from "./returnTrip";
+import { ReturnSection } from "./ReturnSection";
 import {
   fieldDomId,
   parseTripForm,
@@ -170,11 +178,37 @@ export function TripBuilder({ editId }: { editId?: string } = {}) {
     setForm((current) => ({ ...current, ...next }));
   }
 
+  function dropErrors(predicate: (key: string) => boolean): void {
+    setFieldErrors((current) => {
+      const keys = Object.keys(current).filter(predicate);
+      if (keys.length === 0) return current;
+      const next = { ...current };
+      for (const key of keys) delete next[key];
+      return next;
+    });
+  }
+
   function changeLeg(index: number, legPatch: Partial<LegForm>): void {
-    clearErrors(Object.keys(legPatch).map((field) => `legs.${index}.${field}`));
+    clearErrors([
+      ...Object.keys(legPatch).map((field) => `legs.${index}.${field}`),
+      "tripDays",
+    ]);
     setForm((current) => ({
       ...current,
       legs: current.legs.map((leg, legIndex) =>
+        legIndex === index ? withFollowedArrival(leg, legPatch) : leg,
+      ),
+    }));
+  }
+
+  function changeReturnLeg(index: number, legPatch: Partial<LegForm>): void {
+    clearErrors([
+      ...Object.keys(legPatch).map((field) => `returnLegs.${index}.${field}`),
+      "tripDays",
+    ]);
+    setForm((current) => ({
+      ...current,
+      returnLegs: current.returnLegs.map((leg, legIndex) =>
         legIndex === index ? withFollowedArrival(leg, legPatch) : leg,
       ),
     }));
@@ -270,16 +304,73 @@ export function TripBuilder({ editId }: { editId?: string } = {}) {
         return;
       }
 
+      const wantReturn = mapped.input.itinerary.returnLegs !== undefined;
+      let returnInput: ReturnType<typeof returnPlanInput> = undefined;
+      let returnResult: PlanResult | undefined;
+      if (wantReturn && result.decision.direction !== "short-trip") {
+        returnInput = returnPlanInput(mapped.input);
+        if (returnInput === undefined) {
+          setFormAlert({
+            title: messages.unexpectedFailure,
+            issues: [],
+          });
+          return;
+        }
+        const returnCheck = validatePlanInput(returnInput);
+        if (!returnCheck.ok) {
+          setFormAlert({
+            title: messages.engineRejected,
+            issues: returnCheck.issues,
+          });
+          return;
+        }
+        try {
+          returnResult = generatePlan(returnInput);
+        } catch (error) {
+          if (error instanceof EngineInputError) {
+            setFormAlert({
+              title: messages.engineRejected,
+              issues: [...error.issues],
+            });
+            return;
+          }
+          setFormAlert({
+            title: messages.unexpectedFailure,
+            issues: [error instanceof Error ? error.message : String(error)],
+          });
+          return;
+        }
+      }
+
       const id = crypto.randomUUID();
+      const returnId = crypto.randomUUID();
+      const createdAt = currentInstant();
+      const savedIds: string[] = [];
       try {
         await savePlan({
           id,
           input: mapped.input,
           result,
           engineVersion: ENGINE_VERSION,
-          createdAt: currentInstant(),
+          createdAt,
+          ...(returnResult === undefined ? {} : { returnPlanId: returnId }),
         });
+        savedIds.push(id);
+        if (returnInput !== undefined && returnResult !== undefined) {
+          await savePlan({
+            id: returnId,
+            input: returnInput,
+            result: returnResult,
+            engineVersion: ENGINE_VERSION,
+            createdAt,
+            outboundPlanId: id,
+          });
+          savedIds.push(returnId);
+        }
       } catch {
+        await Promise.allSettled(
+          savedIds.map((savedId) => deletePlan(savedId)),
+        );
         setFormAlert({ title: messages.saveFailed, issues: [] });
         return;
       }
@@ -290,8 +381,51 @@ export function TripBuilder({ editId }: { editId?: string } = {}) {
     }
   }
 
+  function revealReturn(): void {
+    dropErrors((key) => key === "tripDays");
+    setForm((current) => ({
+      ...current,
+      tripDays: "",
+      returnLegs: [emptyLeg()],
+    }));
+  }
+
+  function moveDetected(at: number): void {
+    dropErrors(
+      (key) =>
+        key === "tripDays" ||
+        key.startsWith("legs.") ||
+        key.startsWith("returnLegs."),
+    );
+    setForm((current) => {
+      if (at <= 0 || at >= current.legs.length) return current;
+      return {
+        ...current,
+        tripDays: "",
+        legs: current.legs.slice(0, at),
+        returnLegs: current.legs.slice(at),
+      };
+    });
+  }
+
+  const airports = directory === null ? null : directory.airports;
   const zones =
     directory === null ? [] : zonesForLegs(form.legs, directory.lookup);
+  const splitAt =
+    directory === null || form.returnLegs.length > 0
+      ? undefined
+      : returnSplitIndex(form.legs, directory.lookup);
+  const lastOutbound = form.legs[form.legs.length - 1];
+  const firstReturn = form.returnLegs[0];
+  const stay =
+    form.returnLegs.length === 0
+      ? null
+      : {
+          days: stayDays(
+            lastOutbound?.arrivalDate ?? "",
+            firstReturn?.departureDate ?? "",
+          ),
+        };
 
   return (
     <main className={pageClass}>
@@ -328,7 +462,7 @@ export function TripBuilder({ editId }: { editId?: string } = {}) {
         <FlightsSection
           legs={form.legs}
           errors={fieldErrors}
-          airports={directory === null ? null : directory.airports}
+          airports={airports}
           airportsError={airportsError}
           onChangeLeg={changeLeg}
           onAdd={() =>
@@ -344,10 +478,62 @@ export function TripBuilder({ editId }: { editId?: string } = {}) {
             }))
           }
         />
+        {splitAt === undefined ? null : (
+          <div className="flex flex-col items-start gap-3">
+            <p role="status">{returnMessages.detected}</p>
+            <button
+              type="button"
+              className={buttonClass}
+              onClick={() => moveDetected(splitAt)}
+            >
+              {returnMessages.moveToReturn}
+            </button>
+          </div>
+        )}
+        {form.returnLegs.length === 0 ? (
+          <button
+            type="button"
+            className={`${buttonClass} self-start`}
+            onClick={revealReturn}
+          >
+            {returnMessages.add}
+          </button>
+        ) : (
+          <ReturnSection
+            legs={form.returnLegs}
+            errors={fieldErrors}
+            airports={airports}
+            onChangeLeg={changeReturnLeg}
+            onAdd={() =>
+              setForm((current) => ({
+                ...current,
+                returnLegs: [...current.returnLegs, emptyLeg()],
+              }))
+            }
+            onRemove={(index) => {
+              dropErrors(
+                (key) => key === "tripDays" || key.startsWith("returnLegs."),
+              );
+              setForm((current) => ({
+                ...current,
+                returnLegs: current.returnLegs.filter(
+                  (_, legIndex) => legIndex !== index,
+                ),
+              }));
+            }}
+            onRemoveAll={() => {
+              dropErrors(
+                (key) => key === "tripDays" || key.startsWith("returnLegs."),
+              );
+              setForm((current) => ({ ...current, returnLegs: [] }));
+            }}
+          />
+        )}
         <ConstraintsSection
           form={form}
           errors={fieldErrors}
           zones={zones}
+          stay={stay}
           onTripDays={(tripDays) => patch({ tripDays })}
           onAddEvent={() =>
             setForm((current) => ({
