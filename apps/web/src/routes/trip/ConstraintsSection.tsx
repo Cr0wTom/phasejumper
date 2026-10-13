@@ -16,8 +16,14 @@
 
 import { TimeField } from "../../components/TimeField";
 import { SelectField, TextField } from "../../components/fields";
-import { messages } from "../../messages";
-import { buttonClass, h2Class, h3Class, surfaceClass } from "../../ui";
+import { messages, returnMessages } from "../../messages";
+import {
+  buttonClass,
+  errorClass,
+  h2Class,
+  h3Class,
+  surfaceClass,
+} from "../../ui";
 import {
   fieldDomId,
   type AwakeForm,
@@ -39,6 +45,7 @@ export function ConstraintsSection({
   form,
   errors,
   zones,
+  stay,
   onTripDays,
   onAddEvent,
   onRemoveEvent,
@@ -50,6 +57,8 @@ export function ConstraintsSection({
   form: TripFormValues;
   errors: FieldErrors;
   zones: readonly string[];
+  /** Set while return flights are on the form. Days then come from the flights. */
+  stay: { days: number | undefined } | null;
   onTripDays: (tripDays: string) => void;
   onAddEvent: () => void;
   onRemoveEvent: (index: number) => void;
@@ -228,15 +237,43 @@ export function ConstraintsSection({
           {messages.addNoWorkout}
         </button>
       </div>
-      <TextField
-        id={fieldDomId("tripDays")}
-        label={messages.tripDays}
-        hint={messages.tripDaysHint}
-        value={form.tripDays}
-        error={errors.tripDays}
-        inputMode="decimal"
-        onChange={onTripDays}
-      />
+      {stay === null ? (
+        <TextField
+          id={fieldDomId("tripDays")}
+          label={messages.tripDays}
+          hint={messages.tripDaysHint}
+          value={form.tripDays}
+          error={errors.tripDays}
+          inputMode="decimal"
+          onChange={onTripDays}
+        />
+      ) : (
+        <div className="flex flex-col gap-2">
+          {stay.days === undefined ? null : (
+            <p
+              id={fieldDomId("tripDays")}
+              tabIndex={errors.tripDays === undefined ? undefined : -1}
+              className="text-15 leading-body"
+            >
+              {returnMessages.tripDaysFromFlights(stay.days)}
+            </p>
+          )}
+          {errors.tripDays === undefined ? null : (
+            <p
+              id={
+                stay.days === undefined
+                  ? fieldDomId("tripDays")
+                  : `${fieldDomId("tripDays")}-error`
+              }
+              tabIndex={stay.days === undefined ? -1 : undefined}
+              role="alert"
+              className={errorClass}
+            >
+              {errors.tripDays}
+            </p>
+          )}
+        </div>
+      )}
     </section>
   );
 }

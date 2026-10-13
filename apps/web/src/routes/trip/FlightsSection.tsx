@@ -14,23 +14,17 @@
  * limitations under the License.
  */
 
-import {
-  airportLabel,
-  type SearchableAirport,
-} from "../../airports/searchAirports";
-import { AirportCombobox } from "../../components/AirportCombobox";
-import { TimeField } from "../../components/TimeField";
-import { TextField } from "../../components/fields";
+import type { SearchableAirport } from "../../airports/searchAirports";
 import { messages } from "../../messages";
 import {
   buttonClass,
   errorClass,
   h2Class,
-  h3Class,
   hintClass,
   surfaceClass,
 } from "../../ui";
-import { fieldDomId, type FieldErrors, type LegForm } from "./schema";
+import { FlightLegFields } from "./FlightLegFields";
+import type { FieldErrors, LegForm } from "./schema";
 
 export function FlightsSection({
   legs,
@@ -71,106 +65,20 @@ export function FlightsSection({
       {legs.map((leg, index) => {
         const number = index + 1;
         return (
-          <section
+          <FlightLegFields
             key={leg.id}
-            aria-labelledby={`flight-${leg.id}`}
-            className="flex flex-col gap-4 border-t border-line pt-4"
-          >
-            <h3 id={`flight-${leg.id}`} className={h3Class}>
-              {messages.flightLegend(number)}
-            </h3>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <AirportCombobox
-                id={fieldDomId(`legs.${index}.fromIata`)}
-                label={messages.fromAirport}
-                query={leg.fromQuery}
-                airports={airports}
-                disabled={airports === null}
-                error={errors[`legs.${index}.fromIata`]}
-                onQueryChange={(fromQuery) =>
-                  onChangeLeg(index, { fromQuery, fromIata: "" })
-                }
-                onSelect={(airport) =>
-                  onChangeLeg(index, {
-                    fromQuery: airportLabel(airport),
-                    fromIata: airport.iata,
-                  })
-                }
-              />
-              <AirportCombobox
-                id={fieldDomId(`legs.${index}.toIata`)}
-                label={messages.toAirport}
-                query={leg.toQuery}
-                airports={airports}
-                disabled={airports === null}
-                error={errors[`legs.${index}.toIata`]}
-                onQueryChange={(toQuery) =>
-                  onChangeLeg(index, { toQuery, toIata: "" })
-                }
-                onSelect={(airport) =>
-                  onChangeLeg(index, {
-                    toQuery: airportLabel(airport),
-                    toIata: airport.iata,
-                  })
-                }
-              />
-              <TextField
-                id={fieldDomId(`legs.${index}.departureDate`)}
-                label={messages.departureDate}
-                type="date"
-                value={leg.departureDate}
-                error={errors[`legs.${index}.departureDate`]}
-                required
-                onChange={(departureDate) =>
-                  onChangeLeg(index, { departureDate })
-                }
-              />
-              <TimeField
-                id={fieldDomId(`legs.${index}.departureTime`)}
-                label={messages.departureTime}
-                value={leg.departureTime}
-                error={errors[`legs.${index}.departureTime`]}
-                required
-                onChange={(departureTime) =>
-                  onChangeLeg(index, { departureTime })
-                }
-              />
-              <TextField
-                id={fieldDomId(`legs.${index}.arrivalDate`)}
-                label={messages.arrivalDate}
-                type="date"
-                value={leg.arrivalDate}
-                error={errors[`legs.${index}.arrivalDate`]}
-                required
-                onChange={(arrivalDate) => onChangeLeg(index, { arrivalDate })}
-              />
-              <TimeField
-                id={fieldDomId(`legs.${index}.arrivalTime`)}
-                label={messages.arrivalTime}
-                value={leg.arrivalTime}
-                error={errors[`legs.${index}.arrivalTime`]}
-                required
-                onChange={(arrivalTime) => onChangeLeg(index, { arrivalTime })}
-              />
-            </div>
-            <TextField
-              id={fieldDomId(`legs.${index}.flightNumber`)}
-              label={messages.flightNumber}
-              hint={messages.flightNumberHint}
-              value={leg.flightNumber}
-              error={errors[`legs.${index}.flightNumber`]}
-              onChange={(flightNumber) => onChangeLeg(index, { flightNumber })}
-            />
-            {legs.length > 1 ? (
-              <button
-                type="button"
-                className={buttonClass}
-                onClick={() => onRemove(index)}
-              >
-                {messages.removeLeg(number)}
-              </button>
-            ) : null}
-          </section>
+            leg={leg}
+            index={index}
+            path="legs"
+            headingId={`flight-${leg.id}`}
+            legend={messages.flightLegend(number)}
+            removeLabel={messages.removeLeg(number)}
+            showRemove={legs.length > 1}
+            errors={errors}
+            airports={airports}
+            onChange={(patch) => onChangeLeg(index, patch)}
+            onRemove={() => onRemove(index)}
+          />
         );
       })}
       <button type="button" className={buttonClass} onClick={onAdd}>

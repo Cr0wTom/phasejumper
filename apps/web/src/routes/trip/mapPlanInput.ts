@@ -17,8 +17,9 @@
 import type { Airport } from "@phasejumper/airports";
 import type { Constraints, FlightLeg, PlanInput } from "@phasejumper/engine";
 import { Temporal } from "temporal-polyfill";
-import { messages } from "../../messages";
-import type { FieldErrors, TripFormValues } from "./schema";
+import { messages, returnMessages } from "../../messages";
+import { returnDepartsBeforeArrival, stayDays } from "./returnTrip";
+import type { FieldErrors, LegForm, TripFormValues } from "./schema";
 
 function zonedInstant(
   date: string,
@@ -57,23 +58,23 @@ export function zonesForLegs(
   return zones;
 }
 
-export function mapTripForm(
-  form: TripFormValues,
+function mapLegs(
+  formLegs: readonly LegForm[],
   lookup: (iata: string) => Airport | undefined,
-  now: string,
-): { ok: true; input: PlanInput } | { ok: false; fieldErrors: FieldErrors } {
-  const errors: Record<string, string> = {};
-  const legs: FlightLeg[] = [];
+  errors: Record<string, string>,
+  prefix: "legs" | "returnLegs",
+): FlightLeg[] {
+  const built: FlightLeg[] = [];
   let previousArrival: Temporal.Instant | undefined;
 
-  form.legs.forEach((leg, index) => {
+  formLegs.forEach((leg, index) => {
     const departure = lookup(leg.fromIata);
     const arrival = lookup(leg.toIata);
     if (departure === undefined) {
-      put(errors, `legs.${index}.fromIata`, messages.chooseAirport);
+      put(errors, `${prefix}.${index}.fromIata`, messages.chooseAirport);
     }
     if (arrival === undefined) {
-      put(errors, `legs.${index}.toIata`, messages.chooseAirport);
+      put(errors, `${prefix}.${index}.toIata`, messages.chooseAirport);
     }
     if (departure === undefined || arrival === undefined) return;
 
@@ -88,23 +89,27 @@ export function mapTripForm(
       arrival.tz,
     );
     if (depInstant === undefined) {
-      put(errors, `legs.${index}.departureTime`, messages.timeInvalid);
+      put(errors, `${prefix}.${index}.departureTime`, messages.timeInvalid);
     }
     if (arrInstant === undefined) {
-      put(errors, `legs.${index}.arrivalTime`, messages.timeInvalid);
+      put(errors, `${prefix}.${index}.arrivalTime`, messages.timeInvalid);
     }
     if (depInstant === undefined || arrInstant === undefined) return;
     if (Temporal.Instant.compare(arrInstant, depInstant) <= 0) {
-      put(errors, `legs.${index}.arrivalTime`, messages.arrivalBeforeDeparture);
+      put(
+        errors,
+        `${prefix}.${index}.arrivalTime`,
+        messages.arrivalBeforeDeparture,
+      );
     } else if (
       previousArrival !== undefined &&
       Temporal.Instant.compare(depInstant, previousArrival) < 0
     ) {
-      put(errors, `legs.${index}.departureTime`, messages.legOutOfOrder);
+      put(errors, `${prefix}.${index}.departureTime`, messages.legOutOfOrder);
     }
     previousArrival = arrInstant;
 
-    const built: FlightLeg = {
+    const flight: FlightLeg = {
       departureAirport: departure.iata,
       arrivalAirport: arrival.iata,
       departureLocal: `${leg.departureDate}T${leg.departureTime}`,
@@ -114,9 +119,58 @@ export function mapTripForm(
       departureLatLon: { lat: departure.lat, lon: departure.lon },
       arrivalLatLon: { lat: arrival.lat, lon: arrival.lon },
     };
-    if (leg.flightNumber.length > 0) built.flightNumber = leg.flightNumber;
-    legs.push(built);
+    if (leg.flightNumber.length > 0) flight.flightNumber = leg.flightNumber;
+    built.push(flight);
   });
+
+  return built;
+}
+
+/**
+ * The return journey, planned from the destination as home. The traveler has
+ * adapted, so their usual sleep times apply there. No trip length: the stay
+ * was already decided on the outbound plan.
+ */
+export function returnPlanInput(outbound: PlanInput): PlanInput | undefined {
+  const legs = outbound.itinerary.returnLegs;
+  if (legs === undefined || legs.length === 0) return undefined;
+  return {
+    traveler: outbound.traveler,
+    itinerary: {
+      homeTz: outbound.itinerary.destinationTz,
+      legs,
+      destinationTz: outbound.itinerary.homeTz,
+    },
+    ...(outbound.constraints === undefined
+      ? {}
+      : { constraints: outbound.constraints }),
+    now: outbound.now,
+  };
+}
+
+export function mapTripForm(
+  form: TripFormValues,
+  lookup: (iata: string) => Airport | undefined,
+  now: string,
+): { ok: true; input: PlanInput } | { ok: false; fieldErrors: FieldErrors } {
+  const errors: Record<string, string> = {};
+  const legs = mapLegs(form.legs, lookup, errors, "legs");
+  const mappedReturn = mapLegs(form.returnLegs, lookup, errors, "returnLegs");
+
+  let derivedDays: number | undefined;
+  if (form.returnLegs.length > 0) {
+    const lastForm = form.legs[form.legs.length - 1];
+    const firstReturn = form.returnLegs[0];
+    if (lastForm !== undefined && firstReturn !== undefined) {
+      if (returnDepartsBeforeArrival(lastForm, firstReturn, lookup)) {
+        put(errors, "tripDays", returnMessages.beforeArrival);
+      }
+      derivedDays = stayDays(lastForm.arrivalDate, firstReturn.departureDate);
+      if (derivedDays === undefined) {
+        put(errors, "tripDays", messages.dateInvalid);
+      }
+    }
+  }
 
   const allowed = new Set(zonesForLegs(form.legs, lookup));
 
@@ -186,7 +240,11 @@ export function mapTripForm(
   }
 
   const tripDays =
-    form.tripDays.length === 0 ? undefined : Number(form.tripDays);
+    form.returnLegs.length > 0
+      ? derivedDays
+      : form.tripDays.length === 0
+        ? undefined
+        : Number(form.tripDays);
 
   const input: PlanInput = {
     traveler: {
@@ -212,6 +270,7 @@ export function mapTripForm(
       legs,
       destinationTz: last.arrivalTz,
       ...(tripDays === undefined ? {} : { tripDays }),
+      ...(form.returnLegs.length === 0 ? {} : { returnLegs: mappedReturn }),
     },
     ...(constraints.mustBeAwake === undefined &&
     constraints.noWorkoutWindows === undefined

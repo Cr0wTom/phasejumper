@@ -75,6 +75,7 @@ export function createDefaultForm(): TripFormValues {
     mealTimingEnabled: false,
     preAdjustDays: 0,
     legs: [emptyLeg()],
+    returnLegs: [],
     mustBeAwake: [],
     noWorkoutWindows: [],
     tripDays: "",
@@ -103,6 +104,20 @@ export function formFromPlanInput(
   const t = input.traveler;
   const date = (local: string): string => local.slice(0, 10);
   const time = (local: string): string => local.slice(11, 16);
+  const toLeg = (leg: (typeof input.itinerary.legs)[number]): LegForm => ({
+    id: createId(),
+    fromQuery: airportLabel(leg.departureAirport),
+    fromIata: leg.departureAirport,
+    toQuery: airportLabel(leg.arrivalAirport),
+    toIata: leg.arrivalAirport,
+    departureDate: date(leg.departureLocal),
+    departureTime: time(leg.departureLocal),
+    arrivalDate: date(leg.arrivalLocal),
+    arrivalTime: time(leg.arrivalLocal),
+    flightNumber: leg.flightNumber ?? "",
+  });
+  // Days at the destination are derived from the flights while a return exists.
+  const returnLegs = (input.itinerary.returnLegs ?? []).map(toLeg);
   return {
     habitualBedtime: t.habitualBedtime,
     habitualWake: t.habitualWake,
@@ -117,18 +132,8 @@ export function formFromPlanInput(
     meditationEnabled: t.meditation.enabled,
     mealTimingEnabled: t.mealTiming.enabled,
     preAdjustDays: t.preAdjustDays,
-    legs: input.itinerary.legs.map((leg) => ({
-      id: createId(),
-      fromQuery: airportLabel(leg.departureAirport),
-      fromIata: leg.departureAirport,
-      toQuery: airportLabel(leg.arrivalAirport),
-      toIata: leg.arrivalAirport,
-      departureDate: date(leg.departureLocal),
-      departureTime: time(leg.departureLocal),
-      arrivalDate: date(leg.arrivalLocal),
-      arrivalTime: time(leg.arrivalLocal),
-      flightNumber: leg.flightNumber ?? "",
-    })),
+    legs: input.itinerary.legs.map(toLeg),
+    returnLegs,
     mustBeAwake: (input.constraints?.mustBeAwake ?? []).map((event) => ({
       id: createId(),
       label: event.label,
@@ -149,7 +154,7 @@ export function formFromPlanInput(
       }),
     ),
     tripDays:
-      input.itinerary.tripDays === undefined
+      returnLegs.length > 0 || input.itinerary.tripDays === undefined
         ? ""
         : String(input.itinerary.tripDays),
   };

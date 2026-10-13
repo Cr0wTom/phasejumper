@@ -21,8 +21,9 @@ import type { PlanInput } from "@phasejumper/engine";
 import { toIcs } from "@phasejumper/ical";
 import { useRef, useState } from "react";
 import { PhaseMap } from "../../components/PhaseMap/PhaseMap";
-import { messages, planMessages as m } from "../../messages";
-import { savePlan } from "../../storage/plans";
+import { messages, planMessages as m, returnMessages } from "../../messages";
+import { goToPlan } from "../../router";
+import { savePlan, type StoredPlan } from "../../storage/plans";
 import { shareUrl } from "../../storage/shareLink";
 import {
   buttonClass,
@@ -42,6 +43,57 @@ function calendarFilename(input: PlanInput): string {
   const origin = legs[0]?.departureAirport.toLowerCase() ?? "";
   const destination = legs.at(-1)?.arrivalAirport.toLowerCase() ?? "";
   return `phasejumper-${origin}-${destination}.ics`;
+}
+
+function linkedIds(
+  plan: StoredPlan,
+): { outboundId: string; returnId: string } | undefined {
+  if (plan.returnPlanId !== undefined && plan.returnPlanId.length > 0) {
+    return { outboundId: plan.id, returnId: plan.returnPlanId };
+  }
+  if (plan.outboundPlanId !== undefined && plan.outboundPlanId.length > 0) {
+    return { outboundId: plan.outboundPlanId, returnId: plan.id };
+  }
+  return undefined;
+}
+
+function PlanParts({
+  currentId,
+  outboundId,
+  returnId,
+}: {
+  currentId: string;
+  outboundId: string;
+  returnId: string;
+}) {
+  const parts = [
+    { id: outboundId, label: returnMessages.outbound },
+    { id: returnId, label: returnMessages.return },
+  ] as const;
+  return (
+    <div
+      role="group"
+      aria-label={returnMessages.partsLabel}
+      className="flex w-fit gap-1"
+    >
+      {parts.map((part) => {
+        const pressed = part.id === currentId;
+        return (
+          <button
+            key={part.label}
+            type="button"
+            aria-pressed={pressed}
+            className={buttonClass}
+            onClick={() => {
+              if (!pressed) goToPlan(part.id);
+            }}
+          >
+            {part.label}
+          </button>
+        );
+      })}
+    </div>
+  );
 }
 
 function storedSequence(value: number | undefined): number {
@@ -123,6 +175,15 @@ export function PlanScreen({ id }: { id?: string }) {
   }
 
   const { plan, regenerated } = state;
+  const parts = linkedIds(plan);
+  const editId =
+    plan.outboundPlanId !== undefined && plan.outboundPlanId.length > 0
+      ? plan.outboundPlanId
+      : plan.id;
+  const showShortStay =
+    parts === undefined &&
+    (plan.input.itinerary.returnLegs?.length ?? 0) > 0 &&
+    plan.result.decision.direction === "short-trip";
   const planWarnings = plan.result.warnings.filter(
     (w) => w.dayIndex === undefined,
   );
@@ -182,6 +243,18 @@ export function PlanScreen({ id }: { id?: string }) {
     <main className={pageClass}>
       <header className="pj-card flex flex-col gap-3 p-5">
         <h1 className={h1Class}>{m.planHeading}</h1>
+        {parts === undefined ? null : (
+          <PlanParts
+            currentId={plan.id}
+            outboundId={parts.outboundId}
+            returnId={parts.returnId}
+          />
+        )}
+        {showShortStay ? (
+          <p role="status" className="text-15 leading-body">
+            {returnMessages.shortStay}
+          </p>
+        ) : null}
         <p className="text-17 leading-body">
           {plan.result.decision.explanation}
         </p>
@@ -204,7 +277,7 @@ export function PlanScreen({ id }: { id?: string }) {
           </button>
           <a
             className={buttonClass}
-            href={`#/trip/${encodeURIComponent(plan.id)}`}
+            href={`#/trip/${encodeURIComponent(editId)}`}
           >
             {m.editTrip}
           </a>

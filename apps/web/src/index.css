@@ -277,6 +277,12 @@ body {
   background: color-mix(in srgb, var(--fg) 9%, transparent);
 }
 
+/* A pressed pill (segmented choices) shows its state in the accent. */
+.pj-btn[aria-pressed="true"] {
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+}
+
 .pj-btn:active {
   transform: translateY(1px);
 }

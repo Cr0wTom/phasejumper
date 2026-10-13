@@ -25,7 +25,12 @@ import { PhaseMap } from "../../components/PhaseMap/PhaseMap";
 import { ICON_STROKE } from "../../icons";
 import { EXAMPLE_TRIP } from "../../exampleTrip";
 import { shortDate } from "../../format";
-import { legalMessages, messages, startMessages as m } from "../../messages";
+import {
+  legalMessages,
+  messages,
+  returnMessages,
+  startMessages as m,
+} from "../../messages";
 import { planHash } from "../../router";
 import { listPlans, type StoredPlan } from "../../storage/plans";
 import {
@@ -48,11 +53,15 @@ function tripLabel(plan: StoredPlan): string {
   const first = legs[0];
   const last = legs[legs.length - 1];
   if (first === undefined || last === undefined) return plan.id;
-  return m.savedTrip(
-    first.departureAirport,
-    last.arrivalAirport,
-    shortDate(first.departureLocal.slice(0, 10)),
-  );
+  const date = shortDate(first.departureLocal.slice(0, 10));
+  if (plan.returnPlanId !== undefined && plan.returnPlanId.length > 0) {
+    return returnMessages.savedRoundTrip(
+      first.departureAirport,
+      last.arrivalAirport,
+      date,
+    );
+  }
+  return m.savedTrip(first.departureAirport, last.arrivalAirport, date);
 }
 
 export function StartScreen() {
@@ -75,6 +84,10 @@ export function StartScreen() {
   }, []);
 
   const featureIcons = [Sun, Lock, CalendarArrowDown] as const;
+  const visiblePlans =
+    saved.status === "ready"
+      ? saved.plans.filter((plan) => plan.outboundPlanId === undefined)
+      : [];
 
   return (
     <main className={pageClass}>
@@ -155,11 +168,11 @@ export function StartScreen() {
           <p role="alert" className={errorClass}>
             {m.savedFailed}
           </p>
-        ) : saved.plans.length === 0 ? (
+        ) : visiblePlans.length === 0 ? (
           <p className="text-fg-muted">{m.savedNone}</p>
         ) : (
           <ul className="pj-card divide-y divide-line overflow-hidden p-0">
-            {saved.plans.map((plan) => (
+            {visiblePlans.map((plan) => (
               <li key={plan.id}>
                 <a className="pj-list-link" href={planHash(plan.id)}>
                   <span>{tripLabel(plan)}</span>

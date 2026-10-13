@@ -394,3 +394,30 @@ export const feedbackMessages = {
   privacyLink: "privacy notice",
   reportUnavailable: "(not available)",
 } as const;
+
+/** Round trips (outbound and return plans). Maintainer copy; wire, never edit. */
+export const returnMessages = {
+  heading: "Return flights",
+  hint: "Add your flights home to plan the way back too. Times are local to each airport.",
+  add: "Add return flights",
+  addLeg: "Add another return flight",
+  removeAll: "Remove return flights",
+  legHeading: (index: number): string => `Return flight ${index}`,
+  removeLeg: (index: number): string => `Remove return flight ${index}`,
+  tripDaysFromFlights: (days: number): string =>
+    days === 1
+      ? "1 day at your destination, from your flights."
+      : `${days} days at your destination, from your flights.`,
+  beforeArrival:
+    "Your return flight leaves before you arrive. Check the dates and times.",
+  detected:
+    "Your last flight goes back to where you started after a stay. Are these your flights home?",
+  moveToReturn: "Move them to return flights",
+  partsLabel: "Plan",
+  outbound: "Outbound",
+  return: "Return",
+  shortStay:
+    "Your stay is short, so the plan keeps you on home time and no return plan is needed.",
+  savedRoundTrip: (from: string, to: string, date: string): string =>
+    `${from} to ${to} and back, ${date}`,
+} as const;

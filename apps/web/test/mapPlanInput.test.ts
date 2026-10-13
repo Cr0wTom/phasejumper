@@ -54,6 +54,7 @@ function form(overrides: Partial<TripFormValues> = {}): TripFormValues {
     ],
     mustBeAwake: [],
     noWorkoutWindows: [],
+    returnLegs: [],
     tripDays: "",
     ...overrides,
   };
