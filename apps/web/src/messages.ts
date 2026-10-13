@@ -421,3 +421,22 @@ export const returnMessages = {
   savedRoundTrip: (from: string, to: string, date: string): string =>
     `${from} to ${to} and back, ${date}`,
 } as const;
+
+/** Shared plans and per-plan delete. Maintainer copy (privacy); never edit. */
+export const sharedMessages = {
+  label: "Shared plan",
+  notice:
+    "Someone shared this plan with you. It is shown on this device and is not saved unless you save it.",
+  save: "Save to my plans",
+  saving: "Saving…",
+  saveFailed:
+    "This plan could not be saved on this device. Allow site data for this site, then try again.",
+  yourTrips: "Your trips",
+  sharedWithYou: "Shared with you",
+  delete: (label: string): string => `Delete ${label}`,
+  deleteConfirm: "Delete this plan from this device? This cannot be undone.",
+  deleteYes: "Delete",
+  deleteCancel: "Cancel",
+  deleteFailed:
+    "This plan could not be deleted. Reload the page and try again.",
+} as const;

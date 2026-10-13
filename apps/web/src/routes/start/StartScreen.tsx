@@ -18,7 +18,7 @@
 // this device, and the required footer.
 
 import { generatePlan } from "@phasejumper/engine";
-import { CalendarArrowDown, ChevronRight, Lock, Sun } from "lucide-react";
+import { CalendarArrowDown, Lock, Sun } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { BrandMark } from "../../components/BrandMark";
 import { PhaseMap } from "../../components/PhaseMap/PhaseMap";
@@ -29,9 +29,10 @@ import {
   legalMessages,
   messages,
   returnMessages,
+  sharedMessages,
   startMessages as m,
 } from "../../messages";
-import { planHash } from "../../router";
+import { SavedPlanList } from "./SavedPlanList";
 import { listPlans, type StoredPlan } from "../../storage/plans";
 import {
   buttonClass,
@@ -68,6 +69,8 @@ export function StartScreen() {
   const example = useMemo(() => generatePlan(EXAMPLE_TRIP), []);
   const [saved, setSaved] = useState<Saved>({ status: "loading" });
 
+  const [version, setVersion] = useState(0);
+
   useEffect(() => {
     let live = true;
     listPlans().then(
@@ -81,13 +84,17 @@ export function StartScreen() {
     return () => {
       live = false;
     };
-  }, []);
+  }, [version]);
 
   const featureIcons = [Sun, Lock, CalendarArrowDown] as const;
   const visiblePlans =
     saved.status === "ready"
       ? saved.plans.filter((plan) => plan.outboundPlanId === undefined)
       : [];
+  // Plans saved from someone else's share link are never mixed with yours.
+  const ownPlans = visiblePlans.filter((plan) => plan.source !== "shared");
+  const sharedPlans = visiblePlans.filter((plan) => plan.source === "shared");
+  const reload = (): void => setVersion((v) => v + 1);
 
   return (
     <main className={pageClass}>
@@ -171,20 +178,32 @@ export function StartScreen() {
         ) : visiblePlans.length === 0 ? (
           <p className="text-fg-muted">{m.savedNone}</p>
         ) : (
-          <ul className="pj-card divide-y divide-line overflow-hidden p-0">
-            {visiblePlans.map((plan) => (
-              <li key={plan.id}>
-                <a className="pj-list-link" href={planHash(plan.id)}>
-                  <span>{tripLabel(plan)}</span>
-                  <ChevronRight
-                    size={16}
-                    strokeWidth={ICON_STROKE}
-                    aria-hidden="true"
-                  />
-                </a>
-              </li>
-            ))}
-          </ul>
+          <>
+            {ownPlans.length === 0 ? null : (
+              <>
+                <h3 className="text-13 font-medium text-fg-muted">
+                  {sharedMessages.yourTrips}
+                </h3>
+                <SavedPlanList
+                  plans={ownPlans}
+                  label={tripLabel}
+                  onDeleted={reload}
+                />
+              </>
+            )}
+            {sharedPlans.length === 0 ? null : (
+              <>
+                <h3 className="mt-2 text-13 font-medium text-fg-muted">
+                  {sharedMessages.sharedWithYou}
+                </h3>
+                <SavedPlanList
+                  plans={sharedPlans}
+                  label={tripLabel}
+                  onDeleted={reload}
+                />
+              </>
+            )}
+          </>
         )}
       </section>
 

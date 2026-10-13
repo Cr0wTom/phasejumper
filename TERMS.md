@@ -1,6 +1,6 @@
 # Terms of use
 
-Version 2, 13 October 2026.
+Version 3, 13 October 2026.
 
 These terms are short on purpose. Please read them before you use PhaseJumper.
 
@@ -50,6 +50,7 @@ These terms are governed by the law of the Federal Republic of Germany. If you l
 
 ## Changelog
 
+- Version 3, 13 October 2026: the privacy notice now says that opening a share link does not save the plan; the terms themselves did not change.
 - Version 2, 13 October 2026: the privacy notice now covers feedback sent by email; the terms themselves did not change.
 - Version 1, 13 October 2026: first version.
 

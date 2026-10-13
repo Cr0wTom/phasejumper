@@ -1,6 +1,6 @@
 # Privacy notice
 
-Version 2, 13 October 2026.
+Version 3, 13 October 2026.
 
 ## The short version
 
@@ -18,7 +18,7 @@ None of this is sent anywhere. To delete it, use **Settings → Forget all trips
 
 ## Files and links you create
 
-- **Share links** contain your trip (flights, usual sleep times and the choices you made) inside the part of the link after the "#". Browsers do not send that part to the website host, so it never reaches us or the host. Anyone you give the link to can see that trip.
+- **Share links** contain your trip (flights, usual sleep times and the choices you made) inside the part of the link after the "#". Browsers do not send that part to the website host, so it never reaches us or the host. Anyone you give the link to can see that trip. Opening a share link shows the plan on that device without saving it; it is saved only if you choose "Save to my plans", and saved shared plans are listed apart from your own trips.
 - **Calendar files and plan exports** are saved to your device. If you import them into a calendar or another service, that service's own terms and privacy notice apply.
 - **Technical report:** if you choose "Copy technical report" in Settings, PhaseJumper copies a short technical summary to your clipboard: the app and planner versions, your browser's user agent, the build's feature switches, a one-way fingerprint of your trip (not the trip itself) and any planner warnings. It is only shared if you paste it somewhere yourself.
 
@@ -50,6 +50,7 @@ Write to feedback@phasejumper.world, or open an issue in the project's GitHub re
 
 ## Changelog
 
+- Version 3, 13 October 2026: opening a share link no longer saves the plan.
 - Version 2, 13 October 2026: feedback by email.
 - Version 1, 13 October 2026: first version.
 
