@@ -81,3 +81,25 @@ test("the arrival date follows the departure date until it is changed", async ({
   await departure.fill("2027-01-22");
   await expect(arrival).toHaveValue("2027-01-21");
 });
+
+test("a half-typed date says what is missing; a 2-digit year is refused", async ({
+  page,
+}) => {
+  await page.goto("#/trip");
+  const departure = page.getByLabel(messages.departureDate, { exact: true });
+  await departure.click();
+  await page.keyboard.type("1104");
+  // Tab moves between the day/month/year parts; leave the field instead.
+  await page.getByRole("heading", { level: 1 }).click();
+  await expect(page.getByText(messages.dateIncomplete)).toBeVisible();
+  // Typing the full date clears it.
+  await departure.click();
+  await page.keyboard.type("11042027");
+  await page.getByRole("heading", { level: 1 }).click();
+  await expect(page.getByText(messages.dateIncomplete)).toHaveCount(0);
+  await expect(departure).toHaveValue(/^2027-/);
+
+  await departure.fill("0026-11-04");
+  await page.getByRole("button", { name: messages.generate }).click();
+  await expect(page.getByText(messages.dateYear).first()).toBeVisible();
+});

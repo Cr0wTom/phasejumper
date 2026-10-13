@@ -86,6 +86,9 @@ function inkFor(kind: BlockKind): string {
 /** Outline around the CBTmin dot so it reads on top of any band. */
 const DOT_OUTLINE = "var(--bg)";
 
+/** Band label size; a band shows its name only if it is this tall + 4 px. */
+const LABEL_FONT = 11;
+
 /** Kinds drawn faintly (lighter weight, no text) so stronger bands read on top. */
 const QUIET: ReadonlySet<BlockKind> = new Set([
   "EXERCISE_AVOID",
@@ -166,6 +169,26 @@ function clockLabel(min: number, withMinutes: boolean): string {
 
 function textFits(label: string, px: number): boolean {
   return label.length * 6.6 + 8 <= px;
+}
+
+/**
+ * Where a band's name starts: at its left edge, or just past a body-clock
+ * dot that would sit on it. Null when it does not fit either way.
+ */
+function labelX(
+  label: string,
+  x0: number,
+  w: number,
+  dots: readonly number[],
+): number | null {
+  const textW = label.length * 6.6;
+  const end = x0 + w - 4;
+  let at = x0 + 4;
+  for (const dot of [...dots].sort((a, b) => a - b)) {
+    if (dot + 6 < at || dot - 6 > at + textW) continue;
+    at = dot + 8;
+  }
+  return at + textW <= end ? at : null;
 }
 
 export function PhaseMap({
@@ -459,6 +482,7 @@ export function PhaseMap({
           {rows.map((row, rowIndex) => {
             const y0 = g.header + rowIndex * g.rowH;
             const past = nowAt !== undefined && rowIndex < nowAt.rowIndex;
+            const dotXs = row.cbtMin.map((c) => x(c.min));
             const list = row.segments;
             return (
               <g
@@ -687,12 +711,14 @@ export function PhaseMap({
                       )}
                       {!seg.point &&
                       !quiet &&
-                      lane.h >= 10 &&
-                      textFits(name, w) ? (
+                      lane.h >= LABEL_FONT + 4 &&
+                      labelX(name, x0, w, dotXs) !== null ? (
                         <text
-                          x={x0 + 4}
-                          y={lane.y + lane.h - Math.round((lane.h - 9) / 2) - 1}
-                          fontSize="11"
+                          x={labelX(name, x0, w, dotXs) ?? x0 + 4}
+                          y={lane.y + lane.h / 2}
+                          dominantBaseline="central"
+                          fontSize={LABEL_FONT}
+                          fontWeight={500}
                           fill={inkFor(seg.block.kind)}
                           aria-hidden="true"
                         >
