@@ -63,6 +63,8 @@ export interface Leg extends Interval {
 export interface TripContext {
   legs: readonly Leg[];
   mustBeAwake: readonly Interval[];
+  /** The hours before each departure: awake, getting to the airport. */
+  preDeparture: readonly Interval[];
   noWorkout: readonly Interval[];
   exerciseEnabled: boolean;
   meditationEnabled: boolean;
@@ -251,7 +253,12 @@ function applyMustBeAwake(
   const result: RawBlock[] = [];
   for (const b of blocks) {
     if (b.kind === "SLEEP") {
-      const events = trip.mustBeAwake.filter((e) => overlaps(b, e));
+      const beforeFlight = trip.preDeparture.filter((e) => overlaps(b, e));
+      if (beforeFlight.length > 0) out.warnings.push("SLEEP_BEFORE_FLIGHT");
+      const events = [
+        ...trip.mustBeAwake.filter((e) => overlaps(b, e)),
+        ...beforeFlight,
+      ];
       if (events.length === 0) {
         result.push(b);
         continue;

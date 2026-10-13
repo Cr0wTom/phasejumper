@@ -68,8 +68,8 @@ Every number the model uses, as defined in [`packages/engine/src/prc.ts`](../pac
 | `CAFFEINE.stopBeforeSleepHours.heavy` | 9 h | Same, heavy caffeine users | R11 |
 | `CAFFEINE.advanceStopAfterCbtMinHours` | 8 h | Advancing: also stop by CBTmin + this | R10 |
 | `CAFFEINE.lateOkBeforeSleepHours` | 6 h | Delaying behind schedule: late caffeine until sleep minus this | R10 |
-| `NAP.minutes` | 20 h | Nap length | R12 |
-| `NAP.minutesAfterShortSleep` | 90 h | Nap length after under 4 h of sleep | R12 |
+| `NAP.minutes` | 20 min | Nap length | R12 |
+| `NAP.minutesAfterShortSleep` | 90 min | Nap length after under 4 h of sleep | R12 |
 | `NAP.shortSleepHours` | 4 h | "Short sleep" for nap length | R12 |
 | `NAP.endBeforeSleepHours` | 8 h | A ground nap ends at least this long before sleep | R12 |
 | `MEALS.afterWakeHours` | 1 h | First meal marker after wake | — |
@@ -85,6 +85,8 @@ Every number the model uses, as defined in [`packages/engine/src/prc.ts`](../pac
 | `FEASIBILITY.minBlockMinutes` | 15 min | Trimmed blocks shorter than this are dropped | — |
 | `FEASIBILITY.walkMinutes` | 30 min | Optional walk at the arrival airport | — |
 | `FEASIBILITY.walkBeforeSleepHours` | 3 h | Walk only if it ends this long before sleep | R9 |
+| `FEASIBILITY.awakeBeforeDepartureHours` | 3 h | Awake this long before every departure (getting to the airport); sleep ends here | — |
+| `FEASIBILITY.earlierBedtimeMaxMinutes` | 60 min | When that cuts a night, bedtime moves at most this much earlier; the rest is a nap | R1, R12 |
 | `DAYLIGHT.sunUpAltitudeDegrees` | −0.35° | Sun below this apparent altitude counts as dark | — |
 | `DAYLIGHT.sampleMinutes` | 5 min | Daylight is checked at this interval | — |
 | `MARKER_MINUTES` | 5 min | Length of point events (caffeine stop, meals) | — |

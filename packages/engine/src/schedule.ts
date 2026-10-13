@@ -46,6 +46,7 @@ import {
 import {
   CAFFEINE,
   EXERCISE,
+  FEASIBILITY,
   LIGHT,
   MARKER_MINUTES,
   MEALS,
@@ -97,7 +98,7 @@ import type {
 } from "./types";
 
 /** Bumped whenever plan output changes (§7.4). */
-export const ENGINE_VERSION = "0.2.0";
+export const ENGINE_VERSION = "0.3.0";
 
 /** Guard against a non-terminating loop; weak days at half rate stay far below. */
 const MAX_PLAN_DAYS = 60;
@@ -142,6 +143,8 @@ interface PlanContext {
   direction: Direction;
   shifting: boolean;
   sleepReason: (frame: DayFrame) => ReasonCode;
+  /** Bedtime for the night around `cbtMin`, moved earlier before a flight. */
+  sleepStart: (cbtMin: Instant) => Instant;
 }
 
 interface BuiltDay {
@@ -239,14 +242,14 @@ function buildRaw(
     }
   };
   const wake = wakeOf(frame.cbtMin, phase);
-  const nextSleep = sleepStartOf(frame.nextCbtMin, phase);
+  const nextSleep = ctx.sleepStart(frame.nextCbtMin);
   const nextWake = wakeOf(frame.nextCbtMin, phase);
   const at = (hours: number): Instant => plus(frame.cbtMin, hours * 60);
   const shiftingToday = ctx.shifting && frame.shift > 0;
   let lightShifted = false;
   let melatoninDropped = false;
 
-  add("SLEEP", sleepStartOf(frame.cbtMin, phase), wake, ctx.sleepReason(frame));
+  add("SLEEP", ctx.sleepStart(frame.cbtMin), wake, ctx.sleepReason(frame));
 
   if (shiftingToday) {
     // Light (R2, R3).
@@ -424,9 +427,9 @@ function buildDay(
     raw,
     {
       index: frame.index,
-      sleepStart: sleepStartOf(frame.cbtMin, ctx.phase),
+      sleepStart: ctx.sleepStart(frame.cbtMin),
       wake: wakeOf(frame.cbtMin, ctx.phase),
-      nextSleepStart: sleepStartOf(frame.nextCbtMin, ctx.phase),
+      nextSleepStart: ctx.sleepStart(frame.nextCbtMin),
     },
     ctx.trip,
   );
@@ -543,8 +546,13 @@ export function generatePlan(
 
   const constraints = input.constraints ?? {};
   const zoneAt = zoneLocator(input, legs);
+  const preDeparture: Interval[] = legs.map((l) => ({
+    start: plus(l.start, -FEASIBILITY.awakeBeforeDepartureHours * 60),
+    end: l.start,
+  }));
   const trip: TripContext = {
     legs,
+    preDeparture,
     mustBeAwake: (constraints.mustBeAwake ?? []).map((e) =>
       localInterval(e.start, e.end, e.tz),
     ),
@@ -572,6 +580,18 @@ export function generatePlan(
         : decision.direction === "short-trip"
           ? () => "SLEEP_HOME_TIME"
           : (f) => (f.shift > 0 ? "SLEEP_SHIFTING" : "SLEEP_SETTLED"),
+    sleepStart: (cbtMin) => {
+      const start = sleepStartOf(cbtMin, phase);
+      const wake = wakeOf(cbtMin, phase);
+      // A departure buffer that begins after bedtime cuts the end of this
+      // night; recover up to an hour of it by going to bed earlier.
+      const cut = preDeparture.find(
+        (p) => compare(p.start, start) > 0 && compare(p.start, wake) < 0,
+      );
+      if (cut === undefined) return start;
+      const lost = minutesBetween(cut.start, wake);
+      return plus(start, -Math.min(FEASIBILITY.earlierBedtimeMaxMinutes, lost));
+    },
   };
 
   const steady = (cbtMin: Instant, index: number): DayFrame => ({
