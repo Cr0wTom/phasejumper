@@ -92,6 +92,6 @@ No request leaves the page.
 ## Build and deploy
 
 - **CI** (`ci.yml`, every pull request): `pnpm install --frozen-lockfile`, `check:terms`, lint, typecheck, test, build; a second job runs the Playwright end-to-end tests in Chromium (`pnpm test:e2e`) and a Lighthouse accessibility check on the trip form (fails below 95).
-- **Pages** (`pages.yml`, push to `main`): build → `actions/upload-pages-artifact` → `actions/deploy-pages`. Site: https://cr0wtom.github.io/phasejumper/
+- **Pages** (`pages.yml`, push to `main`): build → `actions/upload-pages-artifact` → `actions/deploy-pages`. Site: https://phasejumper.world/ (custom domain; built with `VITE_BASE_PATH=/`)
 - The base path comes from `VITE_BASE_PATH` (default `/phasejumper/`); set it to `/` to serve from a custom domain root.
 - Rollback: revert the merge commit; Pages redeploys in about a minute.

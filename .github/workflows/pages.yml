@@ -50,8 +50,11 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build
-        # Default VITE_BASE_PATH is /phasejumper/ (GitHub Pages).
-        # A custom-domain root is this same build with VITE_BASE_PATH=/.
+        # The site is served from the root of https://phasejumper.world (the
+        # repository's Pages custom domain). Tests keep the /phasejumper/
+        # default so a sub-path build stays working.
+        env:
+          VITE_BASE_PATH: /
         run: pnpm build
 
       - name: Upload Pages artifact
