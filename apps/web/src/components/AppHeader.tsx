@@ -15,15 +15,21 @@
  */
 
 import { messages } from "../messages";
+import type { Route } from "../router";
+import { BrandMark } from "./BrandMark";
+import { NavBar } from "./NavBar";
 
-// The theme switch lives in Settings (T13).
-export function AppHeader() {
+// A floating glass bar: the brand links to Start; the navigation sits in the
+// bar from 768 px and docks to the bottom of the screen on phones.
+export function AppHeader({ route }: { route: Route }) {
   return (
     <header className="pj-header">
       <div className="pj-header-bar">
         <a className="pj-brand" href="#/">
-          {messages.title}
+          <BrandMark />
+          <span>{messages.title}</span>
         </a>
+        <NavBar route={route} />
       </div>
     </header>
   );
