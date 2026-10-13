@@ -23,12 +23,10 @@ import { TextField } from "../../components/fields";
 import { messages } from "../../messages";
 import {
   buttonClass,
-  controlClass,
   errorClass,
   h2Class,
   h3Class,
   hintClass,
-  labelClass,
   surfaceClass,
 } from "../../ui";
 import { fieldDomId, type FieldErrors, type LegForm } from "./schema";
@@ -38,13 +36,6 @@ export function FlightsSection({
   errors,
   airports,
   airportsError,
-  paste,
-  pasteError,
-  unparsed,
-  readDisabled,
-  reviewed,
-  onPaste,
-  onRead,
   onChangeLeg,
   onAdd,
   onRemove,
@@ -53,13 +44,6 @@ export function FlightsSection({
   errors: FieldErrors;
   airports: readonly SearchableAirport[] | null;
   airportsError: string | null;
-  paste: string;
-  pasteError: string | null;
-  unparsed: readonly string[];
-  readDisabled: boolean;
-  reviewed: (legId: string, field: string) => boolean;
-  onPaste: (value: string) => void;
-  onRead: () => void;
   onChangeLeg: (index: number, patch: Partial<LegForm>) => void;
   onAdd: () => void;
   onRemove: (index: number) => void;
@@ -70,42 +54,6 @@ export function FlightsSection({
         {messages.flightsHeading}
       </h2>
       <p className={hintClass}>{messages.localTimesHint}</p>
-      <div className="flex flex-col gap-2">
-        <label htmlFor="itinerary-paste" className={labelClass}>
-          {messages.pasteLabel}
-        </label>
-        <textarea
-          id="itinerary-paste"
-          className={`${controlClass} min-h-32 resize-y`}
-          value={paste}
-          onChange={(event) => onPaste(event.target.value)}
-          spellCheck={false}
-          autoComplete="off"
-        />
-        <button
-          type="button"
-          className={`${buttonClass} self-start`}
-          onClick={onRead}
-          disabled={readDisabled}
-        >
-          {messages.readFlights}
-        </button>
-        {pasteError === null ? null : (
-          <p role="alert" className={errorClass}>
-            {pasteError}
-          </p>
-        )}
-        {unparsed.length === 0 ? null : (
-          <div>
-            <p>{messages.pasteUnparsed}</p>
-            <ul className="mt-2 list-disc pl-5">
-              {unparsed.map((line, index) => (
-                <li key={`${index}-${line}`}>{line}</li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </div>
       {airports === null && airportsError === null ? (
         <p>{messages.airportsLoading}</p>
       ) : null}
@@ -138,9 +86,6 @@ export function FlightsSection({
                 airports={airports}
                 disabled={airports === null}
                 error={errors[`legs.${index}.fromIata`]}
-                review={
-                  reviewed(leg.id, "fromIata") ? messages.checkThis : undefined
-                }
                 onQueryChange={(fromQuery) =>
                   onChangeLeg(index, { fromQuery, fromIata: "" })
                 }
@@ -158,9 +103,6 @@ export function FlightsSection({
                 airports={airports}
                 disabled={airports === null}
                 error={errors[`legs.${index}.toIata`]}
-                review={
-                  reviewed(leg.id, "toIata") ? messages.checkThis : undefined
-                }
                 onQueryChange={(toQuery) =>
                   onChangeLeg(index, { toQuery, toIata: "" })
                 }
@@ -177,11 +119,6 @@ export function FlightsSection({
                 type="date"
                 value={leg.departureDate}
                 error={errors[`legs.${index}.departureDate`]}
-                review={
-                  reviewed(leg.id, "departureDate")
-                    ? messages.checkThis
-                    : undefined
-                }
                 required
                 onChange={(departureDate) =>
                   onChangeLeg(index, { departureDate })
@@ -193,11 +130,6 @@ export function FlightsSection({
                 type="time"
                 value={leg.departureTime}
                 error={errors[`legs.${index}.departureTime`]}
-                review={
-                  reviewed(leg.id, "departureTime")
-                    ? messages.checkThis
-                    : undefined
-                }
                 required
                 onChange={(departureTime) =>
                   onChangeLeg(index, { departureTime })
@@ -209,11 +141,6 @@ export function FlightsSection({
                 type="date"
                 value={leg.arrivalDate}
                 error={errors[`legs.${index}.arrivalDate`]}
-                review={
-                  reviewed(leg.id, "arrivalDate")
-                    ? messages.checkThis
-                    : undefined
-                }
                 required
                 onChange={(arrivalDate) => onChangeLeg(index, { arrivalDate })}
               />
@@ -223,11 +150,6 @@ export function FlightsSection({
                 type="time"
                 value={leg.arrivalTime}
                 error={errors[`legs.${index}.arrivalTime`]}
-                review={
-                  reviewed(leg.id, "arrivalTime")
-                    ? messages.checkThis
-                    : undefined
-                }
                 required
                 onChange={(arrivalTime) => onChangeLeg(index, { arrivalTime })}
               />
@@ -238,11 +160,6 @@ export function FlightsSection({
               hint={messages.flightNumberHint}
               value={leg.flightNumber}
               error={errors[`legs.${index}.flightNumber`]}
-              review={
-                reviewed(leg.id, "flightNumber")
-                  ? messages.checkThis
-                  : undefined
-              }
               onChange={(flightNumber) => onChangeLeg(index, { flightNumber })}
             />
             {legs.length > 1 ? (

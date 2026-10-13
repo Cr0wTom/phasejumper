@@ -205,9 +205,6 @@ importers:
       '@phasejumper/ical':
         specifier: workspace:*
         version: link:../../packages/ical
-      '@phasejumper/itinerary':
-        specifier: workspace:*
-        version: link:../../packages/itinerary
       idb-keyval:
         specifier: 6.3.0
         version: 6.3.0
