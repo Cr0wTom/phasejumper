@@ -32,7 +32,19 @@ function realDate(value: string): boolean {
 
 const timeField = z.string().trim().regex(TIME, messages.timeInvalid);
 
-const dateField = z.string().trim().refine(realDate, messages.dateInvalid);
+/** Plans are for real trips; a 2-digit year typed as "26" reads as 0026. */
+const YEARS = { min: 2020, max: 2100 } as const;
+
+function plausibleYear(value: string): boolean {
+  const year = Number(value.slice(0, 4));
+  return year >= YEARS.min && year <= YEARS.max;
+}
+
+const dateField = z
+  .string()
+  .trim()
+  .refine(realDate, messages.dateInvalid)
+  .refine(plausibleYear, messages.dateYear);
 
 const preAdjustDays = z.union(
   [z.literal(0), z.literal(1), z.literal(2), z.literal(3)],

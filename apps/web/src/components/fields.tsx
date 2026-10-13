@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import { useId, type ReactNode } from "react";
+import { useId, useState, type ReactNode } from "react";
+import { messages } from "../messages";
 import {
   controlClass,
   errorClass,
@@ -95,8 +96,22 @@ export function TextField({
   /** "date" and "time" use the platform's own picker (values YYYY-MM-DD, HH:MM). */
   type?: "text" | "date" | "time";
 }) {
+  // A native date/time box can show a half-typed value while reporting ""
+  // (validity.badInput). Say what is missing instead of "Choose a date."
+  const [incomplete, setIncomplete] = useState(false);
+  const shownError = incomplete
+    ? type === "date"
+      ? messages.dateIncomplete
+      : messages.timeUnreadable
+    : error;
   return (
-    <FieldFrame id={id} label={label} hint={hint} review={review} error={error}>
+    <FieldFrame
+      id={id}
+      label={label}
+      hint={hint}
+      review={review}
+      error={shownError}
+    >
       {(described) => (
         <input
           id={id}
@@ -107,8 +122,16 @@ export function TextField({
               : `${controlClass} ring-1 ring-inset ring-fg`
           }
           value={value}
-          onChange={(event) => onChange(event.target.value)}
-          aria-invalid={error === undefined ? undefined : true}
+          onChange={(event) => {
+            setIncomplete(false);
+            onChange(event.target.value);
+          }}
+          onBlur={(event) => {
+            if (type !== "text") {
+              setIncomplete(event.currentTarget.validity.badInput);
+            }
+          }}
+          aria-invalid={shownError === undefined ? undefined : true}
           aria-describedby={described}
           aria-required={required ? true : undefined}
           autoComplete="off"
