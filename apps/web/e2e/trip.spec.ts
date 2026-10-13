@@ -135,7 +135,8 @@ test("completes the form with the keyboard only", async ({ page }) => {
   await page.keyboard.type("01012027");
   await tabUntil(page, messages.arrivalTime);
   await page.keyboard.type("1100A");
-  // The fields must hold exactly what was typed, whatever the layout.
+  // Desktop time fields keep the typed text until blur, then show HH:MM.
+  await labeled(page, messages.arrivalTime).blur();
   await expect(labeled(page, messages.departureDate)).toHaveValue("2027-01-01");
   await expect(labeled(page, messages.departureTime)).toHaveValue("10:00");
   await expect(labeled(page, messages.arrivalTime)).toHaveValue("11:00");
@@ -157,17 +158,20 @@ test("the trip form has no Confirmation text field", async ({ page }) => {
   await expect(labeled(page, "Confirmation text")).toHaveCount(0);
 });
 
-test("uses native date and time pickers", async ({ page }) => {
+test("uses a native date picker and a time combobox on desktop", async ({
+  page,
+}) => {
   await page.goto("#/trip");
-  await expect(labeled(page, messages.bedtime)).toHaveAttribute("type", "time");
+  const bedtime = labeled(page, messages.bedtime);
+  await expect(bedtime).toHaveAttribute("role", "combobox");
+  await expect(bedtime).toHaveAttribute("type", "text");
   await expect(labeled(page, messages.departureDate)).toHaveAttribute(
     "type",
     "date",
   );
-  await expect(labeled(page, messages.departureTime)).toHaveAttribute(
-    "type",
-    "time",
-  );
+  const departureTime = labeled(page, messages.departureTime);
+  await expect(departureTime).toHaveAttribute("role", "combobox");
+  await expect(departureTime).toHaveAttribute("type", "text");
 });
 
 test("shows a field error when arrival is before departure", async ({

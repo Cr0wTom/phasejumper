@@ -19,6 +19,7 @@ import {
   type SearchableAirport,
 } from "../../airports/searchAirports";
 import { AirportCombobox } from "../../components/AirportCombobox";
+import { TimeField } from "../../components/TimeField";
 import { TextField } from "../../components/fields";
 import { messages } from "../../messages";
 import {
@@ -124,10 +125,9 @@ export function FlightsSection({
                   onChangeLeg(index, { departureDate })
                 }
               />
-              <TextField
+              <TimeField
                 id={fieldDomId(`legs.${index}.departureTime`)}
                 label={messages.departureTime}
-                type="time"
                 value={leg.departureTime}
                 error={errors[`legs.${index}.departureTime`]}
                 required
@@ -144,10 +144,9 @@ export function FlightsSection({
                 required
                 onChange={(arrivalDate) => onChangeLeg(index, { arrivalDate })}
               />
-              <TextField
+              <TimeField
                 id={fieldDomId(`legs.${index}.arrivalTime`)}
                 label={messages.arrivalTime}
-                type="time"
                 value={leg.arrivalTime}
                 error={errors[`legs.${index}.arrivalTime`]}
                 required

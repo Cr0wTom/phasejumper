@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { TimeField } from "../../components/TimeField";
 import { CheckboxField, SelectField, TextField } from "../../components/fields";
 import { legalMessages, messages } from "../../messages";
 import { h2Class, labelClass, surfaceClass } from "../../ui";
@@ -39,20 +40,18 @@ export function YouSection({
         {messages.youHeading}
       </h2>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <TextField
+        <TimeField
           id={fieldDomId("habitualBedtime")}
           label={messages.bedtime}
-          type="time"
           hint={messages.bedtimeHint}
           value={form.habitualBedtime}
           error={errors.habitualBedtime}
           required
           onChange={(habitualBedtime) => onChange({ habitualBedtime })}
         />
-        <TextField
+        <TimeField
           id={fieldDomId("habitualWake")}
           label={messages.wake}
-          type="time"
           hint={messages.wakeHint}
           value={form.habitualWake}
           error={errors.habitualWake}
