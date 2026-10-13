@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="apps/web/public/icons/icon-192.png" width="96" height="96" alt="PhaseJumper icon">
+  <img src="docs/assets/icon.png" width="128" height="128" alt="PhaseJumper icon">
 </p>
 
 <h1 align="center">PhaseJumper</h1>
@@ -25,13 +25,6 @@
 Enter your flights and sleep habits, and PhaseJumper lays out day by day when to sleep, seek light and avoid it so your body clock lands on destination time.
 No account, no server, no tracking: your trip never leaves your device.
 
-<p align="center">
-  <img src="docs/assets/plan-phone.png" width="250" alt="The plan on a phone">
-  &nbsp;
-  <img src="docs/assets/today-phone.png" width="250" alt="Today on a phone">
-  &nbsp;
-  <img src="docs/assets/trip-phone.png" width="250" alt="Planning a trip on a phone">
-</p>
 
 ## Quick start
 
