@@ -74,6 +74,7 @@ export function createDefaultForm(): TripFormValues {
     meditationEnabled: false,
     mealTimingEnabled: false,
     preAdjustDays: 0,
+    arrivalStyle: "body-clock",
     legs: [emptyLeg()],
     returnLegs: [],
     mustBeAwake: [],
@@ -132,6 +133,7 @@ export function formFromPlanInput(
     meditationEnabled: t.meditation.enabled,
     mealTimingEnabled: t.mealTiming.enabled,
     preAdjustDays: t.preAdjustDays,
+    arrivalStyle: t.arrivalStyle ?? "body-clock",
     legs: input.itinerary.legs.map(toLeg),
     returnLegs,
     mustBeAwake: (input.constraints?.mustBeAwake ?? []).map((event) => ({

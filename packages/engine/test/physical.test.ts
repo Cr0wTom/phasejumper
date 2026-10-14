@@ -124,15 +124,15 @@ function audit(trips: fc.Arbitrary<PlanInput>, seed: number): string[] {
           hit("R3 sleep in the awake time before a departure", tag(b));
         if (
           b.kind === "SLEEP" &&
-          legs.some((f) => ov(i, { s: f.e, e: f.e + H }))
+          legs.some((f) => ov(i, { s: f.e, e: f.e + 2 * H }))
         )
-          hit("R3b sleep within 1 h after landing", tag(b));
+          hit("R3b sleep within 2 h after landing", tag(b));
         if (
           b.kind === "NAP" &&
           !legs.some((f) => i.s >= f.s && i.e <= f.e) &&
           legs.some(
             (f) =>
-              ov(i, { s: f.e, e: f.e + H }) ||
+              ov(i, { s: f.e, e: f.e + 2 * H }) ||
               ov(i, { s: f.s - f.before, e: f.s }),
           )
         )

@@ -103,3 +103,14 @@ test("a half-typed date says what is missing; a 2-digit year is refused", async 
   await page.getByRole("button", { name: messages.generate }).click();
   await expect(page.getByText(messages.dateYear).first()).toBeVisible();
 });
+
+test("the arrival-day choice defaults to following the body clock", async ({
+  page,
+}) => {
+  await page.goto("#/trip");
+  const choice = page.getByLabel(messages.arrivalStyle, { exact: true });
+  await expect(choice).toHaveValue("body-clock");
+  await choice.selectOption("local");
+  await expect(choice).toHaveValue("local");
+  await expect(page.getByText(messages.arrivalStyleHint)).toBeVisible();
+});

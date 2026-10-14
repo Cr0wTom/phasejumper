@@ -43,6 +43,11 @@ export const messages = {
   windDown: "Wind-down",
   meals: "Meals",
   preAdjust: "Days to shift before you fly",
+  arrivalStyle: "On arrival day",
+  arrivalStyleBodyClock: "Follow my body clock (recommended)",
+  arrivalStyleLocal: "Switch to local time faster",
+  arrivalStyleHint:
+    "Faster means a short nap after landing and bed by 22:00 local time. You'll feel more tired that day, and full adjustment may take about a day longer.",
   preAdjustOption: (days: number): string =>
     days === 1 ? "1 day" : `${days} days`,
   fromAirport: "From",

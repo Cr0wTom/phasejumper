@@ -75,6 +75,8 @@ export function reasonCopy(code: ReasonCode): string {
       return "It's dark outside, so bright indoor light or a 10 000 lux lamp does the job now.";
     case "NAP_SHORT_SLEEP":
       return "A short nap here makes up for a short night.";
+    case "NAP_ARRIVAL":
+      return "A short nap after landing; your main sleep moves to the local evening.";
     case "NSDR":
       return "A short rest here helps after a long flight; you don't need to fall asleep.";
     case "EXERCISE_OPTIONAL_WALK":
@@ -90,6 +92,8 @@ export function warningCopy(code: WarningCode): string {
       return "Your sleep times don't match your chronotype, so the plan uses your sleep times and keeps wider margins around light.";
     case "LIGHT_BLOCK_SHIFTED":
       return "The best light time falls while you sleep, so light windows sit just before your sleep instead.";
+    case "ARRIVAL_LOCAL_TIME":
+      return "You chose to switch to local time faster: expect to feel more tired on arrival day, and full adjustment may take about a day longer.";
     case "SLEEP_BEFORE_FLIGHT":
       return "Your night ends 3 hours before your flight so you have time to get to the airport. Bedtime moves up to an hour earlier, and if the night is still short the plan adds a nap.";
     case "SHORT_SLEEP_DAY":

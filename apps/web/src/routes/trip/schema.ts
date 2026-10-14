@@ -109,6 +109,9 @@ export const tripFormSchema = z
     meditationEnabled: z.boolean(),
     mealTimingEnabled: z.boolean(),
     preAdjustDays,
+    arrivalStyle: z.enum(["body-clock", "local"], {
+      error: messages.fieldInvalid,
+    }),
     legs: z.array(legSchema).min(1, messages.legsRequired),
     returnLegs: z.array(legSchema),
     mustBeAwake: z.array(awakeSchema),

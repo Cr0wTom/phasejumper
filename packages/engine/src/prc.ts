@@ -160,13 +160,28 @@ export const FEASIBILITY = {
    * of the lost sleep is recovered with a nap instead (R1).
    */
   earlierBedtimeMaxMinutes: 60,
-  /** Awake after every landing: leaving the plane and getting to a bed. */
-  awakeAfterArrivalMinutes: 60,
+  /** Awake after every landing: passport control, baggage, getting to a bed. */
+  awakeAfterArrivalMinutes: 120,
   /**
    * A ground sleep left shorter than this after flights and must-be-awake
    * events is not shown as "Sleep"; the short-sleep nap covers it instead.
    */
   minSleepMinutes: 120,
+} as const;
+
+/**
+ * "Switch to local time faster" (traveler.arrivalStyle "local"): practical,
+ * not from the cited studies. A daytime sleep after the final landing is cut
+ * to a nap, and the next night starts by the local bedtime below.
+ */
+export const ARRIVAL_LOCAL = {
+  napMaxMinutes: 90,
+  /** A ground sleep whose middle falls between these local hours is "daytime". */
+  daytimeFromHour: 8,
+  daytimeToHour: 20,
+  localBedtimeHour: 22,
+  /** The local bedtime applies only if it is at least this long after landing + 2 h. */
+  minAwakeBeforeBedHours: 4,
 } as const;
 
 /** Daylight check (§2.7 rule 3), via suncalc. */

@@ -116,17 +116,6 @@
           "movable": false
         },
         {
-          "kind": "SLEEP",
-          "startUtc": "2027-03-26T08:00:00Z",
-          "endUtc": "2027-03-26T10:00:00Z",
-          "localTz": "Europe/London",
-          "reasonCode": "SLEEP_SHIFTING",
-          "reason": "Sleep in this window; it moves a little each day with your clock.",
-          "source": "R1",
-          "confidence": "A",
-          "movable": false
-        },
-        {
           "kind": "SEEK_LIGHT",
           "startUtc": "2027-03-26T10:00:00Z",
           "endUtc": "2027-03-26T11:00:00Z",

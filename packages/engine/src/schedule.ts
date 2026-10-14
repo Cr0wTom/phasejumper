@@ -44,6 +44,7 @@ import {
   type ForecastState,
 } from "./forecast";
 import {
+  ARRIVAL_LOCAL,
   CAFFEINE,
   EXERCISE,
   FEASIBILITY,
@@ -71,15 +72,16 @@ import {
   type PhaseEstimate,
 } from "./phase";
 import {
+  type Instant,
+  type Interval,
   compare,
   earlier,
   later,
+  length,
   minutesBetween,
   overlaps,
   plus,
   subtract,
-  type Instant,
-  type Interval,
 } from "./time";
 import type {
   Block,
@@ -147,6 +149,8 @@ interface PlanContext {
   sleepReason: (frame: DayFrame) => ReasonCode;
   /** Bedtime for the night around `cbtMin`, moved earlier before a flight. */
   sleepStart: (cbtMin: Instant) => Instant;
+  /** Arrival style "local": the night from `start` to `wake` becomes a nap. */
+  arrivalNap: (start: Instant, wake: Instant) => boolean;
 }
 
 interface BuiltDay {
@@ -450,6 +454,10 @@ function buildDay(
       sleepStart: ctx.sleepStart(frame.cbtMin),
       wake: wakeOf(frame.cbtMin, ctx.phase),
       nextSleepStart: ctx.sleepStart(frame.nextCbtMin),
+      arrivalNap: ctx.arrivalNap(
+        ctx.sleepStart(frame.cbtMin),
+        wakeOf(frame.cbtMin, ctx.phase),
+      ),
     },
     ctx.trip,
   );
@@ -605,6 +613,27 @@ export function generatePlan(
   };
   const shifting =
     decision.direction === "advance" || decision.direction === "delay";
+  // Arrival style "local" (practical, opt-in): only for plans that shift.
+  const finalLanding = legs[legs.length - 1]?.end;
+  const outOfAirport =
+    traveler.arrivalStyle === "local" && shifting && finalLanding !== undefined
+      ? plus(finalLanding, FEASIBILITY.awakeAfterArrivalMinutes)
+      : undefined;
+  const localBedtime = (() => {
+    if (outOfAirport === undefined) return undefined;
+    const bed = outOfAirport
+      .toZonedDateTimeISO(destinationTz)
+      .toPlainDate()
+      .toZonedDateTime({
+        timeZone: destinationTz,
+        plainTime: new Temporal.PlainTime(ARRIVAL_LOCAL.localBedtimeHour),
+      })
+      .toInstant();
+    return minutesBetween(outOfAirport, bed) >=
+      ARRIVAL_LOCAL.minAwakeBeforeBedHours * 60
+      ? bed
+      : undefined;
+  })();
   const direction = decision.shiftDirection;
   const ctx: PlanContext = {
     input,
@@ -622,6 +651,15 @@ export function generatePlan(
     sleepStart: (cbtMin) => {
       const start = sleepStartOf(cbtMin, phase);
       const wake = wakeOf(cbtMin, phase);
+      // Arrival style "local": the first night after landing starts at the
+      // local bedtime when the body clock would start it later.
+      if (
+        localBedtime !== undefined &&
+        compare(start, localBedtime) > 0 &&
+        minutesBetween(localBedtime, start) < 12 * 60
+      ) {
+        return localBedtime;
+      }
       // A departure buffer that begins after bedtime cuts the end of this
       // night; recover up to an hour of it by going to bed earlier.
       const cut = preDeparture.find(
@@ -630,6 +668,19 @@ export function generatePlan(
       if (cut === undefined) return start;
       const lost = minutesBetween(cut.start, wake);
       return plus(start, -Math.min(FEASIBILITY.earlierBedtimeMaxMinutes, lost));
+    },
+    arrivalNap: (start, wake) => {
+      if (outOfAirport === undefined) return false;
+      if (compare(wake, outOfAirport) <= 0) return false;
+      if (minutesBetween(outOfAirport, start) > 12 * 60) return false;
+      const ground = { start: later(start, outOfAirport), end: wake };
+      if (length(ground) < 15) return false;
+      const middle = plus(ground.start, Math.round(length(ground) / 2));
+      const hour = middle.toZonedDateTimeISO(destinationTz).hour;
+      return (
+        hour >= ARRIVAL_LOCAL.daytimeFromHour &&
+        hour < ARRIVAL_LOCAL.daytimeToHour
+      );
     },
   };
 

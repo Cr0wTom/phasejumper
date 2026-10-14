@@ -177,6 +177,22 @@ export function YouSection({
           ) : null}
         </>
       ) : null}
+      <SelectField
+        id={fieldDomId("arrivalStyle")}
+        label={messages.arrivalStyle}
+        hint={messages.arrivalStyleHint}
+        value={form.arrivalStyle}
+        error={errors.arrivalStyle}
+        options={[
+          { value: "body-clock", label: messages.arrivalStyleBodyClock },
+          { value: "local", label: messages.arrivalStyleLocal },
+        ]}
+        onChange={(value) => {
+          if (value === "body-clock" || value === "local") {
+            onChange({ arrivalStyle: value });
+          }
+        }}
+      />
     </section>
   );
 }
