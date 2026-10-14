@@ -264,6 +264,8 @@ export function mapTripForm(
       meditation: { enabled: form.meditationEnabled },
       mealTiming: { enabled: form.mealTimingEnabled },
       preAdjustDays: form.preAdjustDays,
+      // Only stored when chosen, so default plans and share links are unchanged.
+      ...(form.arrivalStyle === "local" ? { arrivalStyle: "local" } : {}),
     },
     itinerary: {
       homeTz: first.departureTz,

@@ -38,6 +38,7 @@ function form(overrides: Partial<TripFormValues> = {}): TripFormValues {
     meditationEnabled: false,
     mealTimingEnabled: false,
     preAdjustDays: 0,
+    arrivalStyle: "body-clock",
     legs: [
       {
         id: "leg-1",
@@ -119,6 +120,8 @@ describe("mapTripForm", () => {
       mealTiming: { enabled: false },
       preAdjustDays: 0,
     });
+    // The default arrival style is not stored (share links stay the same).
+    expect(mapped.input.traveler).not.toHaveProperty("arrivalStyle");
 
     const leg = mapped.input.itinerary.legs[0];
     expect(leg).toMatchObject({
@@ -224,5 +227,12 @@ describe("mapTripForm", () => {
     if (!mapped.ok) return;
     expect(mapped.input.traveler.useMelatonin).toBe(true);
     expect(mapped.input.traveler.melatoninContraindicated).toBe(true);
+  });
+
+  it("stores the arrival style only when 'local' is chosen", () => {
+    const mapped = mapTripForm(form({ arrivalStyle: "local" }), lookup, NOW);
+    expect(mapped.ok).toBe(true);
+    if (!mapped.ok) return;
+    expect(mapped.input.traveler.arrivalStyle).toBe("local");
   });
 });

@@ -33,6 +33,7 @@ function validForm(): TripFormValues {
     meditationEnabled: false,
     mealTimingEnabled: false,
     preAdjustDays: 0,
+    arrivalStyle: "body-clock",
     legs: [
       {
         id: "leg-1",

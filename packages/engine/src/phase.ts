@@ -259,6 +259,13 @@ export function validatePlanInput(input: PlanInput): ValidationResult {
   ) {
     issues.push("traveler.sleepNeedHours must be between 0 and 24");
   }
+  if (
+    t.arrivalStyle !== undefined &&
+    t.arrivalStyle !== "body-clock" &&
+    t.arrivalStyle !== "local"
+  ) {
+    issues.push('traveler.arrivalStyle must be "body-clock" or "local"');
+  }
   if (![0, 1, 2, 3].includes(t.preAdjustDays)) {
     issues.push("traveler.preAdjustDays must be 0, 1, 2 or 3");
   }

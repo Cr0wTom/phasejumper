@@ -23,7 +23,7 @@
 import { getPosition } from "suncalc";
 import { Temporal } from "temporal-polyfill";
 import type { AdviceCode, DropCode } from "./copy";
-import { DAYLIGHT, FEASIBILITY, NAP, WIND_DOWN } from "./prc";
+import { ARRIVAL_LOCAL, DAYLIGHT, FEASIBILITY, NAP, WIND_DOWN } from "./prc";
 import { instantAt } from "./phase";
 import {
   compare,
@@ -79,6 +79,11 @@ export interface DayContext {
   sleepStart: Instant;
   wake: Instant;
   nextSleepStart: Instant;
+  /**
+   * Arrival style "local": this day's sleep after the final landing falls in
+   * local daytime, so it becomes a short nap.
+   */
+  arrivalNap?: boolean;
 }
 
 export interface FilterResult {
@@ -342,6 +347,33 @@ function applyMustBeAwake(
       continue;
     }
     result.push(b);
+  }
+
+  // Arrival style "local": a daytime sleep after the final landing becomes
+  // one short nap; the next night starts at the local bedtime instead.
+  const finalLanding = trip.legs[trip.legs.length - 1]?.end;
+  if (day.arrivalNap === true && finalLanding !== undefined) {
+    const after = result.filter(
+      (b) => b.kind === "SLEEP" && compare(b.start, finalLanding) >= 0,
+    );
+    const main = longest(after);
+    if (main !== undefined) {
+      const napEnd = plus(
+        main.start,
+        Math.min(ARRIVAL_LOCAL.napMaxMinutes, length(main)),
+      );
+      const rest = result.filter((b) => !after.includes(b));
+      rest.push({
+        kind: "NAP",
+        reasonCode: "NAP_ARRIVAL",
+        start: main.start,
+        end: napEnd,
+      });
+      result.length = 0;
+      result.push(...rest);
+      out.warnings.push("ARRIVAL_LOCAL_TIME");
+      clip = undefined;
+    }
   }
 
   // A night cut by the airport or an event counts all of its sleep: the

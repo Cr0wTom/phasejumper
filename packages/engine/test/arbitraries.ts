@@ -81,6 +81,7 @@ export const inputs: fc.Arbitrary<PlanInput> = fc
     meditation: fc.boolean(),
     meals: fc.boolean(),
     preAdjustDays: fc.constantFrom(0, 1, 2, 3),
+    arrivalStyle: fc.constantFrom(undefined, "local" as const),
     home: fc.constantFrom(...ZONES),
     destination: fc.constantFrom(...ZONES),
     // 2026-01-01 .. 2028-12-31, minute resolution.
@@ -144,6 +145,9 @@ export const inputs: fc.Arbitrary<PlanInput> = fc
         meditation: { enabled: r.meditation },
         mealTiming: { enabled: r.meals },
         preAdjustDays: r.preAdjustDays,
+        ...(r.arrivalStyle === undefined
+          ? {}
+          : { arrivalStyle: r.arrivalStyle }),
       },
       itinerary: {
         homeTz: r.home,

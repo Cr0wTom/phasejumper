@@ -43,6 +43,12 @@ export interface Traveler {
   meditation: { enabled: boolean; minutes?: number };
   mealTiming: { enabled: boolean };
   preAdjustDays: PreAdjustDays;
+  /**
+   * Arrival day. "body-clock" (default): sleep follows the shifting body
+   * clock. "local": a daytime sleep after the final landing becomes a short
+   * nap, and the next night starts by 22:00 local time.
+   */
+  arrivalStyle?: "body-clock" | "local";
 }
 
 export interface LatLon {
@@ -175,6 +181,7 @@ export const REASON_CODES = [
   "AVOID_LIGHT_INFLIGHT",
   "SEEK_LIGHT_ARTIFICIAL",
   "NAP_SHORT_SLEEP",
+  "NAP_ARRIVAL",
   "NSDR",
   "EXERCISE_OPTIONAL_WALK",
   "CAFFEINE_LATE_OK",
@@ -204,6 +211,7 @@ export const WARNING_CODES = [
   "WEAK_DAY",
   "DAYLIGHT_UNKNOWN",
   "SLEEP_BEFORE_FLIGHT",
+  "ARRIVAL_LOCAL_TIME",
 ] as const;
 
 export type WarningCode = (typeof WARNING_CODES)[number];

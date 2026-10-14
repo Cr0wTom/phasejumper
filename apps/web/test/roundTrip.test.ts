@@ -75,6 +75,7 @@ function form(overrides: Partial<TripFormValues> = {}): TripFormValues {
     meditationEnabled: false,
     mealTimingEnabled: false,
     preAdjustDays: 0,
+    arrivalStyle: "body-clock",
     legs: [
       leg({
         fromIata: "PRG",
