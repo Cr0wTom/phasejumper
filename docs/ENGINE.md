@@ -80,12 +80,14 @@ Every number the model uses, as defined in [`packages/engine/src/prc.ts`](../pac
 | `WIND_DOWN.nsdrWindow.from` | 14:00 | Rest block not before this local time | — |
 | `WIND_DOWN.nsdrWindow.to` | 18:00 | Rest block ends by this local time | — |
 | `WIND_DOWN.nsdrWindow.afterArrivalMinutes` | 60 min | Rest block not before arrival plus this | — |
-| `FEASIBILITY.inflightSleepHours` | 4 h | This much sleep in the air → in-flight sleep | R1 |
+| `FEASIBILITY.inflightSleepMinutes` | 90 min | The in-air part of a night this long or longer is shown as sleep on board | R1 |
 | `FEASIBILITY.shortSleepHours` | 5 h | Less sleep than this → short-sleep day with a nap | R12 |
 | `FEASIBILITY.minBlockMinutes` | 15 min | Trimmed blocks shorter than this are dropped | — |
 | `FEASIBILITY.walkMinutes` | 30 min | Optional walk at the arrival airport | — |
 | `FEASIBILITY.walkBeforeSleepHours` | 3 h | Walk only if it ends this long before sleep | R9 |
 | `FEASIBILITY.awakeBeforeDepartureHours` | 3 h | Awake this long before every departure (getting to the airport); sleep ends here | — |
+| `FEASIBILITY.awakeBeforeConnectionMinutes` | 60 min | Awake before a connecting flight (already at the airport) | — |
+| `FEASIBILITY.connectionMaxHours` | 24 h | A flight leaving within this of the previous landing is a connection | — |
 | `FEASIBILITY.earlierBedtimeMaxMinutes` | 60 min | When that cuts a night, bedtime moves at most this much earlier; the rest is a nap | R1, R12 |
 | `FEASIBILITY.awakeAfterArrivalMinutes` | 60 min | Awake after every landing (leaving the plane, getting to a bed); no ground sleep or nap here | — |
 | `FEASIBILITY.minSleepMinutes` | 120 min | A ground sleep cut shorter than this is not shown; the short-sleep nap covers it | R12 |

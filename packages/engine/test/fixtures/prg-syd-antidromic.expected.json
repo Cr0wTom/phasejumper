@@ -59,17 +59,6 @@
           "movable": false
         },
         {
-          "kind": "EXERCISE_OPTIONAL_WALK",
-          "startUtc": "2026-10-10T18:30:00Z",
-          "endUtc": "2026-10-10T19:00:00Z",
-          "localTz": "Asia/Dubai",
-          "reasonCode": "EXERCISE_OPTIONAL_WALK",
-          "reason": "An easy walk after landing, if you feel like it.",
-          "source": "R9",
-          "confidence": "C",
-          "movable": true
-        },
-        {
           "kind": "EXERCISE_AVOID",
           "startUtc": "2026-10-10T19:00:00Z",
           "endUtc": "2026-10-10T22:00:00Z",
@@ -1374,5 +1363,5 @@
       "reason": "It overlapped a more important window and was too short to keep."
     }
   ],
-  "engineVersion": "0.6.0"
+  "engineVersion": "0.7.0"
 }

@@ -33,7 +33,6 @@ import {
   length,
   longest,
   minutesBetween,
-  overlapMinutes,
   overlaps,
   plus,
   subtract,
@@ -91,7 +90,7 @@ export interface FilterResult {
   daylightUnknown: boolean;
 }
 
-const INFLIGHT_SLEEP_MINUTES = FEASIBILITY.inflightSleepHours * 60;
+const INFLIGHT_SLEEP_MINUTES = FEASIBILITY.inflightSleepMinutes;
 const SHORT_SLEEP_MINUTES = FEASIBILITY.shortSleepHours * 60;
 const MIN_SLEEP_MINUTES = FEASIBILITY.minSleepMinutes;
 
@@ -149,13 +148,17 @@ function applyFlights(
   const result: RawBlock[] = [];
   for (const b of blocks) {
     if (b.kind === "SLEEP") {
-      const inAir = flights.reduce((sum, f) => sum + overlapMinutes(b, f), 0);
-      if (inAir >= INFLIGHT_SLEEP_MINUTES) {
-        // Sleep on board is only the time actually in the air; what falls
-        // on the ground stays ground sleep, so the airport rules apply to it.
-        for (const f of flights) {
-          const air = intersection(b, f);
-          if (air === undefined) continue;
+      const onBoard = flights
+        .map((f) => intersection(b, f))
+        .filter(
+          (air): air is Interval =>
+            air !== undefined && length(air) >= INFLIGHT_SLEEP_MINUTES,
+        );
+      if (onBoard.length > 0) {
+        // The night's in-air part is sleep on board (only the time actually
+        // in the air); what falls on the ground stays ground sleep, so the
+        // airport rules apply to it.
+        for (const air of onBoard) {
           result.push({
             ...air,
             kind: "SLEEP_INFLIGHT",
@@ -166,7 +169,7 @@ function applyFlights(
           const piece = sleepPiece(ground);
           if (piece !== undefined) result.push(withSpan(b, piece));
         }
-      } else if (inAir > 0) {
+      } else if (flights.some((f) => overlaps(b, f))) {
         const kept = sleepPiece(longest(subtract(b, flights)));
         if (kept !== undefined) result.push(withSpan(b, kept));
         const flight = flights.find((f) => overlaps(b, f));
@@ -226,9 +229,14 @@ function applyFlights(
         b.reasonCode === "EXERCISE_AVOID_DIRECTION"
       ),
   );
-  const arrivals = trip.legs.filter((l) =>
-    contains({ start: day.wake, end: day.nextSleepStart }, l.end),
-  );
+  // The walk and the rest after a long flight follow the final landing only,
+  // never a connection.
+  const finalLeg = trip.legs[trip.legs.length - 1];
+  const arrivals =
+    finalLeg !== undefined &&
+    contains({ start: day.wake, end: day.nextSleepStart }, finalLeg.end)
+      ? [finalLeg]
+      : [];
   const lastArrival = arrivals[arrivals.length - 1];
   if (trip.exerciseEnabled && lastArrival !== undefined) {
     const end = plus(lastArrival.end, WALK_MINUTES);

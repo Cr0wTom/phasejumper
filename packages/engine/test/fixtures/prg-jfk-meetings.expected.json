@@ -580,5 +580,5 @@
       "reason": "It overlapped a more important window and was too short to keep."
     }
   ],
-  "engineVersion": "0.6.0"
+  "engineVersion": "0.7.0"
 }

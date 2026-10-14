@@ -72,6 +72,17 @@
       "cbtMinUtc": "2027-01-16T12:30:00Z",
       "blocks": [
         {
+          "kind": "SLEEP_INFLIGHT",
+          "startUtc": "2027-01-16T07:00:00Z",
+          "endUtc": "2027-01-16T10:30:00Z",
+          "localTz": "America/Los_Angeles",
+          "reasonCode": "SLEEP_INFLIGHT",
+          "reason": "Sleep on the plane in this window; an eye mask helps.",
+          "source": "R1",
+          "confidence": "A",
+          "movable": false
+        },
+        {
           "kind": "SLEEP",
           "startUtc": "2027-01-16T11:30:00Z",
           "endUtc": "2027-01-16T15:00:00Z",
@@ -83,19 +94,8 @@
           "movable": false
         },
         {
-          "kind": "NAP",
-          "startUtc": "2027-01-16T15:00:00Z",
-          "endUtc": "2027-01-16T16:30:00Z",
-          "localTz": "Europe/Prague",
-          "reasonCode": "NAP_SHORT_SLEEP",
-          "reason": "A short nap here makes up for a short night.",
-          "source": "R12",
-          "confidence": "B",
-          "movable": true
-        },
-        {
           "kind": "CAFFEINE_OK",
-          "startUtc": "2027-01-16T16:30:00Z",
+          "startUtc": "2027-01-16T15:00:00Z",
           "endUtc": "2027-01-16T23:00:00Z",
           "localTz": "Europe/Prague",
           "reasonCode": "CAFFEINE_OK",
@@ -131,8 +131,7 @@
       "misalignmentAfter": 9,
       "effectiveShiftHours": 0,
       "flags": [
-        "FLIGHT_DAY",
-        "SHORT_SLEEP_DAY"
+        "FLIGHT_DAY"
       ]
     },
     {
@@ -243,13 +242,7 @@
       "source": "none"
     }
   ],
-  "warnings": [
-    {
-      "code": "SHORT_SLEEP_DAY",
-      "message": "Your sleep window is short today, so the plan adds a nap.",
-      "dayIndex": 1
-    }
-  ],
+  "warnings": [],
   "droppedBlocks": [],
-  "engineVersion": "0.6.0"
+  "engineVersion": "0.7.0"
 }
