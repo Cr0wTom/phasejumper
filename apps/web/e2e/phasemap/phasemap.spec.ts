@@ -175,62 +175,56 @@ test("DST fixture shows the right wall times on both time scales", async ({
   await expect(lastSleep()).toHaveAccessibleName("Sleep, 23:00 to 07:00");
 });
 
-test("the key lists what is drawn, in band order", async ({ page }) => {
+test("the legend sits under the map, grouped like the bands", async ({
+  page,
+}) => {
   await open(page, "prg-tyo-advance", 1280);
-  const key = (
-    await page
-      .getByRole("list", { name: phaseMapMessages.keyLabel })
-      .locator("li")
-      .allTextContents()
-  ).map((t) => t.trim());
-  const at = (name: string): number => key.indexOf(name);
-  for (const k of [
-    phaseMapMessages.kinds.SLEEP,
-    phaseMapMessages.kinds.EXERCISE_GOOD,
-    phaseMapMessages.kinds.EXERCISE_OK,
-    phaseMapMessages.kinds.MEAL,
-    phaseMapMessages.kinds.MELATONIN_WINDOW,
-  ]) {
-    expect(key).toContain(k);
-  }
-  expect(at(phaseMapMessages.kinds.SLEEP)).toBeLessThan(
-    at(phaseMapMessages.kinds.EXERCISE_GOOD),
-  );
-  expect(at(phaseMapMessages.kinds.EXERCISE_GOOD)).toBeLessThan(
-    at(phaseMapMessages.kinds.MELATONIN_WINDOW),
-  );
-  // Wide screens always draw everything, so there is no details switch.
+  const groups = await page
+    .getByRole("heading", { level: 4 })
+    .allTextContents();
+  expect(groups).toEqual([
+    phaseMapMessages.legendGroups.sleep,
+    phaseMapMessages.legendGroups.light,
+    phaseMapMessages.legendGroups.exercise,
+    phaseMapMessages.legendGroups.intake,
+    phaseMapMessages.legendGroups.markers,
+  ]);
+  const map = await page.getByTestId("phase-map").boundingBox();
+  const legend = await page
+    .getByRole("heading", { name: phaseMapMessages.legend })
+    .boundingBox();
+  expect(legend?.y ?? 0).toBeGreaterThan((map?.y ?? 0) + (map?.height ?? 0));
   await expect(
-    page.getByRole("button", { name: phaseMapMessages.showDetails }),
-  ).toHaveCount(0);
+    page.getByRole("link", { name: phaseMapMessages.fullKey }),
+  ).toHaveAttribute("href", "#/evidence/key");
 });
 
-test("phones show key moments until all details are asked for", async ({
+test("on phones each day is one line of sleep, light, meals and flights", async ({
   page,
 }) => {
   await open(page, "prg-tyo-advance", 390);
-  const background = page.locator(
-    '[data-kind="EXERCISE_OK"], [data-kind="CAFFEINE_OK"], [data-kind="MELATONIN_OK"], [data-kind="MEAL"]',
-  );
-  await expect(background).toHaveCount(0);
-  await expect(
-    page.locator('[data-kind="MELATONIN_WINDOW"]').first(),
-  ).toBeVisible();
-  await expect(
-    page.locator('[data-kind="CAFFEINE_STOP"]').first(),
-  ).toBeVisible();
-  const toggle = page.getByRole("button", {
-    name: phaseMapMessages.showDetails,
-  });
-  await expect(toggle).toHaveAttribute("aria-pressed", "false");
-  await toggle.click();
-  await expect(toggle).toHaveAttribute("aria-pressed", "true");
-  expect(await background.count()).toBeGreaterThan(0);
-  await expect(
-    page
-      .getByRole("list", { name: phaseMapMessages.keyLabel })
-      .getByText(phaseMapMessages.kinds.MEAL),
-  ).toBeVisible();
+  const kinds = await page
+    .locator("[data-kind]")
+    .evaluateAll((els) => [
+      ...new Set(els.map((e) => (e as HTMLElement).dataset.kind)),
+    ]);
+  for (const k of kinds) {
+    expect([
+      "SLEEP",
+      "SLEEP_INFLIGHT",
+      "NAP",
+      "SEEK_LIGHT",
+      "SEEK_LIGHT_ARTIFICIAL",
+      "LIGHT_INFLIGHT_WINDOW",
+      "MEAL",
+    ]).toContain(k);
+  }
+  expect(kinds).toContain("SLEEP");
+  expect(kinds).toContain("MEAL");
+  await expect(page.getByText(phaseMapMessages.stripHint)).toBeVisible();
+  // Rows stay one line high.
+  const row = await page.locator("g[data-date]").first().boundingBox();
+  expect(row?.height ?? 99).toBeLessThanOrEqual(40);
 });
 
 test("both time scales show by default and can be switched", async ({

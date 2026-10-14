@@ -145,3 +145,59 @@ test("the map joins the body-clock dots and marks today", async ({ page }) => {
   );
   await expect(today).toHaveCSS("opacity", "1");
 });
+
+test("on phones the whole day is drawn at the top of the sheet; touching it highlights the list", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await openPlan(page);
+  await page.locator('[data-date="2027-01-17"]').click();
+  const dialog = page.getByRole("dialog");
+  const view = dialog.getByTestId("day-view");
+  await expect(view).toBeVisible();
+  // The drawn day is the top of the sheet, above its heading.
+  const viewBox = await view.boundingBox();
+  const heading = await dialog.getByRole("heading", { level: 2 }).boundingBox();
+  expect((viewBox?.y ?? 0) + (viewBox?.height ?? 0)).toBeLessThan(
+    heading?.y ?? 0,
+  );
+  await expect(dialog.getByTestId("day-view-night").first()).toBeAttached();
+  // Shapes only: the drawing carries no text.
+  await expect(view.locator("text")).toHaveCount(0);
+  // Touching the drawing highlights what is going on then in the list.
+  const box = await view.boundingBox();
+  if (box === null) throw new Error("no day view");
+  const at = (hour: number): number => box.x + (box.width * hour) / 24;
+  const active = dialog.locator("li[data-active]");
+  await expect(active).toHaveCount(0);
+  await page.mouse.move(at(5), box.y + box.height / 2);
+  await page.mouse.down();
+  // 05:00 in Los Angeles: caffeine fits, can exercise.
+  await expect(
+    active.filter({ hasText: phaseMapMessages.kinds.CAFFEINE_OK }),
+  ).toHaveCount(1);
+  // Dragging to 13:00: the ideal exercise window.
+  await page.mouse.move(at(13.25), box.y + box.height / 2, { steps: 8 });
+  await page.mouse.up();
+  await expect(
+    active.filter({ hasText: phaseMapMessages.kinds.EXERCISE_GOOD }),
+  ).toHaveCount(1);
+  await expect(
+    active.filter({ hasText: phaseMapMessages.kinds.CAFFEINE_OK }),
+  ).toHaveCount(0);
+  await expect(dialog.getByTestId("day-view-cursor")).toBeAttached();
+  // Tapping above the sheet closes it.
+  await page.mouse.click(195, 40);
+  await expect(dialog).toHaveCount(0);
+});
+
+test("wide screens keep the side panel without the drawn day", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await openPlan(page);
+  await page.locator('[data-date="2027-01-17"]').focus();
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await expect(page.getByTestId("day-view")).toBeHidden();
+});

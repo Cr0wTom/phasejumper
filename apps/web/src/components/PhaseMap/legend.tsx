@@ -55,16 +55,6 @@ export const SOFT = { fillOpacity: "var(--pj-soft)" } as const;
 export const SOFT_STROKE = { strokeOpacity: "var(--pj-soft)" } as const;
 export const QUIET_FILL = { fillOpacity: "var(--pj-quiet)" } as const;
 
-/** Background ranges: drawn on phones only when "Show all details" is on. */
-export const DETAIL_KINDS: ReadonlySet<BlockKind> = new Set([
-  "EXERCISE_OK",
-  "EXERCISE_AVOID",
-  "CAFFEINE_OK",
-  "CAFFEINE_LATE_OK",
-  "MELATONIN_OK",
-  "MEAL",
-]);
-
 const FG = "var(--fg)";
 
 /** The small sample drawn next to each name in a key (14 × 10). */
@@ -108,6 +98,20 @@ export function swatch(kind: BlockKind): ReactNode {
       return <rect width="14" height="10" rx="2" fill={color} />;
   }
 }
+
+/** Light on a one-line day is a thinner band on the sleep line. */
+export function stripSwatch(kind: BlockKind): ReactNode {
+  if (LIGHT_KINDS.has(kind)) {
+    return <rect y="2" width="14" height="6" rx="3" fill={COLOR[kind]} />;
+  }
+  return swatch(kind);
+}
+
+const LIGHT_KINDS: ReadonlySet<BlockKind> = new Set([
+  "SEEK_LIGHT",
+  "SEEK_LIGHT_ARTIFICIAL",
+  "LIGHT_INFLIGHT_WINDOW",
+]);
 
 export type Marker = "flight" | "cbtMin" | "target";
 

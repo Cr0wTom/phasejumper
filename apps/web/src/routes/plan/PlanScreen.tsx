@@ -408,6 +408,7 @@ export function PlanView({
       </nav>
 
       <DaySheet
+        input={plan.input}
         result={plan.result}
         index={dayIndex}
         onIndex={setDayIndex}
