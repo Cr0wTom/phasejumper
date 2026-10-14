@@ -338,4 +338,51 @@ describe("engine properties", { timeout: 30_000 }, () => {
       expect(generatePlan(input)).toEqual(plan);
     });
   });
+
+  it("EXERCISE_OK is leftover: ≥ 15 min, no overlap with GOOD, AVOID, SLEEP or a flight", () => {
+    check((input, plan) => {
+      const kinds = plan.days.flatMap((d) => d.blocks.map((b) => b.kind));
+      if (!input.traveler.exercise.enabled) {
+        expect(kinds).not.toContain("EXERCISE_OK");
+        expect(kinds).not.toContain("EXERCISE_GOOD");
+        return;
+      }
+      const flights = input.itinerary.legs.map((leg) => {
+        const start = Temporal.PlainDateTime.from(leg.departureLocal)
+          .toZonedDateTime(leg.departureTz)
+          .toInstant().epochMilliseconds;
+        const end = Temporal.PlainDateTime.from(leg.arrivalLocal)
+          .toZonedDateTime(leg.arrivalTz)
+          .toInstant().epochMilliseconds;
+        return [start, end] as const;
+      });
+      for (const day of plan.days) {
+        if (day.flags.includes("FLIGHT_DAY")) {
+          expect(day.blocks.map((b) => b.kind)).not.toContain("EXERCISE_OK");
+        }
+        const ok = day.blocks.filter((b) => b.kind === "EXERCISE_OK");
+        const blockers = day.blocks.filter(
+          (b) =>
+            b.kind === "EXERCISE_GOOD" ||
+            b.kind === "EXERCISE_AVOID" ||
+            b.kind === "SLEEP" ||
+            b.kind === "SLEEP_INFLIGHT",
+        );
+        for (const piece of ok) {
+          const start = Date.parse(piece.startUtc);
+          const end = Date.parse(piece.endUtc);
+          expect((end - start) / 60_000).toBeGreaterThanOrEqual(15);
+          for (const other of blockers) {
+            expect(
+              start < Date.parse(other.endUtc) &&
+                Date.parse(other.startUtc) < end,
+            ).toBe(false);
+          }
+          for (const [from, to] of flights) {
+            expect(start < to && from < end).toBe(false);
+          }
+        }
+      }
+    });
+  });
 });

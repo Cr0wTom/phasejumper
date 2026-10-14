@@ -177,6 +177,78 @@ describe("exercise and caffeine (§2.5)", () => {
     );
     expect([...kinds].sort()).toEqual(["AVOID_LIGHT", "SEEK_LIGHT", "SLEEP"]);
   });
+
+  it("ideal window is 60 min when there is room", () => {
+    for (const plan of [generatePlan(prgSfo()), generatePlan(prgTyo())]) {
+      const shifting = plan.days.filter(
+        (d) =>
+          !d.flags.includes("FLIGHT_DAY") &&
+          d.blocks.some((b) => b.kind === "EXERCISE_GOOD"),
+      );
+      expect(shifting.length).toBeGreaterThan(0);
+      for (const day of shifting) {
+        const good = day.blocks.filter((b) => b.kind === "EXERCISE_GOOD");
+        expect(good).toHaveLength(1);
+        const g = good[0];
+        if (g === undefined) continue;
+        expect(Date.parse(g.endUtc) - Date.parse(g.startUtc)).toBe(60 * 60_000);
+      }
+    }
+  });
+
+  it("preferredMinutes overrides the default ideal window", () => {
+    const plan = generatePlan(
+      prgTyo({
+        traveler: { exercise: { enabled: true, preferredMinutes: 30 } },
+      }),
+    );
+    const good = plan.days
+      .flatMap((d) => d.blocks)
+      .filter((b) => b.kind === "EXERCISE_GOOD");
+    expect(good.length).toBeGreaterThan(0);
+    for (const g of good) {
+      expect(Date.parse(g.endUtc) - Date.parse(g.startUtc)).toBe(30 * 60_000);
+    }
+  });
+
+  it("EXERCISE_OK leftover never overlaps GOOD, AVOID, SLEEP or a flight", () => {
+    for (const plan of [generatePlan(prgSfo()), generatePlan(prgTyo())]) {
+      for (const day of plan.days) {
+        const ok = day.blocks.filter((b) => b.kind === "EXERCISE_OK");
+        const blockers = day.blocks.filter(
+          (b) =>
+            b.kind === "EXERCISE_GOOD" ||
+            b.kind === "EXERCISE_AVOID" ||
+            b.kind === "SLEEP" ||
+            b.kind === "SLEEP_INFLIGHT",
+        );
+        if (day.flags.includes("FLIGHT_DAY")) expect(ok).toHaveLength(0);
+        for (const piece of ok) {
+          const len =
+            (Date.parse(piece.endUtc) - Date.parse(piece.startUtc)) / 60_000;
+          expect(len).toBeGreaterThanOrEqual(15);
+          expect(piece.source).toBe("R9");
+          expect(piece.confidence).toBe("B");
+          expect(piece.movable).toBe(true);
+          expect(piece.reasonCode).toBe("EXERCISE_OK");
+          for (const other of blockers) {
+            expect(
+              piece.startUtc < other.endUtc && other.startUtc < piece.endUtc,
+            ).toBe(false);
+          }
+        }
+      }
+    }
+  });
+
+  it("no EXERCISE_OK when exercise is off", () => {
+    const plan = generatePlan(
+      prgTyo({ traveler: { exercise: { enabled: false } } }),
+    );
+    expect(plan.days.flatMap((d) => d.blocks).map((b) => b.kind)).not.toContain(
+      "EXERCISE_OK",
+    );
+  });
 });
 
 describe("contract", () => {
@@ -210,6 +282,6 @@ describe("contract", () => {
   });
 
   it("stamps the engine version", () => {
-    expect(generatePlan(prgTyo()).engineVersion).toBe("0.4.0");
+    expect(generatePlan(prgTyo()).engineVersion).toBe("0.5.0");
   });
 });

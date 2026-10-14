@@ -77,6 +77,7 @@ const LANE: Record<BlockKind, Lane> = {
   LIGHT_INFLIGHT_WINDOW: "light",
   AVOID_LIGHT: "light",
   EXERCISE_GOOD: "move",
+  EXERCISE_OK: "move",
   EXERCISE_OPTIONAL_WALK: "move",
   EXERCISE_AVOID: "move",
   WIND_DOWN: "move",

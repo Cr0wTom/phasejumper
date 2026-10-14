@@ -61,7 +61,7 @@ Every number the model uses, as defined in [`packages/engine/src/prc.ts`](../pac
 | `EXERCISE.advanceMorningZone` | [2, 3] h | Morning advance zone (our translation of R9 clock times) | R9 |
 | `EXERCISE.advanceAfternoonZone` | [8.5, 11.5] h | Afternoon advance zone (preferred) | R9 |
 | `EXERCISE.delayZone` | [14.5, 17.5] h | Evening delay zone | R9 |
-| `EXERCISE.defaultMinutes` | 45 min | Exercise window length when not given | R9 |
+| `EXERCISE.defaultMinutes` | 60 min | Exercise window length when not given | R9 |
 | `EXERCISE.avoidBeforeSleepHours` | 3 h | No exercise this close to sleep | R9 |
 | `EXERCISE.bonusShiftHours` | 0.3 h | Forecast-only bonus when exercise lands in its zone | R9 |
 | `CAFFEINE.stopBeforeSleepHours.normal` | 8 h | Last caffeine this long before sleep | R11 |

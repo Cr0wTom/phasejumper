@@ -200,6 +200,7 @@ function applyFlights(
   const onFlightDay = result.filter(
     (b) =>
       b.kind !== "EXERCISE_GOOD" &&
+      b.kind !== "EXERCISE_OK" &&
       !(
         b.kind === "EXERCISE_AVOID" &&
         b.reasonCode === "EXERCISE_AVOID_DIRECTION"
@@ -302,6 +303,13 @@ function applyMustBeAwake(
       } else {
         result.push(withSpan(b, kept));
       }
+      continue;
+    }
+    if (b.kind === "EXERCISE_OK") {
+      const kept = subtract(b, trip.noWorkout).filter(
+        (s) => length(s) >= MIN_BLOCK_MINUTES,
+      );
+      for (const s of kept) result.push(withSpan(b, s));
       continue;
     }
     result.push(b);
@@ -424,6 +432,7 @@ const OCCUPYING_RANK: Partial<Record<BlockKind, number>> = {
   NAP: 6,
   NSDR: 7,
   WIND_DOWN: 7,
+  EXERCISE_OK: 8,
 };
 
 const LIGHT_SEEKING: ReadonlySet<BlockKind> = new Set([
@@ -434,6 +443,7 @@ const LIGHT_SEEKING: ReadonlySet<BlockKind> = new Set([
 const EXERCISING: ReadonlySet<BlockKind> = new Set([
   "EXERCISE_GOOD",
   "EXERCISE_OPTIONAL_WALK",
+  "EXERCISE_OK",
 ]);
 const RESTING: ReadonlySet<BlockKind> = new Set(["WIND_DOWN", "NSDR"]);
 
@@ -472,13 +482,18 @@ function applyCollisions(blocks: RawBlock[], out: FilterResult): RawBlock[] {
         byTime(x, y),
     );
   for (const b of occupying) {
-    const blockers = placed.filter(
-      (p) => HARD_SLEEP.has(p.kind) || conflicts(b.kind, p.kind),
-    );
+    const blockers =
+      b.kind === "EXERCISE_OK"
+        ? placed
+        : placed.filter(
+            (p) => HARD_SLEEP.has(p.kind) || conflicts(b.kind, p.kind),
+          );
     const kept = subtract(b, blockers).filter(
       (s) => length(s) >= MIN_BLOCK_MINUTES,
     );
-    if (kept.length === 0) out.dropped.push({ kind: b.kind, code: "TRIMMED" });
+    if (kept.length === 0 && b.kind !== "EXERCISE_OK") {
+      out.dropped.push({ kind: b.kind, code: "TRIMMED" });
+    }
     for (const s of kept) placed.push(withSpan(b, s));
   }
   // Advisory windows (caffeine, meals, melatonin, exercise-avoid) only give

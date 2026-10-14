@@ -89,6 +89,7 @@ export const KIND_ICON: Partial<Record<BlockKind, IconName>> = {
   LIGHT_INFLIGHT_WINDOW: "seekLight",
   AVOID_LIGHT: "avoidLight",
   EXERCISE_GOOD: "exercise",
+  EXERCISE_OK: "exercise",
   EXERCISE_OPTIONAL_WALK: "exercise",
   EXERCISE_AVOID: "exercise",
   CAFFEINE_OK: "caffeine",

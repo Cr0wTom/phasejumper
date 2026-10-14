@@ -49,6 +49,7 @@ const COLOR: Record<BlockKind, string> = {
   AVOID_LIGHT: "var(--dark)",
   MELATONIN_WINDOW: "var(--melatonin)",
   EXERCISE_GOOD: "var(--move)",
+  EXERCISE_OK: "var(--move)",
   EXERCISE_OPTIONAL_WALK: "var(--move)",
   EXERCISE_AVOID: "var(--move)",
   CAFFEINE_OK: "var(--caffeine)",
@@ -92,6 +93,7 @@ const LABEL_FONT = 11;
 /** Kinds drawn faintly (lighter weight, no text) so stronger bands read on top. */
 const QUIET: ReadonlySet<BlockKind> = new Set([
   "EXERCISE_AVOID",
+  "EXERCISE_OK",
   "CAFFEINE_OK",
   "CAFFEINE_LATE_OK",
 ]);
@@ -231,6 +233,7 @@ export function PhaseMap({
   const headingId = useId();
   const patternId = `${useId().replace(/:/g, "")}-hatch`;
   const sheenId = `${patternId}-sheen`;
+  const exerciseOkId = `${patternId}-ok`;
 
   useEffect(() => {
     const el = containerRef.current;
@@ -445,6 +448,23 @@ export function PhaseMap({
                 stroke={MUTED}
                 strokeWidth="2"
                 strokeOpacity="0.3"
+              />
+            </pattern>
+            <pattern
+              id={exerciseOkId}
+              width="6"
+              height="6"
+              patternUnits="userSpaceOnUse"
+              patternTransform="rotate(45)"
+            >
+              <line
+                x1="0"
+                y1="0"
+                x2="0"
+                y2="6"
+                stroke={COLOR.EXERCISE_OK}
+                strokeWidth="2"
+                strokeOpacity="0.35"
               />
             </pattern>
           </defs>
@@ -683,6 +703,31 @@ export function PhaseMap({
                           strokeOpacity={0.35}
                           strokeDasharray="3 2"
                         />
+                      ) : seg.block.kind === "EXERCISE_OK" ? (
+                        <>
+                          <rect
+                            x={x0}
+                            y={lane.y}
+                            width={w}
+                            height={lane.h}
+                            rx={2}
+                            fill={`url(#${exerciseOkId})`}
+                            pointerEvents="none"
+                            aria-hidden="true"
+                          />
+                          <rect
+                            className="pj-mark"
+                            x={x0 + 0.5}
+                            y={lane.y + 0.5}
+                            width={Math.max(1, w - 1)}
+                            height={lane.h - 1}
+                            rx={2}
+                            fill="none"
+                            stroke={color}
+                            strokeOpacity={0.35}
+                            strokeDasharray="3 2"
+                          />
+                        </>
                       ) : (
                         <>
                           <rect
@@ -864,6 +909,27 @@ export function PhaseMap({
                   rx="2"
                   fill={COLOR.EXERCISE_GOOD}
                 />,
+              ],
+              [
+                "EXERCISE_OK",
+                <g>
+                  <rect
+                    width="14"
+                    height="10"
+                    rx="2"
+                    fill={`url(#${exerciseOkId})`}
+                  />
+                  <rect
+                    x="0.5"
+                    y="0.5"
+                    width="13"
+                    height="9"
+                    rx="2"
+                    fill="none"
+                    stroke={COLOR.EXERCISE_OK}
+                    strokeDasharray="3 2"
+                  />
+                </g>,
               ],
               [
                 "EXERCISE_AVOID",

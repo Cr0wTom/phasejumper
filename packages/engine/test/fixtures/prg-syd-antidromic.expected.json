@@ -262,6 +262,17 @@
           "movable": false
         },
         {
+          "kind": "EXERCISE_OK",
+          "startUtc": "2026-10-12T08:30:00Z",
+          "endUtc": "2026-10-12T14:00:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "EXERCISE_OK",
+          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": true
+        },
+        {
           "kind": "EXERCISE_AVOID",
           "startUtc": "2026-10-12T14:00:00Z",
           "endUtc": "2026-10-12T17:00:00Z",
@@ -271,6 +282,17 @@
           "source": "R9",
           "confidence": "B",
           "movable": false
+        },
+        {
+          "kind": "EXERCISE_OK",
+          "startUtc": "2026-10-12T17:00:00Z",
+          "endUtc": "2026-10-12T20:00:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "EXERCISE_OK",
+          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": true
         },
         {
           "kind": "CAFFEINE_LATE_OK",
@@ -286,7 +308,7 @@
         {
           "kind": "EXERCISE_GOOD",
           "startUtc": "2026-10-12T20:00:00Z",
-          "endUtc": "2026-10-12T20:45:00Z",
+          "endUtc": "2026-10-12T21:00:00Z",
           "localTz": "Australia/Sydney",
           "reasonCode": "EXERCISE_GOOD_DELAY",
           "reason": "Exercise in this window can help move your clock later.",
@@ -304,6 +326,17 @@
           "source": "R11",
           "confidence": "B",
           "movable": false
+        },
+        {
+          "kind": "EXERCISE_OK",
+          "startUtc": "2026-10-12T21:00:00Z",
+          "endUtc": "2026-10-12T23:00:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "EXERCISE_OK",
+          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": true
         },
         {
           "kind": "EXERCISE_AVOID",
@@ -383,6 +416,17 @@
           "movable": false
         },
         {
+          "kind": "EXERCISE_OK",
+          "startUtc": "2026-10-13T10:30:00Z",
+          "endUtc": "2026-10-13T16:00:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "EXERCISE_OK",
+          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": true
+        },
+        {
           "kind": "EXERCISE_AVOID",
           "startUtc": "2026-10-13T16:00:00Z",
           "endUtc": "2026-10-13T19:00:00Z",
@@ -392,6 +436,17 @@
           "source": "R9",
           "confidence": "B",
           "movable": false
+        },
+        {
+          "kind": "EXERCISE_OK",
+          "startUtc": "2026-10-13T19:00:00Z",
+          "endUtc": "2026-10-13T22:00:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "EXERCISE_OK",
+          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": true
         },
         {
           "kind": "CAFFEINE_LATE_OK",
@@ -407,7 +462,7 @@
         {
           "kind": "EXERCISE_GOOD",
           "startUtc": "2026-10-13T22:00:00Z",
-          "endUtc": "2026-10-13T22:45:00Z",
+          "endUtc": "2026-10-13T23:00:00Z",
           "localTz": "Australia/Sydney",
           "reasonCode": "EXERCISE_GOOD_DELAY",
           "reason": "Exercise in this window can help move your clock later.",
@@ -425,6 +480,17 @@
           "source": "R11",
           "confidence": "B",
           "movable": false
+        },
+        {
+          "kind": "EXERCISE_OK",
+          "startUtc": "2026-10-13T23:00:00Z",
+          "endUtc": "2026-10-14T01:00:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "EXERCISE_OK",
+          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": true
         },
         {
           "kind": "EXERCISE_AVOID",
@@ -504,6 +570,17 @@
           "movable": false
         },
         {
+          "kind": "EXERCISE_OK",
+          "startUtc": "2026-10-14T12:30:00Z",
+          "endUtc": "2026-10-14T18:00:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "EXERCISE_OK",
+          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": true
+        },
+        {
           "kind": "EXERCISE_AVOID",
           "startUtc": "2026-10-14T18:00:00Z",
           "endUtc": "2026-10-14T21:00:00Z",
@@ -513,6 +590,17 @@
           "source": "R9",
           "confidence": "B",
           "movable": false
+        },
+        {
+          "kind": "EXERCISE_OK",
+          "startUtc": "2026-10-14T21:00:00Z",
+          "endUtc": "2026-10-15T00:00:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "EXERCISE_OK",
+          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": true
         },
         {
           "kind": "CAFFEINE_LATE_OK",
@@ -528,7 +616,7 @@
         {
           "kind": "EXERCISE_GOOD",
           "startUtc": "2026-10-15T00:00:00Z",
-          "endUtc": "2026-10-15T00:45:00Z",
+          "endUtc": "2026-10-15T01:00:00Z",
           "localTz": "Australia/Sydney",
           "reasonCode": "EXERCISE_GOOD_DELAY",
           "reason": "Exercise in this window can help move your clock later.",
@@ -546,6 +634,17 @@
           "source": "R11",
           "confidence": "B",
           "movable": false
+        },
+        {
+          "kind": "EXERCISE_OK",
+          "startUtc": "2026-10-15T01:00:00Z",
+          "endUtc": "2026-10-15T03:00:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "EXERCISE_OK",
+          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": true
         },
         {
           "kind": "EXERCISE_AVOID",
@@ -625,6 +724,17 @@
           "movable": false
         },
         {
+          "kind": "EXERCISE_OK",
+          "startUtc": "2026-10-15T14:30:00Z",
+          "endUtc": "2026-10-15T20:00:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "EXERCISE_OK",
+          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": true
+        },
+        {
           "kind": "EXERCISE_AVOID",
           "startUtc": "2026-10-15T20:00:00Z",
           "endUtc": "2026-10-15T23:00:00Z",
@@ -634,6 +744,17 @@
           "source": "R9",
           "confidence": "B",
           "movable": false
+        },
+        {
+          "kind": "EXERCISE_OK",
+          "startUtc": "2026-10-15T23:00:00Z",
+          "endUtc": "2026-10-16T02:00:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "EXERCISE_OK",
+          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": true
         },
         {
           "kind": "CAFFEINE_LATE_OK",
@@ -649,7 +770,7 @@
         {
           "kind": "EXERCISE_GOOD",
           "startUtc": "2026-10-16T02:00:00Z",
-          "endUtc": "2026-10-16T02:45:00Z",
+          "endUtc": "2026-10-16T03:00:00Z",
           "localTz": "Australia/Sydney",
           "reasonCode": "EXERCISE_GOOD_DELAY",
           "reason": "Exercise in this window can help move your clock later.",
@@ -667,6 +788,17 @@
           "source": "R11",
           "confidence": "B",
           "movable": false
+        },
+        {
+          "kind": "EXERCISE_OK",
+          "startUtc": "2026-10-16T03:00:00Z",
+          "endUtc": "2026-10-16T05:00:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "EXERCISE_OK",
+          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": true
         },
         {
           "kind": "EXERCISE_AVOID",
@@ -746,6 +878,17 @@
           "movable": false
         },
         {
+          "kind": "EXERCISE_OK",
+          "startUtc": "2026-10-16T16:30:00Z",
+          "endUtc": "2026-10-16T19:10:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "EXERCISE_OK",
+          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": true
+        },
+        {
           "kind": "AVOID_LIGHT",
           "startUtc": "2026-10-16T19:10:00Z",
           "endUtc": "2026-10-16T19:30:00Z",
@@ -757,6 +900,17 @@
           "movable": false
         },
         {
+          "kind": "EXERCISE_OK",
+          "startUtc": "2026-10-16T19:30:00Z",
+          "endUtc": "2026-10-16T22:00:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "EXERCISE_OK",
+          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": true
+        },
+        {
           "kind": "EXERCISE_AVOID",
           "startUtc": "2026-10-16T22:00:00Z",
           "endUtc": "2026-10-17T01:00:00Z",
@@ -766,6 +920,17 @@
           "source": "R9",
           "confidence": "B",
           "movable": false
+        },
+        {
+          "kind": "EXERCISE_OK",
+          "startUtc": "2026-10-17T01:00:00Z",
+          "endUtc": "2026-10-17T04:00:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "EXERCISE_OK",
+          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": true
         },
         {
           "kind": "CAFFEINE_LATE_OK",
@@ -781,7 +946,7 @@
         {
           "kind": "EXERCISE_GOOD",
           "startUtc": "2026-10-17T04:00:00Z",
-          "endUtc": "2026-10-17T04:45:00Z",
+          "endUtc": "2026-10-17T05:00:00Z",
           "localTz": "Australia/Sydney",
           "reasonCode": "EXERCISE_GOOD_DELAY",
           "reason": "Exercise in this window can help move your clock later.",
@@ -799,6 +964,17 @@
           "source": "R11",
           "confidence": "B",
           "movable": false
+        },
+        {
+          "kind": "EXERCISE_OK",
+          "startUtc": "2026-10-17T05:00:00Z",
+          "endUtc": "2026-10-17T07:00:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "EXERCISE_OK",
+          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": true
         },
         {
           "kind": "EXERCISE_AVOID",
@@ -878,6 +1054,17 @@
           "movable": false
         },
         {
+          "kind": "EXERCISE_OK",
+          "startUtc": "2026-10-17T18:30:00Z",
+          "endUtc": "2026-10-17T19:10:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "EXERCISE_OK",
+          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": true
+        },
+        {
           "kind": "AVOID_LIGHT",
           "startUtc": "2026-10-17T19:10:00Z",
           "endUtc": "2026-10-17T21:30:00Z",
@@ -889,6 +1076,17 @@
           "movable": false
         },
         {
+          "kind": "EXERCISE_OK",
+          "startUtc": "2026-10-17T21:30:00Z",
+          "endUtc": "2026-10-18T00:00:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "EXERCISE_OK",
+          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": true
+        },
+        {
           "kind": "EXERCISE_AVOID",
           "startUtc": "2026-10-18T00:00:00Z",
           "endUtc": "2026-10-18T03:00:00Z",
@@ -898,6 +1096,17 @@
           "source": "R9",
           "confidence": "B",
           "movable": false
+        },
+        {
+          "kind": "EXERCISE_OK",
+          "startUtc": "2026-10-18T03:00:00Z",
+          "endUtc": "2026-10-18T06:00:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "EXERCISE_OK",
+          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": true
         },
         {
           "kind": "CAFFEINE_LATE_OK",
@@ -913,7 +1122,7 @@
         {
           "kind": "EXERCISE_GOOD",
           "startUtc": "2026-10-18T06:00:00Z",
-          "endUtc": "2026-10-18T06:45:00Z",
+          "endUtc": "2026-10-18T07:00:00Z",
           "localTz": "Australia/Sydney",
           "reasonCode": "EXERCISE_GOOD_DELAY",
           "reason": "Exercise in this window can help move your clock later.",
@@ -931,6 +1140,17 @@
           "source": "R11",
           "confidence": "B",
           "movable": false
+        },
+        {
+          "kind": "EXERCISE_OK",
+          "startUtc": "2026-10-18T07:00:00Z",
+          "endUtc": "2026-10-18T09:00:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "EXERCISE_OK",
+          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": true
         },
         {
           "kind": "EXERCISE_AVOID",
@@ -986,6 +1206,17 @@
           "source": "R1",
           "confidence": "A",
           "movable": false
+        },
+        {
+          "kind": "EXERCISE_OK",
+          "startUtc": "2026-10-18T20:00:00Z",
+          "endUtc": "2026-10-19T09:00:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "EXERCISE_OK",
+          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": true
         },
         {
           "kind": "CAFFEINE_OK",
@@ -1143,5 +1374,5 @@
       "reason": "It overlapped a more important window and was too short to keep."
     }
   ],
-  "engineVersion": "0.4.0"
+  "engineVersion": "0.5.0"
 }

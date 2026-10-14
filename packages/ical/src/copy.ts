@@ -35,6 +35,7 @@ const EXPORTABLE = {
   MELATONIN_WINDOW: true,
   MEAL: false,
   EXERCISE_AVOID: false,
+  EXERCISE_OK: false,
   CAFFEINE_OK: false,
   CAFFEINE_LATE_OK: false,
 } as const satisfies Record<BlockKind, boolean>;
