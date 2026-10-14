@@ -161,6 +161,13 @@ export const phaseMapMessages = {
       : `Evidence grade ${grade}, source ${source}.`,
   close: "Close",
   legend: "Legend",
+  legendGroups: {
+    sleep: "Sleep & rest",
+    light: "Light",
+    exercise: "Exercise",
+    intake: "Food & drink",
+    markers: "On the map",
+  },
   kinds: {
     SLEEP: "Sleep",
     SLEEP_INFLIGHT: "Sleep on board",

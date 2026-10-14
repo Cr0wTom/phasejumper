@@ -174,20 +174,40 @@ test("DST fixture shows the right wall times on both time scales", async ({
   await expect(lastSleep()).toHaveAccessibleName("Sleep, 23:00 to 07:00");
 });
 
-test("legend lists the three exercise windows in order", async ({ page }) => {
+test("legend is grouped like the bands, exercise windows in order", async ({
+  page,
+}) => {
   await open(page, "prg-tyo-advance", 1280);
-  const items = page
-    .getByRole("heading", { name: phaseMapMessages.legend })
-    .locator("xpath=following-sibling::ul[1]")
-    .locator("li");
-  const labels = (await items.allTextContents()).map((t) => t.trim());
-  const good = labels.findIndex((t) =>
-    t.includes(phaseMapMessages.kinds.EXERCISE_GOOD),
-  );
-  expect(good).toBeGreaterThanOrEqual(0);
-  expect(labels[good]).toContain(phaseMapMessages.kinds.EXERCISE_GOOD);
-  expect(labels[good + 1]).toContain(phaseMapMessages.kinds.EXERCISE_OK);
-  expect(labels[good + 2]).toContain(phaseMapMessages.kinds.EXERCISE_AVOID);
+  const groups = await page
+    .getByRole("heading", { level: 4 })
+    .allTextContents();
+  expect(groups).toEqual([
+    phaseMapMessages.legendGroups.sleep,
+    phaseMapMessages.legendGroups.light,
+    phaseMapMessages.legendGroups.exercise,
+    phaseMapMessages.legendGroups.intake,
+    phaseMapMessages.legendGroups.markers,
+  ]);
+  const exercise = (
+    await page
+      .getByRole("heading", { name: phaseMapMessages.legendGroups.exercise })
+      .locator("xpath=following-sibling::ul[1]")
+      .locator("li")
+      .allTextContents()
+  ).map((t) => t.trim());
+  expect(exercise).toEqual([
+    phaseMapMessages.kinds.EXERCISE_GOOD,
+    phaseMapMessages.kinds.EXERCISE_OK,
+    phaseMapMessages.kinds.EXERCISE_AVOID,
+  ]);
+  const intake = (
+    await page
+      .getByRole("heading", { name: phaseMapMessages.legendGroups.intake })
+      .locator("xpath=following-sibling::ul[1]")
+      .allTextContents()
+  ).join(" ");
+  expect(intake).toContain(phaseMapMessages.kinds.MEAL);
+  expect(intake).toContain(phaseMapMessages.kinds.MELATONIN_WINDOW);
 });
 
 test("both time scales show by default and can be switched", async ({

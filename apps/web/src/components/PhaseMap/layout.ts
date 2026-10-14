@@ -29,7 +29,11 @@ import { Temporal } from "temporal-polyfill";
 
 export type Axis = "destination" | "home";
 
-export type Lane = "sleep" | "light" | "move" | "caffeine";
+/**
+ * Bands inside a day row, top to bottom: sleep & rest, light, exercise,
+ * food & drink (caffeine, meals, melatonin).
+ */
+export type Lane = "sleep" | "light" | "move" | "intake";
 
 export interface Segment {
   /** Stable id: day, block, piece. */
@@ -80,13 +84,13 @@ const LANE: Record<BlockKind, Lane> = {
   EXERCISE_OK: "move",
   EXERCISE_OPTIONAL_WALK: "move",
   EXERCISE_AVOID: "move",
-  WIND_DOWN: "move",
-  NSDR: "move",
-  MELATONIN_WINDOW: "move",
-  MEAL: "move",
-  CAFFEINE_OK: "caffeine",
-  CAFFEINE_LATE_OK: "caffeine",
-  CAFFEINE_STOP: "caffeine",
+  WIND_DOWN: "sleep",
+  NSDR: "sleep",
+  MELATONIN_WINDOW: "intake",
+  MEAL: "intake",
+  CAFFEINE_OK: "intake",
+  CAFFEINE_LATE_OK: "intake",
+  CAFFEINE_STOP: "intake",
 };
 
 const POINT: ReadonlySet<BlockKind> = new Set([

@@ -56,8 +56,9 @@ const COLOR: Record<BlockKind, string> = {
   CAFFEINE_LATE_OK: "var(--caffeine)",
   CAFFEINE_STOP: "var(--caffeine)",
   MEAL: "var(--fg-muted)",
-  WIND_DOWN: "var(--fg-muted)",
-  NSDR: "var(--fg-muted)",
+  // Wind-down and rest share the sleep band, as pale sleep.
+  WIND_DOWN: "var(--sleep)",
+  NSDR: "var(--sleep)",
 };
 
 const FG = "var(--fg)";
@@ -96,6 +97,8 @@ const QUIET: ReadonlySet<BlockKind> = new Set([
   "EXERCISE_OK",
   "CAFFEINE_OK",
   "CAFFEINE_LATE_OK",
+  "WIND_DOWN",
+  "NSDR",
 ]);
 
 interface Geometry {
@@ -118,12 +121,12 @@ function geometry(width: number, scaleCount: number): Geometry {
     gutter,
     ribbon: Math.max(1, width - gutter - 8),
     header: 4 + 18 * scaleCount,
-    rowH: Math.round(52 * k),
+    rowH: Math.round(60 * k),
     lanes: {
       sleep: { y: Math.round(6 * k), h: Math.round(16 * k) },
       light: { y: Math.round(24 * k), h: Math.round(10 * k) },
       move: { y: Math.round(36 * k), h: Math.round(8 * k) },
-      caffeine: { y: Math.round(45 * k), h: Math.round(3 * k) },
+      intake: { y: Math.round(48 * k), h: Math.round(10 * k) },
     },
     tickEvery: compact ? 6 : 3,
     compact,
@@ -647,19 +650,19 @@ export function PhaseMap({
                           <rect
                             className="pj-mark"
                             x={x0 - 4}
-                            y={lane.y}
+                            y={lane.y + lane.h / 2 - 4}
                             width={8}
                             height={8}
                             fill={color}
-                            transform={`rotate(45 ${x0} ${lane.y + 4})`}
+                            transform={`rotate(45 ${x0} ${lane.y + lane.h / 2})`}
                           />
                         ) : seg.block.kind === "CAFFEINE_STOP" ? (
                           <rect
                             className="pj-mark"
                             x={x0 - 1.5}
-                            y={lane.y - 6}
+                            y={lane.y - 1}
                             width={3}
-                            height={lane.h + 8}
+                            height={lane.h + 2}
                             fill={color}
                           />
                         ) : (
@@ -684,6 +687,21 @@ export function PhaseMap({
                           stroke={color}
                           strokeOpacity={0.35}
                           strokeDasharray="3 2"
+                        />
+                      ) : seg.block.kind === "CAFFEINE_OK" ||
+                        seg.block.kind === "CAFFEINE_LATE_OK" ? (
+                        // Caffeine reads as a line through the food & drink band.
+                        <rect
+                          className="pj-mark"
+                          x={x0}
+                          y={lane.y + lane.h / 2 - 1.5}
+                          width={w}
+                          height={3}
+                          rx={1.5}
+                          fill={color}
+                          fillOpacity={
+                            seg.block.kind === "CAFFEINE_OK" ? 0.6 : 0.35
+                          }
                         />
                       ) : seg.block.kind === "EXERCISE_OK" ? (
                         // "Can exercise" reads like "Caffeine fits": a thin line.
@@ -855,123 +873,191 @@ export function PhaseMap({
 
       <div className={compact ? "hidden" : undefined}>
         <h3 className="text-13 font-medium leading-body">{m.legend}</h3>
-        <ul className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-13 leading-body text-fg-muted">
+        {/* Grouped like the bands in each row, top to bottom. */}
+        <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-3 text-13 leading-body text-fg-muted sm:grid-cols-3 lg:grid-cols-5">
           {(
             [
               [
-                "SLEEP",
-                <rect width="14" height="10" rx="2" fill={COLOR.SLEEP} />,
+                m.legendGroups.sleep,
+                [
+                  [
+                    "SLEEP",
+                    <rect width="14" height="10" rx="2" fill={COLOR.SLEEP} />,
+                  ],
+                  [
+                    "WIND_DOWN",
+                    <rect
+                      width="14"
+                      height="10"
+                      rx="2"
+                      fill={COLOR.WIND_DOWN}
+                      fillOpacity={0.35}
+                    />,
+                  ],
+                  [
+                    "NSDR",
+                    <rect
+                      width="14"
+                      height="10"
+                      rx="2"
+                      fill={COLOR.NSDR}
+                      fillOpacity={0.35}
+                    />,
+                  ],
+                ],
               ],
               [
-                "SEEK_LIGHT",
-                <rect width="14" height="10" rx="2" fill={COLOR.SEEK_LIGHT} />,
+                m.legendGroups.light,
+                [
+                  [
+                    "SEEK_LIGHT",
+                    <rect
+                      width="14"
+                      height="10"
+                      rx="2"
+                      fill={COLOR.SEEK_LIGHT}
+                    />,
+                  ],
+                  [
+                    "AVOID_LIGHT",
+                    <rect
+                      width="14"
+                      height="10"
+                      rx="2"
+                      fill={COLOR.AVOID_LIGHT}
+                    />,
+                  ],
+                ],
               ],
               [
-                "AVOID_LIGHT",
-                <rect width="14" height="10" rx="2" fill={COLOR.AVOID_LIGHT} />,
+                m.legendGroups.exercise,
+                [
+                  [
+                    "EXERCISE_GOOD",
+                    <rect
+                      width="14"
+                      height="10"
+                      rx="2"
+                      fill={COLOR.EXERCISE_GOOD}
+                    />,
+                  ],
+                  [
+                    "EXERCISE_OK",
+                    <rect
+                      y="4"
+                      width="14"
+                      height="3"
+                      rx="1.5"
+                      fill={COLOR.EXERCISE_OK}
+                      fillOpacity={0.6}
+                    />,
+                  ],
+                  [
+                    "EXERCISE_AVOID",
+                    <rect
+                      x="0.5"
+                      y="0.5"
+                      width="13"
+                      height="9"
+                      rx="2"
+                      fill="none"
+                      stroke={COLOR.EXERCISE_AVOID}
+                      strokeDasharray="3 2"
+                    />,
+                  ],
+                ],
               ],
               [
-                "EXERCISE_GOOD",
-                <rect
-                  width="14"
-                  height="10"
-                  rx="2"
-                  fill={COLOR.EXERCISE_GOOD}
-                />,
-              ],
-              [
-                "EXERCISE_OK",
-                <rect
-                  y="4"
-                  width="14"
-                  height="3"
-                  rx="1.5"
-                  fill={COLOR.EXERCISE_OK}
-                  fillOpacity={0.6}
-                />,
-              ],
-              [
-                "EXERCISE_AVOID",
-                <rect
-                  x="0.5"
-                  y="0.5"
-                  width="13"
-                  height="9"
-                  rx="2"
-                  fill="none"
-                  stroke={COLOR.EXERCISE_AVOID}
-                  strokeDasharray="3 2"
-                />,
-              ],
-              [
-                "CAFFEINE_OK",
-                <rect y="4" width="14" height="3" fill={COLOR.CAFFEINE_OK} />,
-              ],
-              [
-                "CAFFEINE_STOP",
-                <rect
-                  x="5.5"
-                  width="3"
-                  height="10"
-                  fill={COLOR.CAFFEINE_STOP}
-                />,
-              ],
-              [
-                "MELATONIN_WINDOW",
-                <rect
-                  x="3"
-                  y="1"
-                  width="7"
-                  height="7"
-                  fill={COLOR.MELATONIN_WINDOW}
-                  transform="rotate(45 7 5)"
-                />,
-              ],
-              ["MEAL", <circle cx="7" cy="5" r="3.5" fill={COLOR.MEAL} />],
-              [
-                "WIND_DOWN",
-                <rect width="14" height="10" rx="2" fill={COLOR.WIND_DOWN} />,
+                m.legendGroups.intake,
+                [
+                  [
+                    "CAFFEINE_OK",
+                    <rect
+                      y="4"
+                      width="14"
+                      height="3"
+                      rx="1.5"
+                      fill={COLOR.CAFFEINE_OK}
+                      fillOpacity={0.6}
+                    />,
+                  ],
+                  [
+                    "CAFFEINE_STOP",
+                    <rect
+                      x="5.5"
+                      width="3"
+                      height="10"
+                      fill={COLOR.CAFFEINE_STOP}
+                    />,
+                  ],
+                  ["MEAL", <circle cx="7" cy="5" r="3.5" fill={COLOR.MEAL} />],
+                  [
+                    "MELATONIN_WINDOW",
+                    <rect
+                      x="3"
+                      y="1"
+                      width="7"
+                      height="7"
+                      fill={COLOR.MELATONIN_WINDOW}
+                      transform="rotate(45 7 5)"
+                    />,
+                  ],
+                ],
               ],
             ] as const
-          ).map(([k, shape]) => (
-            <li key={k} className="flex items-center gap-1">
-              <LegendIcon name={KIND_ICON[k]} />
-              <svg width="14" height="10" aria-hidden="true">
-                {shape}
-              </svg>
-              {m.kinds[k]}
-            </li>
+          ).map(([title, items]) => (
+            <div key={title}>
+              <h4 className="text-13 font-medium text-fg">{title}</h4>
+              <ul className="mt-1 flex flex-col gap-1">
+                {items.map(([k, shape]) => (
+                  <li key={k} className="flex items-center gap-1">
+                    <LegendIcon name={KIND_ICON[k]} />
+                    <svg width="14" height="10" aria-hidden="true">
+                      {shape}
+                    </svg>
+                    {m.kinds[k]}
+                  </li>
+                ))}
+              </ul>
+            </div>
           ))}
-          <li className="flex items-center gap-1">
-            <LegendIcon name="flight" />
-            <svg width="14" height="10" aria-hidden="true">
-              <rect width="14" height="10" fill={`url(#${patternId})`} />
-            </svg>
-            {m.flight("")}
-          </li>
-          <li className="flex items-center gap-1">
-            <LegendIcon name="cbtMin" />
-            <svg width="14" height="10" aria-hidden="true">
-              <circle cx="7" cy="5" r="4" fill={FG} />
-            </svg>
-            {m.cbtMin}
-          </li>
-          <li className="flex items-center gap-1">
-            <LegendIcon name={undefined} />
-            <svg width="14" height="10" aria-hidden="true">
-              <line
-                x1="7"
-                x2="7"
-                y1="0"
-                y2="10"
-                stroke={FG}
-                strokeOpacity={0.5}
-                strokeDasharray="2 2"
-              />
-            </svg>
-            {m.target}
-          </li>
-        </ul>
+          <div>
+            <h4 className="text-13 font-medium text-fg">
+              {m.legendGroups.markers}
+            </h4>
+            <ul className="mt-1 flex flex-col gap-1">
+              <li className="flex items-center gap-1">
+                <LegendIcon name="flight" />
+                <svg width="14" height="10" aria-hidden="true">
+                  <rect width="14" height="10" fill={`url(#${patternId})`} />
+                </svg>
+                {m.flight("")}
+              </li>
+              <li className="flex items-center gap-1">
+                <LegendIcon name="cbtMin" />
+                <svg width="14" height="10" aria-hidden="true">
+                  <circle cx="7" cy="5" r="4" fill={FG} />
+                </svg>
+                {m.cbtMin}
+              </li>
+              <li className="flex items-center gap-1">
+                <LegendIcon name={undefined} />
+                <svg width="14" height="10" aria-hidden="true">
+                  <line
+                    x1="7"
+                    x2="7"
+                    y1="0"
+                    y2="10"
+                    stroke={FG}
+                    strokeOpacity={0.5}
+                    strokeDasharray="2 2"
+                  />
+                </svg>
+                {m.target}
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
     </section>
   );
