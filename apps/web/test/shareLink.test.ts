@@ -59,6 +59,18 @@ describe("share links (§3.3)", () => {
     ).toBe("Café → 会議");
   });
 
+  it("never includes reported sleep", () => {
+    const input = {
+      ...(prgTyo as unknown as PlanInput),
+      observedSleep: [
+        { start: "2027-01-16T14:00:00Z", end: "2027-01-16T22:00:00Z" },
+      ],
+    };
+    const decoded = decodeShareLink(encodeShareLink(input));
+    expect(decoded.ok).toBe(true);
+    if (decoded.ok) expect(decoded.input).not.toHaveProperty("observedSleep");
+  });
+
   it("rejects damaged, oversized and non-plan payloads with a reason", () => {
     expect(decodeShareLink("@@@")).toEqual({ ok: false, reason: "unreadable" });
     expect(

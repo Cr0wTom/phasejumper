@@ -91,6 +91,12 @@ Every number the model uses, as defined in [`packages/engine/src/prc.ts`](../pac
 | `FEASIBILITY.earlierBedtimeMaxMinutes` | 60 min | When that cuts a night, bedtime moves at most this much earlier; the rest is a nap | R1, R12 |
 | `FEASIBILITY.awakeAfterArrivalMinutes` | 120 min | Awake after every landing (passport control, baggage, getting to a bed); no ground sleep or nap here | — |
 | `FEASIBILITY.minSleepMinutes` | 120 min | A ground sleep cut shorter than this is not shown; the short-sleep nap covers it | R12 |
+| `OBSERVED_SLEEP.minMainSleepHours` | 3 h | A reported sleep this long or longer can re-anchor the body clock; shorter ones are naps | R1 |
+| `OBSERVED_SLEEP.matchWithinHours` | 8 h | It re-anchors the planned night whose midpoint is within this of its own | — |
+| `OBSERVED_SLEEP.ignoreUnderMinutes` | 15 min | Smaller differences from the plan change nothing | — |
+| `OBSERVED_SLEEP.maxShiftHours` | 4 h | The re-anchored body clock moves at most this far from the plan | — |
+| `OBSERVED_SLEEP.maxReports` | 60 | Reports accepted per plan | — |
+| `OBSERVED_SLEEP.maxSleepHours` | 16 h | Longest accepted report | — |
 | `ARRIVAL_LOCAL.napMaxMinutes` | 90 min | Arrival style "local": a daytime sleep after the final landing becomes a nap this long at most | — |
 | `ARRIVAL_LOCAL.daytimeFromHour` | 8 h | …a ground sleep whose middle falls from this local hour… | — |
 | `ARRIVAL_LOCAL.daytimeToHour` | 20 h | …to this local hour is "daytime" | — |

@@ -35,6 +35,9 @@ import {
 import { useNow } from "../../useNow";
 import { usePlan } from "../plan/usePlan";
 import { DayDial } from "./DayDial";
+import { lastNight, SleepCheckin } from "./SleepCheckin";
+import { useState } from "react";
+import type { StoredPlan } from "../../storage/plans";
 
 function BlockCard({
   title,
@@ -95,6 +98,8 @@ function doneShare(item: TimedBlock): number {
 export function TodayScreen() {
   const state = usePlan(undefined);
   const now = useNow();
+  // A sleep report rebuilds the plan; show the rebuilt one at once.
+  const [updated, setUpdated] = useState<StoredPlan | null>(null);
 
   if (state.status === "loading") {
     return (
@@ -129,7 +134,8 @@ export function TodayScreen() {
     );
   }
 
-  const { plan } = state;
+  const plan =
+    updated !== null && updated.id === state.plan.id ? updated : state.plan;
   const view = todayView(plan.input, plan.result, now);
   const zone = zoneName(view.zone);
   const firstDate = plan.result.days[0]?.date;
@@ -192,6 +198,19 @@ export function TodayScreen() {
               timing={`${wallTime(view.next.block.startUtc, view.next.block.localTz)}, ${m.inMinutes(m.duration(view.next.minutes))}`}
             />
           )}
+          {(() => {
+            const night = lastNight(plan, now);
+            return view.phase === "during" && night !== undefined ? (
+              <SleepCheckin
+                key={plan.id}
+                plan={plan}
+                night={night}
+                zone={view.zone}
+                now={now}
+                onSaved={setUpdated}
+              />
+            ) : null;
+          })()}
           {later.length === 0 ? null : (
             <section aria-labelledby="today-later" className="min-w-0">
               <h2
@@ -200,7 +219,12 @@ export function TodayScreen() {
               >
                 {m.laterToday}
               </h2>
-              <ul className="mt-2 flex gap-2 overflow-x-auto pb-1">
+              {/* Focusable so keyboard users can scroll a long row. */}
+              <ul
+                className="mt-2 flex gap-2 overflow-x-auto pb-1 outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                tabIndex={0}
+                aria-labelledby="today-later"
+              >
                 {later.map((b) => (
                   <li key={b.startUtc + b.kind} className="pj-chip shrink-0">
                     <span className="text-fg">

@@ -82,6 +82,14 @@ export const inputs: fc.Arbitrary<PlanInput> = fc
     meals: fc.boolean(),
     preAdjustDays: fc.constantFrom(0, 1, 2, 3),
     arrivalStyle: fc.constantFrom(undefined, "local" as const),
+    // Up to two reported sleeps, a few nights around departure.
+    reports: fc.array(
+      fc.tuple(
+        fc.integer({ min: -2 * 1440, max: 8 * 1440 }),
+        fc.integer({ min: 60, max: 12 * 60 }),
+      ),
+      { maxLength: 2 },
+    ),
     home: fc.constantFrom(...ZONES),
     destination: fc.constantFrom(...ZONES),
     // 2026-01-01 .. 2028-12-31, minute resolution.
@@ -185,6 +193,14 @@ export const inputs: fc.Arbitrary<PlanInput> = fc
           : { noWorkoutWindows: [window(r.noWorkout)] }),
       },
       now: "2026-01-01T00:00:00Z",
+      ...(r.reports.length === 0
+        ? {}
+        : {
+            observedSleep: r.reports.map(([offset, minutes]) => ({
+              start: dep.add({ minutes: offset }).toString(),
+              end: dep.add({ minutes: offset + minutes }).toString(),
+            })),
+          }),
     } satisfies PlanInput;
   });
 

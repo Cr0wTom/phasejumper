@@ -52,6 +52,7 @@ import {
   MARKER_MINUTES,
   MEALS,
   MELATONIN,
+  OBSERVED_SLEEP,
   WIND_DOWN,
 } from "./prc";
 import {
@@ -437,6 +438,33 @@ function buildRaw(
   return { raw, lightShifted, melatoninDropped };
 }
 
+/**
+ * Minutes between the planned night around `cbtMin` and a reported main
+ * sleep that matches it (reported midpoint minus planned midpoint), capped
+ * to ±OBSERVED_SLEEP.maxShiftHours; 0 when nothing matches or the
+ * difference is negligible.
+ */
+function reportedShiftMinutes(
+  cbtMin: Instant,
+  phase: PhaseEstimate,
+  observed: readonly Interval[],
+): number {
+  const start = sleepStartOf(cbtMin, phase);
+  const plannedMid = plus(start, Math.round(phase.sleepNeedMinutes / 2));
+  let best: number | undefined;
+  for (const sleep of observed) {
+    if (length(sleep) < OBSERVED_SLEEP.minMainSleepHours * 60) continue;
+    const mid = plus(sleep.start, Math.round(length(sleep) / 2));
+    const delta = minutesBetween(plannedMid, mid);
+    if (Math.abs(delta) > OBSERVED_SLEEP.matchWithinHours * 60) continue;
+    if (best === undefined || Math.abs(delta) < Math.abs(best)) best = delta;
+  }
+  if (best === undefined || Math.abs(best) < OBSERVED_SLEEP.ignoreUnderMinutes)
+    return 0;
+  const cap = OBSERVED_SLEEP.maxShiftHours * 60;
+  return Math.max(-cap, Math.min(cap, best));
+}
+
 function buildDay(
   ctx: PlanContext,
   frame: DayFrame,
@@ -613,6 +641,10 @@ export function generatePlan(
   };
   const shifting =
     decision.direction === "advance" || decision.direction === "delay";
+  const observed: Interval[] = (input.observedSleep ?? []).map((r) => ({
+    start: Temporal.Instant.from(r.start),
+    end: Temporal.Instant.from(r.end),
+  }));
   // Arrival style "local" (practical, opt-in): only for plans that shift.
   const finalLanding = legs[legs.length - 1]?.end;
   const outOfAirport =
@@ -735,6 +767,7 @@ export function generatePlan(
     let cbtMin = cbtMin0;
     let behindSchedule = false;
     let forecast: ForecastState = { cbtMin: cbtMin0, remaining: initial };
+    let followsReport = false;
     for (let index = 0; ; index += 1) {
       if (index >= MAX_PLAN_DAYS) {
         throw new Error(
@@ -742,12 +775,23 @@ export function generatePlan(
         );
       }
       const planned = Math.min(rate, remaining);
-      const frameFor = (shift: number): DayFrame => ({
-        index,
-        cbtMin,
-        nextCbtMin: plus(cbtMin, MINUTES_PER_DAY + sign * shift),
-        shift,
-      });
+      const frameFor = (shift: number): DayFrame => {
+        const next = plus(cbtMin, MINUTES_PER_DAY + sign * shift);
+        // A report counts as progress at most up to the target, never past
+        // it (the plan cannot shift back the other way).
+        // A report of this frame's night (the one that starts the day)
+        // re-anchors the body clock from there: the night itself stays as
+        // planned, the evening and the nights after it follow the report.
+        // The plan's last day (no shift) has nothing left to re-plan.
+        const reported =
+          shift === 0 ? 0 : reportedShiftMinutes(cbtMin, phase, observed);
+        const progress = Math.min(
+          sign * reported,
+          Math.max(0, remaining - shift),
+        );
+        const delta = sign * reported > 0 ? sign * progress : reported;
+        return { index, cbtMin, nextCbtMin: plus(next, delta), shift };
+      };
       let day = buildDay(ctx, frameFor(planned), behindSchedule);
       let weak = false;
       if (planned > 0 && !hasLightInZone(day, direction)) {
@@ -759,6 +803,7 @@ export function generatePlan(
           behindSchedule,
         );
       }
+      if (followsReport) day.filtered.warnings.push("PLAN_ADJUSTED_TO_SLEEP");
       const step = forecastStep(forecast, {
         shift: day.frame.shift,
         bonus:
@@ -790,6 +835,17 @@ export function generatePlan(
         0,
         remaining - day.frame.shift - sign * offsetChange,
       );
+      // How far a report moved the next night from the plan.
+      const delta = minutesBetween(
+        plus(cbtMin, MINUTES_PER_DAY + sign * day.frame.shift),
+        day.frame.nextCbtMin,
+      );
+      followsReport = delta !== 0;
+      if (followsReport) {
+        remaining = Math.max(0, remaining - sign * delta);
+        // A report is a measurement: the forecast restarts from it.
+        forecast = { cbtMin: day.frame.nextCbtMin, remaining };
+      }
       cbtMin = day.frame.nextCbtMin;
       behindSchedule = behindSchedule || weak;
     }

@@ -271,6 +271,18 @@ export const planMessages = {
   after:
     "Your plan is complete. Your body clock should be on destination time.",
   viewPlan: "See the full plan",
+  checkinHeading: "How did you sleep last night?",
+  checkinHint:
+    "Change the times if they were different. The rest of your plan adjusts to what you report. This stays on this device.",
+  checkinBed: "Fell asleep",
+  checkinWake: "Woke up",
+  checkinSave: "Update my plan",
+  checkinSaved: "Your plan now follows the sleep you reported.",
+  checkinSame: "That matches the plan, so nothing changes.",
+  checkinFailed:
+    "Your report could not be saved. Allow site data for this site, then try again.",
+  checkinInvalid: "Waking up must be after falling asleep, within 16 hours.",
+  checkinFuture: "Waking up can't be later than now.",
   dialLabel: (date: string): string => `Your day, ${date}`,
   dialHint: "Tap a part of the day to see what it is and why.",
   laterToday: "Later today",

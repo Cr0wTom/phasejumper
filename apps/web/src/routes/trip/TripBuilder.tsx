@@ -383,7 +383,11 @@ export function TripBuilder({ editId }: { editId?: string } = {}) {
       try {
         await savePlan({
           id,
-          input: mapped.input,
+          // Editing keeps the sleep the traveler already reported.
+          input:
+            editing?.input.observedSleep === undefined
+              ? mapped.input
+              : { ...mapped.input, observedSleep: editing.input.observedSleep },
           result,
           engineVersion: ENGINE_VERSION,
           createdAt,
