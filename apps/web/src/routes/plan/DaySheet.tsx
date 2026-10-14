@@ -15,13 +15,15 @@
  */
 
 // The day sheet: one day's detail in a modal panel, opened from the day
-// chips or a row of the phase map. A bottom sheet on phones, a side panel
-// from 768 px. Uses <dialog> for focus handling and Escape.
+// chips or a row of the phase map. A bottom sheet on phones, with the whole
+// day drawn in the space above it; a side panel from 768 px. Uses <dialog>
+// for focus handling and Escape.
 
-import type { PlanResult } from "@phasejumper/engine";
+import type { PlanInput, PlanResult } from "@phasejumper/engine";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { shortDate } from "../../format";
+import { DayView } from "../../components/PhaseMap/DayView";
 import { ICON_STROKE } from "../../icons";
 import { planMessages as m } from "../../messages";
 import { focusRing } from "../../ui";
@@ -30,11 +32,13 @@ import { DayDetail } from "./DayList";
 const iconButton = `pj-btn pj-icon-btn ${focusRing}`;
 
 export function DaySheet({
+  input,
   result,
   index,
   onIndex,
   onClose,
 }: {
+  input: PlanInput;
   result: PlanResult;
   /** The open day, or null when the sheet is closed. */
   index: number | null;
@@ -43,6 +47,9 @@ export function DaySheet({
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   const day = index === null ? undefined : result.days[index];
+  // The moment touched on the drawn day; cleared when the day changes.
+  const [activeAt, setActiveAt] = useState<string | null>(null);
+  useEffect(() => setActiveAt(null), [index]);
 
   useEffect(() => {
     const dialog = ref.current;
@@ -64,7 +71,17 @@ export function DaySheet({
       }}
     >
       {day === undefined || index === null ? null : (
-        <div className="flex max-h-full flex-col">
+        <div className="pj-sheet-day">
+          <DayView
+            input={input}
+            result={result}
+            date={day.date}
+            onMoment={setActiveAt}
+          />
+        </div>
+      )}
+      {day === undefined || index === null ? null : (
+        <div className="pj-sheet-panel">
           <div className="flex items-center gap-2 border-b border-line p-4">
             <h2
               id="day-sheet-title"
@@ -114,7 +131,7 @@ export function DaySheet({
             role="region"
             aria-labelledby="day-sheet-title"
           >
-            <DayDetail result={result} index={index} />
+            <DayDetail result={result} index={index} activeAt={activeAt} />
           </div>
         </div>
       )}

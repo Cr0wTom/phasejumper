@@ -22,6 +22,7 @@
 // the next night's CBTmin and sleep start (the spec's "sleepStart_d" for that
 // evening).
 
+import { getPosition } from "suncalc";
 import { Temporal } from "temporal-polyfill";
 import {
   adviceCopy,
@@ -222,6 +223,42 @@ function latLonLocator(
     }
     return where;
   };
+}
+
+/** Legs as instants, with airport coordinates where the input has them. */
+function legsWithPlaces(input: PlanInput): Leg[] {
+  return legInstants(input).map((l, i) => {
+    const source = input.itinerary.legs[i];
+    return {
+      start: l.dep,
+      end: l.arr,
+      depTz: l.depTz,
+      arrTz: l.arrTz,
+      ...(source?.departureLatLon === undefined
+        ? {}
+        : { depLatLon: source.departureLatLon }),
+      ...(source?.arrivalLatLon === undefined
+        ? {}
+        : { arrLatLon: source.arrivalLatLon }),
+    };
+  });
+}
+
+/**
+ * The sun's altitude in degrees where the traveler is at an instant, as the
+ * daylight check sees it. Undefined in the air or when the airport has no
+ * coordinates. Assumes validated input.
+ */
+export function sunAltitudeAt(
+  input: PlanInput,
+  atUtc: string,
+): number | undefined {
+  const at = Temporal.Instant.from(atUtc);
+  const where = latLonLocator(legsWithPlaces(input))(at);
+  if (where === undefined) return undefined;
+  // suncalc 2 reports altitude in degrees.
+  return getPosition(new Date(at.epochMilliseconds), where.lat, where.lon)
+    .altitude;
 }
 
 function localInterval(start: string, end: string, tz: string): Interval {
@@ -615,21 +652,7 @@ export function generatePlan(
 
   const { traveler, itinerary } = input;
   const phase = estimatePhase(traveler);
-  const legs: Leg[] = legInstants(input).map((l, i) => {
-    const source = itinerary.legs[i];
-    return {
-      start: l.dep,
-      end: l.arr,
-      depTz: l.depTz,
-      arrTz: l.arrTz,
-      ...(source?.departureLatLon === undefined
-        ? {}
-        : { depLatLon: source.departureLatLon }),
-      ...(source?.arrivalLatLon === undefined
-        ? {}
-        : { arrLatLon: source.arrivalLatLon }),
-    };
-  });
+  const legs = legsWithPlaces(input);
   const firstLeg = legs[0];
   const lastLeg = legs[legs.length - 1];
   if (firstLeg === undefined || lastLeg === undefined) {

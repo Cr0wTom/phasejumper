@@ -585,32 +585,74 @@ input[type="file"]::file-selector-button {
 }
 
 /* Day sheet: a bottom sheet on phones, a side panel from 768 px. */
+/* Phones: the dialog fills the screen and is see-through. The day is drawn
+   at the top, the sheet sits at the bottom, and the gap between them is
+   the dialog itself, so tapping it closes. */
 .pj-sheet {
   position: fixed;
-  inset: auto 0 0 0;
+  inset: 0;
   width: 100%;
   max-width: 100%;
-  max-height: 82vh;
+  height: 100%;
+  max-height: 100%;
   margin: 0;
-  padding: 0 0 env(safe-area-inset-bottom);
-  border: 1px solid var(--line-strong);
-  border-bottom: 0;
-  border-radius: 20px 20px 0 0;
-  background: var(--surface-2);
+  padding: 0;
+  border: 0;
+  background: transparent;
   color: var(--fg);
-  box-shadow: var(--card-shadow);
 }
 
 .pj-sheet[open] {
   display: flex;
   flex-direction: column;
-  animation: pj-sheet-up 220ms ease-out both;
 }
 
 .pj-sheet::backdrop {
   background: rgb(0 0 0 / 0.5);
   -webkit-backdrop-filter: blur(4px);
   backdrop-filter: blur(4px);
+}
+
+.pj-sheet-day {
+  flex: none;
+  margin: calc(env(safe-area-inset-top) + 16px) 16px 0;
+  animation: pj-day-down 220ms ease-out both;
+}
+
+/* Items going on at the moment touched on the drawn day. */
+.pj-day-item {
+  margin: -6px;
+  padding: 6px;
+  border-radius: 12px;
+  transition: background-color 120ms ease;
+}
+
+.pj-day-item[data-active] {
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+/* The drawn day floats on the frosted backdrop: no card, just the shape. */
+.pj-day-view {
+  border-radius: 16px;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--fg) 8%, transparent),
+    0 18px 40px -18px rgb(0 0 0 / 0.6);
+}
+
+.pj-sheet-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  max-height: 60vh;
+  margin-top: auto;
+  padding: 0 0 env(safe-area-inset-bottom);
+  border: 1px solid var(--line-strong);
+  border-bottom: 0;
+  border-radius: 20px 20px 0 0;
+  background: var(--surface-2);
+  box-shadow: var(--card-shadow);
+  animation: pj-sheet-up 220ms ease-out both;
 }
 
 @keyframes pj-sheet-up {
@@ -620,12 +662,30 @@ input[type="file"]::file-selector-button {
   }
 }
 
+@keyframes pj-day-down {
+  from {
+    transform: translateY(-12px);
+    opacity: 0;
+  }
+}
+
 @media (min-width: 768px) {
   .pj-sheet {
     inset: 12px 12px 12px auto;
     width: 440px;
-    max-height: none;
     height: auto;
+    max-height: none;
+  }
+
+  .pj-sheet-day {
+    display: none;
+  }
+
+  .pj-sheet-panel {
+    flex: 1;
+    max-height: none;
+    margin-top: 0;
+    padding: 0;
     border: 1px solid var(--line-strong);
     border-radius: 20px;
   }
@@ -639,7 +699,8 @@ input[type="file"]::file-selector-button {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .pj-sheet[open] {
+  .pj-sheet-panel,
+  .pj-sheet-day {
     animation: none;
   }
 }

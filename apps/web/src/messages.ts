@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-import type { BlockKind } from "@phasejumper/engine";
-
 export const messages = {
   title: "PhaseJumper",
   updateReady: "A new version is ready.",
@@ -175,19 +173,17 @@ export const phaseMapMessages = {
       ? `Evidence grade ${grade}. A comfort layer with no single cited study.`
       : `Evidence grade ${grade}, source ${source}.`,
   close: "Close",
-  keyLabel: "Key",
-  showDetails: "Show all details",
+  legend: "Legend",
   fullKey: "Full key",
+  stripHint:
+    "Each line is one day: sleep, light, meals and flights. Tap a day to see all of it.",
+  stripRowLabel: (date: string): string =>
+    `${date}. Press Enter to open the day.`,
+  dayViewLabel:
+    "The whole day drawn: sleep, light, exercise, food and drink, the sky where you are and your body's night. Every item is listed below.",
   keyHeading: "How to read the phase map",
   keyIntro:
-    'Each row is one day, midnight to midnight. Inside a row the bands run top to bottom: sleep and rest, light, exercise, then food and drink. On a phone the map shows the moments to act on; switch on "Show all details" to see the background ranges too.',
-  /** Shorter names, used inside bands on phones. */
-  shortKinds: {
-    SEEK_LIGHT: "Light",
-    SEEK_LIGHT_ARTIFICIAL: "Light",
-    LIGHT_INFLIGHT_WINDOW: "Window",
-    AVOID_LIGHT: "Dim",
-  } as Partial<Record<BlockKind, string>>,
+    "Each row is one day, midnight to midnight. Inside a row the bands run top to bottom: sleep and rest, light, exercise, then food and drink. On a phone each day is one line with sleep, light, meals and flights; tap a day to see all of it.",
   legendGroups: {
     sleep: "Sleep & rest",
     light: "Light",

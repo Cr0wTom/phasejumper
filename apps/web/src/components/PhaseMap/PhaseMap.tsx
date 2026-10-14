@@ -33,9 +33,9 @@ import { KIND_ICON } from "../../icons";
 import { focusRing } from "../../ui";
 import {
   COLOR,
-  DETAIL_KINDS,
   FAINT,
   Hatch,
+  KEY_GROUPS,
   KEY_ORDER,
   KeyIcon,
   MARKER_ICON,
@@ -44,6 +44,7 @@ import {
   SOFT_STROKE,
   markerName,
   markerSwatch,
+  stripSwatch,
   swatch,
   type Marker,
 } from "./legend";
@@ -99,31 +100,38 @@ interface Geometry {
   compact: boolean;
 }
 
-/** Phones: below this width the map shows key moments unless asked for all. */
+/** Phones: below this width each day is one line; tapping it opens the day. */
 const PHONE_WIDTH = 600;
 
-function geometry(
-  width: number,
-  scaleCount: number,
-  keyMoments: boolean,
-): Geometry {
+/** What a one-line day shows: sleep, light, meals (plus flights and the low point). */
+const STRIP_KINDS: ReadonlySet<BlockKind> = new Set([
+  "SLEEP",
+  "SLEEP_INFLIGHT",
+  "NAP",
+  "SEEK_LIGHT",
+  "SEEK_LIGHT_ARTIFICIAL",
+  "LIGHT_INFLIGHT_WINDOW",
+  "MEAL",
+]);
+
+function geometry(width: number, scaleCount: number, strip: boolean): Geometry {
   const compact = width < PHONE_WIDTH;
   const gutter = compact ? 52 : 96;
-  if (keyMoments) {
-    // Three bands: sleep and light larger, then one band for the moments to
-    // act on (best exercise time, best time for melatonin, last caffeine).
-    const moments = { y: 56, h: 12 };
+  if (strip) {
+    // One line per day: sleep on the line, light as a thinner band on the
+    // same line (they never overlap), meals as ticks through it.
+    const line = { y: 11, h: 16 };
     return {
       width,
       gutter,
       ribbon: Math.max(1, width - gutter - 8),
       header: 4 + 18 * scaleCount,
-      rowH: 78,
+      rowH: 38,
       lanes: {
-        sleep: { y: 6, h: 24 },
-        light: { y: 34, h: 16 },
-        move: moments,
-        intake: moments,
+        sleep: line,
+        light: { y: 16, h: 6 },
+        move: line,
+        intake: { y: 10, h: 18 },
       },
       tickEvery: 6,
       compact,
@@ -241,10 +249,8 @@ export function PhaseMap({
   const otherAxis: Axis = axis === "destination" ? "home" : "destination";
   const shownScales: Axis[] = scales[otherAxis] ? [axis, otherAxis] : [axis];
   const [width, setWidth] = useState(1040);
-  // Phones show key moments; the background ranges come back on request.
-  const [details, setDetails] = useState(false);
-  const phone = width < PHONE_WIDTH;
-  const keyMoments = phone && !details && !compact;
+  // Phones: one line per day; the day sheet shows the rest.
+  const strip = width < PHONE_WIDTH && !compact;
   const [open, setOpen] = useState<{ id: string; x: number; y: number } | null>(
     null,
   );
@@ -271,14 +277,14 @@ export function PhaseMap({
     const all = layoutPlan(input, result, axis);
     const dated =
       onlyDate === undefined ? all : all.filter((r) => r.date === onlyDate);
-    return keyMoments
+    return strip
       ? dated.map((r) => ({
           ...r,
-          segments: r.segments.filter((s) => !DETAIL_KINDS.has(s.block.kind)),
+          segments: r.segments.filter((s) => STRIP_KINDS.has(s.block.kind)),
         }))
       : dated;
-  }, [input, result, axis, onlyDate, keyMoments]);
-  // The key lists only what is drawn right now, in band order.
+  }, [input, result, axis, onlyDate, strip]);
+  // The legend lists only what is drawn, in band order.
   const keyKinds = useMemo(() => {
     const kinds = new Set<BlockKind>();
     for (const row of rows)
@@ -290,7 +296,7 @@ export function PhaseMap({
     ...(rows.some((r) => r.cbtMin.length > 0) ? (["cbtMin"] as const) : []),
     ...(rows.some((r) => r.targetMin !== null) ? (["target"] as const) : []),
   ];
-  const g = geometry(width, shownScales.length, keyMoments);
+  const g = geometry(width, shownScales.length, strip);
   const height = g.header + rows.length * g.rowH;
   const zone = axisZone(axis, input);
   const nowAt =
@@ -356,7 +362,7 @@ export function PhaseMap({
     } else if (event.key === "ArrowUp") {
       event.preventDefault();
       focusRow(rowIndex - 1);
-    } else if (event.key === "ArrowRight" && list[0] !== undefined) {
+    } else if (!strip && event.key === "ArrowRight" && list[0] !== undefined) {
       event.preventDefault();
       segRefs.current.get(list[0].id)?.focus();
     } else if (
@@ -453,60 +459,6 @@ export function PhaseMap({
         )}
       </div>
 
-      {compact ? null : (
-        <div className="flex flex-col gap-2">
-          {/* The key: only the marks drawn right now, in band order. */}
-          <ul
-            aria-label={m.keyLabel}
-            className="flex flex-wrap gap-x-3 gap-y-1 text-13 leading-body text-fg-muted"
-          >
-            {keyKinds.map((k) => (
-              <li key={k} className="flex items-center gap-1">
-                <KeyIcon name={KIND_ICON[k]} />
-                <svg width="14" height="10" aria-hidden="true">
-                  {swatch(k)}
-                </svg>
-                {m.kinds[k]}
-              </li>
-            ))}
-            {keyMarkers.map((k) => (
-              <li key={k} className="flex items-center gap-1">
-                <KeyIcon name={MARKER_ICON[k]} />
-                <svg width="14" height="10" aria-hidden="true">
-                  {markerSwatch(k, patternId)}
-                </svg>
-                {markerName(k)}
-              </li>
-            ))}
-          </ul>
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-13 leading-body">
-            {phone ? (
-              <button
-                type="button"
-                aria-pressed={details}
-                onClick={() => {
-                  setOpen(null);
-                  setDetails((on) => !on);
-                }}
-                className={`rounded-full border px-3 py-1 transition-colors ${
-                  details
-                    ? "border-accent/50 bg-accent/15 text-fg"
-                    : "border-line text-fg-muted hover:text-fg"
-                } ${focusRing}`}
-              >
-                {m.showDetails}
-              </button>
-            ) : null}
-            <a
-              href="#/evidence/key"
-              className={`text-fg-muted underline-offset-2 hover:text-fg hover:underline ${focusRing}`}
-            >
-              {m.fullKey}
-            </a>
-          </div>
-        </div>
-      )}
-
       <div ref={containerRef} className="relative w-full">
         <svg
           role="group"
@@ -561,30 +513,6 @@ export function PhaseMap({
             const past = nowAt !== undefined && rowIndex < nowAt.rowIndex;
             const dotXs = row.cbtMin.map((c) => x(c.min));
             const list = row.segments;
-            // Key moments carry their start time when it fits beside them.
-            const momentLabels = new Map<string, number>();
-            if (keyMoments) {
-              let free = 0;
-              const moments = list
-                .filter((s) => s.lane === "move" || s.lane === "intake")
-                .sort((a, b) => a.startMin - b.startMin);
-              for (const s of moments) {
-                const at = x(s.endMin) + 3;
-                const textW = s.from.length * 6.2;
-                const nextStart = moments.find(
-                  (o) => o.startMin > s.startMin,
-                )?.startMin;
-                const room =
-                  nextStart === undefined ? g.gutter + g.ribbon : x(nextStart);
-                if (
-                  at >= free &&
-                  at + textW <= Math.min(room - 2, g.gutter + g.ribbon - 2)
-                ) {
-                  momentLabels.set(s.id, at);
-                  free = at + textW + 4;
-                }
-              }
-            }
             return (
               <g
                 key={row.date}
@@ -594,7 +522,11 @@ export function PhaseMap({
                 transform={`translate(0 ${y0})`}
                 role="group"
                 tabIndex={0}
-                aria-label={m.rowLabel(dateLabel(row.date, false), list.length)}
+                aria-label={
+                  strip
+                    ? m.stripRowLabel(dateLabel(row.date, false))
+                    : m.rowLabel(dateLabel(row.date, false), list.length)
+                }
                 onKeyDown={(e) => onRowKey(e, rowIndex)}
                 className="pj-row outline-none focus-visible:[&>rect.pj-row-bg]:stroke-fg"
                 style={
@@ -719,10 +651,7 @@ export function PhaseMap({
                   const lane = g.lanes[seg.lane];
                   const color = COLOR[seg.block.kind];
                   const name = m.kinds[seg.block.kind];
-                  // On phones a band shows a short name, so more of them fit.
-                  const bandName = phone
-                    ? (m.shortKinds[seg.block.kind] ?? name)
-                    : name;
+                  const bandName = name;
                   const label = m.itemLabel(name, seg.from, seg.to, seg.point);
                   const x0 = x(seg.startMin);
                   const w = Math.max(2, x(seg.endMin) - x0);
@@ -739,7 +668,12 @@ export function PhaseMap({
                       aria-label={label}
                       aria-haspopup="dialog"
                       onKeyDown={(e) => onSegKey(e, rowIndex, segIndex)}
-                      onClick={() => openFor(seg, rowIndex)}
+                      onClick={() => {
+                        // A one-line day opens as a whole.
+                        if (strip && onSelectDate !== undefined) {
+                          onSelectDate(row.date);
+                        } else openFor(seg, rowIndex);
+                      }}
                       className="cursor-pointer outline-none focus-visible:[&>.pj-mark]:stroke-fg focus-visible:[&>.pj-mark]:[stroke-width:2]"
                       data-kind={seg.block.kind}
                       data-start-min={seg.startMin}
@@ -866,20 +800,6 @@ export function PhaseMap({
                           {bandName}
                         </text>
                       ) : null}
-                      {momentLabels.get(seg.id) === undefined ? null : (
-                        <text
-                          x={momentLabels.get(seg.id)}
-                          y={lane.y + lane.h / 2}
-                          dominantBaseline="central"
-                          fontSize={10}
-                          fill={MUTED}
-                          className="font-mono"
-                          aria-hidden="true"
-                          data-beside=""
-                        >
-                          {seg.from}
-                        </text>
-                      )}
                     </g>
                   );
                 })}
@@ -993,6 +913,66 @@ export function PhaseMap({
           </div>
         )}
       </div>
+      {compact ? null : (
+        <div>
+          <h3 className="text-13 font-medium leading-body">{m.legend}</h3>
+          {strip ? (
+            <p className="mt-1 text-13 leading-body text-fg-muted">
+              {m.stripHint}
+            </p>
+          ) : null}
+          {/* Grouped like the bands in each row; only what is drawn. */}
+          <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-3 text-13 leading-body text-fg-muted sm:grid-cols-3 lg:grid-cols-5">
+            {KEY_GROUPS.map(([group, kinds]) => {
+              const shown = kinds.filter((k) => keyKinds.includes(k));
+              return shown.length === 0 ? null : (
+                <div key={group}>
+                  <h4 className="text-13 font-medium text-fg">
+                    {m.legendGroups[group]}
+                  </h4>
+                  <ul className="mt-1 flex flex-col gap-1">
+                    {shown.map((k) => (
+                      <li key={k} className="flex items-center gap-1">
+                        <KeyIcon name={KIND_ICON[k]} />
+                        <svg width="14" height="10" aria-hidden="true">
+                          {strip ? stripSwatch(k) : swatch(k)}
+                        </svg>
+                        {m.kinds[k]}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })}
+            {keyMarkers.length === 0 ? null : (
+              <div>
+                <h4 className="text-13 font-medium text-fg">
+                  {m.legendGroups.markers}
+                </h4>
+                <ul className="mt-1 flex flex-col gap-1">
+                  {keyMarkers.map((k) => (
+                    <li key={k} className="flex items-center gap-1">
+                      <KeyIcon name={MARKER_ICON[k]} />
+                      <svg width="14" height="10" aria-hidden="true">
+                        {markerSwatch(k, patternId)}
+                      </svg>
+                      {markerName(k)}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+          <p className="mt-3 text-13 leading-body">
+            <a
+              href="#/evidence/key"
+              className={`text-fg-muted underline underline-offset-2 hover:text-fg ${focusRing}`}
+            >
+              {m.fullKey}
+            </a>
+          </p>
+        </div>
+      )}
     </section>
   );
 }

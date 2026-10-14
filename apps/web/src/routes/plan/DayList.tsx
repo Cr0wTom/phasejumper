@@ -21,18 +21,40 @@
 import type { PlanResult } from "@phasejumper/engine";
 import { wallTime, zoneName } from "../../format";
 import { ICON_SIZE, Icon, KIND_ICON } from "../../icons";
+import { useEffect, useRef } from "react";
 import { phaseMapMessages, planMessages as m } from "../../messages";
 
 const POINT = new Set(["CAFFEINE_STOP", "MEAL"]);
+/** A point item counts as "at" a moment within this many minutes of it. */
+const POINT_REACH_MS = 10 * 60_000;
+
+/** Whether a block is going on at an instant (ISO). */
+function isAt(
+  block: { kind: string; startUtc: string; endUtc: string },
+  at: string,
+): boolean {
+  const t = Date.parse(at);
+  const start = Date.parse(block.startUtc);
+  return POINT.has(block.kind)
+    ? Math.abs(start - t) <= POINT_REACH_MS
+    : start <= t && t < Date.parse(block.endUtc);
+}
 
 /** One day's detail: warnings, every block with icon, time and reason. */
 export function DayDetail({
   result,
   index,
+  activeAt,
 }: {
   result: PlanResult;
   index: number;
+  /** A moment (ISO) picked on the drawn day: items going on then stand out. */
+  activeAt?: string | null;
 }) {
+  const firstActive = useRef<HTMLLIElement | null>(null);
+  useEffect(() => {
+    firstActive.current?.scrollIntoView({ block: "nearest" });
+  }, [activeAt]);
   const day = result.days[index];
   if (day === undefined) return null;
   const warnings = result.warnings.filter((w) => w.dayIndex === index);
@@ -49,6 +71,18 @@ export function DayDetail({
       )}
       <ul className="flex flex-col gap-3">
         {day.blocks.map((block, i) => {
+          const active =
+            activeAt !== undefined &&
+            activeAt !== null &&
+            isAt(block, activeAt);
+          const firstOn =
+            active &&
+            day.blocks.findIndex(
+              (b) =>
+                activeAt !== null &&
+                activeAt !== undefined &&
+                isAt(b, activeAt),
+            ) === i;
           const icon = KIND_ICON[block.kind];
           const zone = zoneName(block.localTz);
           const from = wallTime(block.startUtc, block.localTz);
@@ -56,7 +90,12 @@ export function DayDetail({
             ? m.timePoint(from, zone)
             : m.timeRange(from, wallTime(block.endUtc, block.localTz), zone);
           return (
-            <li key={i} className="flex gap-3">
+            <li
+              key={i}
+              ref={firstOn ? firstActive : undefined}
+              data-active={active ? "" : undefined}
+              className="pj-day-item flex gap-3"
+            >
               <span className="pj-icon-tile shrink-0 text-fg-muted">
                 {icon === undefined ? null : (
                   <Icon name={icon} size={ICON_SIZE} />
