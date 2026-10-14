@@ -69,6 +69,10 @@
   --danger: #ffb4b4;
   --ink: #07080a;
   --on-sleep: #07080a;
+  /* Phase-map background marks: faint ranges, soft lines, quiet bands. */
+  --pj-faint: 0.3;
+  --pj-soft: 0.6;
+  --pj-quiet: 0.35;
   /* Hatched in-air band: muted text at 30%. The hatch itself is --flight-hatch. */
   --flight: color-mix(in srgb, var(--fg-muted) 30%, transparent);
   --flight-hatch: repeating-linear-gradient(
@@ -109,6 +113,10 @@
   --melatonin: #8c5cf0;
   --danger: #b42318;
   --on-sleep: #ffffff;
+  /* Stronger on white, so thin marks stay readable. */
+  --pj-faint: 0.45;
+  --pj-soft: 0.85;
+  --pj-quiet: 0.5;
 }
 
 @theme inline {

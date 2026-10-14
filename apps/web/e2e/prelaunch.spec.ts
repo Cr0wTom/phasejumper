@@ -15,7 +15,7 @@
  */
 
 import { expect, test } from "@playwright/test";
-import { messages } from "../src/messages";
+import { messages, phaseMapMessages } from "../src/messages";
 import { preAcceptTerms } from "./acceptTerms";
 
 test.beforeEach(async ({ page }) => {
@@ -113,4 +113,28 @@ test("the arrival-day choice defaults to following the body clock", async ({
   await choice.selectOption("local");
   await expect(choice).toHaveValue("local");
   await expect(page.getByText(messages.arrivalStyleHint)).toBeVisible();
+});
+
+test("the full phase-map key is on the research page", async ({ page }) => {
+  await page.goto("#/evidence/key");
+  const heading = page.getByRole("heading", {
+    name: phaseMapMessages.keyHeading,
+  });
+  await expect(heading).toBeInViewport();
+  const section = page.getByRole("region", {
+    name: phaseMapMessages.keyHeading,
+  });
+  for (const group of Object.values(phaseMapMessages.legendGroups)) {
+    await expect(
+      section.getByRole("heading", { name: group, exact: true }),
+    ).toBeVisible();
+  }
+  for (const kind of [
+    phaseMapMessages.kinds.MELATONIN_OK,
+    phaseMapMessages.kinds.MEAL,
+    phaseMapMessages.kinds.EXERCISE_AVOID,
+    phaseMapMessages.cbtMin,
+  ]) {
+    await expect(section.getByText(kind, { exact: true })).toBeVisible();
+  }
 });
