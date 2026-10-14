@@ -72,19 +72,8 @@
       "cbtMinUtc": "2027-01-16T12:30:00Z",
       "blocks": [
         {
-          "kind": "NAP",
-          "startUtc": "2027-01-16T07:00:00Z",
-          "endUtc": "2027-01-16T07:20:00Z",
-          "localTz": "America/Los_Angeles",
-          "reasonCode": "NAP_SHORT_SLEEP",
-          "reason": "A short nap here makes up for a short night.",
-          "source": "R12",
-          "confidence": "B",
-          "movable": true
-        },
-        {
           "kind": "SLEEP",
-          "startUtc": "2027-01-16T10:30:00Z",
+          "startUtc": "2027-01-16T11:30:00Z",
           "endUtc": "2027-01-16T15:00:00Z",
           "localTz": "Europe/Prague",
           "reasonCode": "SLEEP_HOME_TIME",
@@ -94,8 +83,19 @@
           "movable": false
         },
         {
-          "kind": "CAFFEINE_OK",
+          "kind": "NAP",
           "startUtc": "2027-01-16T15:00:00Z",
+          "endUtc": "2027-01-16T16:30:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "NAP_SHORT_SLEEP",
+          "reason": "A short nap here makes up for a short night.",
+          "source": "R12",
+          "confidence": "B",
+          "movable": true
+        },
+        {
+          "kind": "CAFFEINE_OK",
+          "startUtc": "2027-01-16T16:30:00Z",
           "endUtc": "2027-01-16T23:00:00Z",
           "localTz": "Europe/Prague",
           "reasonCode": "CAFFEINE_OK",
@@ -251,5 +251,5 @@
     }
   ],
   "droppedBlocks": [],
-  "engineVersion": "0.5.0"
+  "engineVersion": "0.6.0"
 }

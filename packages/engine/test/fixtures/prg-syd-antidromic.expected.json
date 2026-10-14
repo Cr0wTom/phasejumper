@@ -118,7 +118,7 @@
       "blocks": [
         {
           "kind": "SLEEP_INFLIGHT",
-          "startUtc": "2026-10-10T22:00:00Z",
+          "startUtc": "2026-10-10T22:30:00Z",
           "endUtc": "2026-10-11T06:00:00Z",
           "localTz": "Asia/Dubai",
           "reasonCode": "SLEEP_INFLIGHT",
@@ -1374,5 +1374,5 @@
       "reason": "It overlapped a more important window and was too short to keep."
     }
   ],
-  "engineVersion": "0.5.0"
+  "engineVersion": "0.6.0"
 }

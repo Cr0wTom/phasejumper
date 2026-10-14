@@ -99,7 +99,7 @@ import type {
 } from "./types";
 
 /** Bumped whenever plan output changes (§7.4). */
-export const ENGINE_VERSION = "0.5.0";
+export const ENGINE_VERSION = "0.6.0";
 
 /** Guard against a non-terminating loop; weak days at half rate stay far below. */
 const MAX_PLAN_DAYS = 60;
@@ -570,9 +570,14 @@ export function generatePlan(
     start: plus(l.start, -FEASIBILITY.awakeBeforeDepartureHours * 60),
     end: l.start,
   }));
+  const postArrival: Interval[] = legs.map((l) => ({
+    start: l.end,
+    end: plus(l.end, FEASIBILITY.awakeAfterArrivalMinutes),
+  }));
   const trip: TripContext = {
     legs,
     preDeparture,
+    postArrival,
     mustBeAwake: (constraints.mustBeAwake ?? []).map((e) =>
       localInterval(e.start, e.end, e.tz),
     ),

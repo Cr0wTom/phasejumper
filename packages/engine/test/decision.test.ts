@@ -79,9 +79,12 @@ describe("decision", () => {
     const sleeps = plan.days.flatMap((d) =>
       d.blocks.filter((b) => b.kind === "SLEEP"),
     );
-    // 23:00–07:00 Prague every night.
+    // 23:00–07:00 Prague every night, except the landing night: the flight
+    // lands 22:05 Prague and bed is at least an hour after landing.
     for (const s of sleeps) {
-      expect(s.startUtc.slice(11)).toBe("22:00:00Z");
+      expect(s.startUtc.slice(11)).toBe(
+        s.startUtc.startsWith("2027-01-15") ? "22:05:00Z" : "22:00:00Z",
+      );
       expect(s.endUtc.slice(11)).toBe("06:00:00Z");
     }
   });
