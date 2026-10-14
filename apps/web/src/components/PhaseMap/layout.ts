@@ -72,7 +72,7 @@ export interface Row {
   targetMin: number | null;
 }
 
-const LANE: Record<BlockKind, Lane> = {
+export const LANE: Record<BlockKind, Lane> = {
   SLEEP: "sleep",
   SLEEP_INFLIGHT: "sleep",
   NAP: "sleep",
@@ -93,7 +93,7 @@ const LANE: Record<BlockKind, Lane> = {
   CAFFEINE_STOP: "intake",
 };
 
-const POINT: ReadonlySet<BlockKind> = new Set([
+export const POINT: ReadonlySet<BlockKind> = new Set([
   "MELATONIN_WINDOW",
   "CAFFEINE_STOP",
   "MEAL",

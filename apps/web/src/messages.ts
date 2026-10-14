@@ -263,6 +263,10 @@ export const planMessages = {
   after:
     "Your plan is complete. Your body clock should be on destination time.",
   viewPlan: "See the full plan",
+  dialLabel: (date: string): string => `Your day, ${date}`,
+  dialHint: "Tap a part of the day to see what it is and why.",
+  laterToday: "Later today",
+  timeLeft: (text: string): string => `${text} left`,
 } as const;
 
 /** Start, Settings and the evidence page (T13). */
