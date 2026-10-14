@@ -21,7 +21,8 @@
 import type { PlanResult } from "@phasejumper/engine";
 import { wallTime, zoneName } from "../../format";
 import { ICON_SIZE, Icon, KIND_ICON } from "../../icons";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type CSSProperties } from "react";
+import { COLOR } from "../../components/PhaseMap/legend";
 import { phaseMapMessages, planMessages as m } from "../../messages";
 
 const POINT = new Set(["CAFFEINE_STOP", "MEAL"]);
@@ -95,6 +96,8 @@ export function DayDetail({
               ref={firstOn ? firstActive : undefined}
               data-active={active ? "" : undefined}
               className="pj-day-item flex gap-3"
+              // A highlighted item takes its band's colour from the drawing.
+              style={{ "--item": COLOR[block.kind] } as CSSProperties}
             >
               <span className="pj-icon-tile shrink-0 text-fg-muted">
                 {icon === undefined ? null : (

@@ -71,17 +71,16 @@ export function DaySheet({
       }}
     >
       {day === undefined || index === null ? null : (
-        <div className="pj-sheet-day">
-          <DayView
-            input={input}
-            result={result}
-            date={day.date}
-            onMoment={setActiveAt}
-          />
-        </div>
-      )}
-      {day === undefined || index === null ? null : (
         <div className="pj-sheet-panel">
+          {/* Phones: the day drawn as the top of the sheet. */}
+          <div className="pj-sheet-day">
+            <DayView
+              input={input}
+              result={result}
+              date={day.date}
+              onMoment={setActiveAt}
+            />
+          </div>
           <div className="flex items-center gap-2 border-b border-line p-4">
             <h2
               id="day-sheet-title"

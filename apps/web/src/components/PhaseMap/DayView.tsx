@@ -51,12 +51,16 @@ const NIGHT_AFTER_MIN = 2 * 60;
 type Sky = "day" | "twilight" | "night" | "air";
 
 const LANES = {
-  sleep: { y: 12, h: 22 },
-  light: { y: 42, h: 16 },
-  move: { y: 66, h: 10 },
-  intake: { y: 84, h: 12 },
+  sleep: { y: 18, h: 22 },
+  light: { y: 48, h: 16 },
+  move: { y: 72, h: 10 },
+  intake: { y: 90, h: 12 },
 } as const;
-const HEIGHT = 108;
+const HEIGHT = 128;
+/** The sky runs edge to edge; the day itself is inset by this much. */
+const PAD = 16;
+/** The bottom of the drawing fades into the sheet below it. */
+const FADE = 22;
 
 const POINT_KINDS = new Set(["CAFFEINE_STOP", "MEAL"]);
 const LINE_KINDS = new Set([
@@ -105,6 +109,7 @@ export function DayView({
   const skyId = `${ids}-sky`;
   const glowId = `${ids}-glow`;
   const clipId = `${ids}-clip`;
+  const fadeId = `${ids}-fade`;
   const wrapRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(340);
   const [cursor, setCursor] = useState<number | null>(null);
@@ -155,11 +160,14 @@ export function DayView({
   }, [result, instantAt]);
 
   if (row === undefined) return null;
-  const x = (min: number): number => (min / 1440) * width;
+  const inner = Math.max(1, width - 2 * PAD);
+  const x = (min: number): number => PAD + (min / 1440) * inner;
 
   function mark(event: PointerEvent<SVGRectElement>): void {
     const box = event.currentTarget.getBoundingClientRect();
-    const raw = ((event.clientX - box.left) / box.width) * 1440;
+    const scale = box.width / width;
+    const raw =
+      ((event.clientX - box.left - PAD * scale) / (inner * scale)) * 1440;
     const min = Math.max(0, Math.min(1435, Math.round(raw / 5) * 5));
     setCursor(min);
     onMoment?.(instantAt(min).toString());
@@ -171,16 +179,35 @@ export function DayView({
         width={width}
         height={HEIGHT}
         viewBox={`0 0 ${width} ${HEIGHT}`}
-        className="pj-day-view block"
+        className="block"
         role="img"
         aria-label={m.dayViewLabel}
       >
         <defs>
           <Hatch id={hatchId} />
           <clipPath id={clipId}>
-            <rect width={width} height={HEIGHT} rx={16} />
+            <rect width={width} height={HEIGHT} />
           </clipPath>
-          <linearGradient id={skyId} x1="0" x2="1" y1="0" y2="0">
+          <linearGradient
+            id={fadeId}
+            x1="0"
+            x2="0"
+            y1={HEIGHT - FADE}
+            y2={HEIGHT}
+            gradientUnits="userSpaceOnUse"
+          >
+            <stop offset="0" stopColor="var(--surface-2)" stopOpacity="0" />
+            <stop offset="1" stopColor="var(--surface-2)" stopOpacity="1" />
+          </linearGradient>
+          {/* Placed on the inset day; the ends carry on to the edges. */}
+          <linearGradient
+            id={skyId}
+            x1={PAD}
+            x2={width - PAD}
+            y1="0"
+            y2="0"
+            gradientUnits="userSpaceOnUse"
+          >
             {sky.map((s, i) => (
               <stop key={i} offset={s.at} stopColor={`var(--sky-${s.sky})`} />
             ))}
@@ -219,8 +246,8 @@ export function DayView({
               key={min}
               x1={x(min)}
               x2={x(min)}
-              y1={0}
-              y2={HEIGHT}
+              y1={8}
+              y2={HEIGHT - FADE}
               stroke="var(--fg-muted)"
               strokeOpacity={0.12}
             />
@@ -231,7 +258,7 @@ export function DayView({
               key={peak}
               x={x(peak - NIGHT_BEFORE_MIN)}
               y={0}
-              width={x(NIGHT_BEFORE_MIN + NIGHT_AFTER_MIN)}
+              width={x(peak + NIGHT_AFTER_MIN) - x(peak - NIGHT_BEFORE_MIN)}
               height={HEIGHT}
               fill={`url(#${glowId})`}
               data-testid="day-view-night"
@@ -313,13 +340,19 @@ export function DayView({
               strokeWidth={1.5}
             />
           ))}
+          <rect
+            y={HEIGHT - FADE}
+            width={width}
+            height={FADE}
+            fill={`url(#${fadeId})`}
+          />
         </g>
         {cursor === null ? null : (
           <line
             x1={x(cursor)}
             x2={x(cursor)}
-            y1={0}
-            y2={HEIGHT}
+            y1={8}
+            y2={HEIGHT - FADE + 4}
             stroke="var(--accent)"
             strokeWidth={2}
             pointerEvents="none"
