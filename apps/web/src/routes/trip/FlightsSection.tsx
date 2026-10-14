@@ -24,7 +24,6 @@ import { CheckboxField } from "../../components/fields";
 import { calendarImportMessages, messages } from "../../messages";
 import {
   buttonClass,
-  controlClass,
   errorClass,
   h2Class,
   h3Class,
@@ -206,7 +205,8 @@ function CalendarImport({
           accept=".ics,text/calendar"
           disabled={!enabled}
           aria-describedby={notice === null ? hintId : `${hintId} ${alertId}`}
-          className={controlClass}
+          // Same plain file picker as Settings → Import plans.
+          className="text-15"
           onChange={onChoose}
         />
         <p id={hintId} className={hintClass}>

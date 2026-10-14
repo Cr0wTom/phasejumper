@@ -324,24 +324,6 @@ body {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
 }
 
-/* The native file button's own padding would make this box taller than a
-   text field. Keep the same border box as .pj-control on a text input. */
-.pj-control[type="file"] {
-  height: calc(var(--text-15) * var(--leading-body) + 1rem + 2px);
-}
-
-.pj-control[type="file"]::file-selector-button,
-.pj-control[type="file"]::-webkit-file-upload-button {
-  height: calc(var(--text-15) * var(--leading-body));
-  margin: 0 0.75rem 0 0;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  line-height: inherit;
-}
-
 /* Small mono chip for facts like "−9 h" or a date. */
 .pj-chip {
   display: inline-flex;
