@@ -71,15 +71,16 @@ describe("sleep before a flight", () => {
     expect(plan.warnings.map((w) => w.code)).toContain("SLEEP_BEFORE_FLIGHT");
   });
 
-  it("adds a nap when the night is still short", () => {
+  it("makes up a short night with sleep on board or a nap", () => {
     const { blocks, dep } = nightBefore(depart("05:00"));
-    // Awake by 02:00, bed no earlier than 22:00: 4 h of sleep, so a nap.
-    const nap = blocks.find(
+    // Awake by 02:00, bed no earlier than 22:00: 4 h on the ground. The rest
+    // of the night is in the air, so it continues as sleep on board.
+    const after = blocks.filter(
       (b) =>
-        b.kind === "NAP" &&
+        (b.kind === "NAP" || b.kind === "SLEEP_INFLIGHT") &&
         Temporal.Instant.compare(Temporal.Instant.from(b.startUtc), dep) >= 0,
     );
-    expect(nap).toBeDefined();
+    expect(after.length).toBeGreaterThan(0);
   });
 
   it("leaves a night alone when the flight is late enough", () => {

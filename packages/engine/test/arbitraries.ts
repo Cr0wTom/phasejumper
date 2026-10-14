@@ -183,3 +183,52 @@ export const inputs: fc.Arbitrary<PlanInput> = fc
       now: "2026-01-01T00:00:00Z",
     } satisfies PlanInput;
   });
+
+/**
+ * Trips of 2–3 flights: connections from 45 min to 30 h (an overnight
+ * layover or a short stop), any departure time, ending at the destination.
+ */
+export const multiLegInputs: fc.Arbitrary<PlanInput> = fc
+  .tuple(
+    inputs,
+    fc.array(
+      fc.record({
+        zone: fc.constantFrom(...ZONES),
+        flyMinutes: fc.integer({ min: 45, max: 900 }),
+        layoverMinutes: fc.integer({ min: 45, max: 1800 }),
+      }),
+      { minLength: 1, maxLength: 2 },
+    ),
+    fc.integer({ min: 45, max: 900 }),
+  )
+  .map(([base, hops, lastFlyMinutes]) => {
+    const first = base.itinerary.legs[0];
+    if (first === undefined) return base;
+    const home = base.itinerary.homeTz;
+    const destination = base.itinerary.destinationTz;
+    const local = (at: Temporal.Instant, zone: string): string =>
+      at.toZonedDateTimeISO(zone).toPlainDateTime().toString();
+    let at = Temporal.PlainDateTime.from(first.departureLocal)
+      .toZonedDateTime(home)
+      .toInstant();
+    let from = home;
+    const stops = [
+      ...hops.map((h) => ({ ...h })),
+      { zone: destination, flyMinutes: lastFlyMinutes, layoverMinutes: 0 },
+    ];
+    const legs = stops.map((stop, i) => {
+      const arrive = at.add({ minutes: stop.flyMinutes });
+      const leg = {
+        departureAirport: `A${i}A`,
+        arrivalAirport: `B${i}B`,
+        departureLocal: local(at, from),
+        arrivalLocal: local(arrive, stop.zone),
+        departureTz: from,
+        arrivalTz: stop.zone,
+      };
+      at = arrive.add({ minutes: stop.layoverMinutes });
+      from = stop.zone;
+      return leg;
+    });
+    return { ...base, itinerary: { ...base.itinerary, legs } };
+  });

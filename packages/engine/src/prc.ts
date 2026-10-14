@@ -132,8 +132,8 @@ export const WIND_DOWN = {
 
 /** Feasibility pass thresholds (§2.7). */
 export const FEASIBILITY = {
-  /** In-air sleep that makes the night SLEEP_INFLIGHT. */
-  inflightSleepHours: 4,
+  /** The in-air part of a night this long or longer is shown as sleep on board. */
+  inflightSleepMinutes: 90,
   /** Below this the day is a SHORT_SLEEP_DAY (§2.5 sleep window). */
   shortSleepHours: 5,
   /** Trimmed blocks shorter than this are dropped. */
@@ -147,6 +147,12 @@ export const FEASIBILITY = {
    * security. A sleep that would run into it ends here instead.
    */
   awakeBeforeDepartureHours: 3,
+  /**
+   * Before a connecting flight (one that leaves within connectionMaxHours of
+   * the previous landing) the traveler is already at the airport.
+   */
+  awakeBeforeConnectionMinutes: 60,
+  connectionMaxHours: 24,
   /**
    * When that cuts a night short, bedtime may move this much earlier. Not
    * more: falling asleep well before the usual bedtime is hard (the evening

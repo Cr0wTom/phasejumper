@@ -99,7 +99,7 @@ import type {
 } from "./types";
 
 /** Bumped whenever plan output changes (§7.4). */
-export const ENGINE_VERSION = "0.6.0";
+export const ENGINE_VERSION = "0.7.0";
 
 /** Guard against a non-terminating loop; weak days at half rate stay far below. */
 const MAX_PLAN_DAYS = 60;
@@ -566,10 +566,24 @@ export function generatePlan(
 
   const constraints = input.constraints ?? {};
   const zoneAt = zoneLocator(input, legs);
-  const preDeparture: Interval[] = legs.map((l) => ({
-    start: plus(l.start, -FEASIBILITY.awakeBeforeDepartureHours * 60),
-    end: l.start,
-  }));
+  // Awake before every departure: 3 h from home or after a stay, 1 h before
+  // a connection (already at the airport).
+  const preDeparture: Interval[] = legs.map((l, i) => {
+    const previous = legs[i - 1];
+    const connecting =
+      previous !== undefined &&
+      minutesBetween(previous.end, l.start) <
+        FEASIBILITY.connectionMaxHours * 60;
+    return {
+      start: plus(
+        l.start,
+        -(connecting
+          ? FEASIBILITY.awakeBeforeConnectionMinutes
+          : FEASIBILITY.awakeBeforeDepartureHours * 60),
+      ),
+      end: l.start,
+    };
+  });
   const postArrival: Interval[] = legs.map((l) => ({
     start: l.end,
     end: plus(l.end, FEASIBILITY.awakeAfterArrivalMinutes),

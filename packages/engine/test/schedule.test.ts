@@ -175,7 +175,13 @@ describe("exercise and caffeine (§2.5)", () => {
     const kinds = new Set(
       plan.days.flatMap((d) => d.blocks.map((b) => b.kind)),
     );
-    expect([...kinds].sort()).toEqual(["AVOID_LIGHT", "SEEK_LIGHT", "SLEEP"]);
+    // Sleep on board is part of sleep, not an optional layer.
+    expect([...kinds].sort()).toEqual([
+      "AVOID_LIGHT",
+      "SEEK_LIGHT",
+      "SLEEP",
+      "SLEEP_INFLIGHT",
+    ]);
   });
 
   it("ideal window is 60 min when there is room", () => {
@@ -282,6 +288,6 @@ describe("contract", () => {
   });
 
   it("stamps the engine version", () => {
-    expect(generatePlan(prgTyo()).engineVersion).toBe("0.6.0");
+    expect(generatePlan(prgTyo()).engineVersion).toBe("0.7.0");
   });
 });
