@@ -107,10 +107,21 @@
         {
           "kind": "SLEEP_INFLIGHT",
           "startUtc": "2027-03-26T02:00:00Z",
-          "endUtc": "2027-03-26T10:00:00Z",
+          "endUtc": "2027-03-26T07:00:00Z",
           "localTz": "America/New_York",
           "reasonCode": "SLEEP_INFLIGHT",
           "reason": "Sleep on the plane in this window; an eye mask helps.",
+          "source": "R1",
+          "confidence": "A",
+          "movable": false
+        },
+        {
+          "kind": "SLEEP",
+          "startUtc": "2027-03-26T08:00:00Z",
+          "endUtc": "2027-03-26T10:00:00Z",
+          "localTz": "Europe/London",
+          "reasonCode": "SLEEP_SHIFTING",
+          "reason": "Sleep in this window; it moves a little each day with your clock.",
           "source": "R1",
           "confidence": "A",
           "movable": false
@@ -660,5 +671,5 @@
   ],
   "warnings": [],
   "droppedBlocks": [],
-  "engineVersion": "0.5.0"
+  "engineVersion": "0.6.0"
 }

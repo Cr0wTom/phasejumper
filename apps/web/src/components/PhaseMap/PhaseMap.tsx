@@ -676,18 +676,30 @@ export function PhaseMap({
                           />
                         )
                       ) : seg.block.kind === "EXERCISE_AVOID" ? (
-                        <rect
-                          className="pj-mark"
-                          x={x0 + 0.5}
-                          y={lane.y + 0.5}
-                          width={Math.max(1, w - 1)}
-                          height={lane.h - 1}
-                          rx={2}
-                          fill="none"
-                          stroke={color}
-                          strokeOpacity={0.35}
-                          strokeDasharray="3 2"
-                        />
+                        // "No exercise" is a dotted line, continuous with the
+                        // "Can exercise" line, so the band reads as one track.
+                        <>
+                          <rect
+                            x={x0}
+                            y={lane.y}
+                            width={w}
+                            height={lane.h}
+                            fill="transparent"
+                            aria-hidden="true"
+                          />
+                          <line
+                            className="pj-mark"
+                            x1={x0 + 1}
+                            x2={x0 + Math.max(1, w - 1)}
+                            y1={lane.y + lane.h / 2}
+                            y2={lane.y + lane.h / 2}
+                            stroke={color}
+                            strokeOpacity={0.6}
+                            strokeWidth={2}
+                            strokeLinecap="round"
+                            strokeDasharray="0.1 4"
+                          />
+                        </>
                       ) : seg.block.kind === "CAFFEINE_OK" ||
                         seg.block.kind === "CAFFEINE_LATE_OK" ? (
                         // Caffeine reads as a line through the food & drink band.
@@ -954,15 +966,16 @@ export function PhaseMap({
                   ],
                   [
                     "EXERCISE_AVOID",
-                    <rect
-                      x="0.5"
-                      y="0.5"
-                      width="13"
-                      height="9"
-                      rx="2"
-                      fill="none"
+                    <line
+                      x1="1"
+                      x2="13"
+                      y1="5"
+                      y2="5"
                       stroke={COLOR.EXERCISE_AVOID}
-                      strokeDasharray="3 2"
+                      strokeOpacity={0.6}
+                      strokeWidth={2}
+                      strokeLinecap="round"
+                      strokeDasharray="0.1 4"
                     />,
                   ],
                 ],

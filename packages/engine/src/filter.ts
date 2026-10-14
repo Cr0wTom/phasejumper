@@ -65,6 +65,8 @@ export interface TripContext {
   mustBeAwake: readonly Interval[];
   /** The hours before each departure: awake, getting to the airport. */
   preDeparture: readonly Interval[];
+  /** The hour after each landing: awake, leaving the airport. */
+  postArrival: readonly Interval[];
   noWorkout: readonly Interval[];
   exerciseEnabled: boolean;
   meditationEnabled: boolean;
@@ -91,6 +93,14 @@ export interface FilterResult {
 
 const INFLIGHT_SLEEP_MINUTES = FEASIBILITY.inflightSleepHours * 60;
 const SHORT_SLEEP_MINUTES = FEASIBILITY.shortSleepHours * 60;
+const MIN_SLEEP_MINUTES = FEASIBILITY.minSleepMinutes;
+
+/** A ground sleep piece long enough to show as "Sleep". */
+function sleepPiece(piece: Interval | undefined): Interval | undefined {
+  return piece !== undefined && length(piece) >= MIN_SLEEP_MINUTES
+    ? piece
+    : undefined;
+}
 const MIN_BLOCK_MINUTES = FEASIBILITY.minBlockMinutes;
 const WALK_MINUTES = FEASIBILITY.walkMinutes;
 const WALK_BEFORE_SLEEP_MINUTES = FEASIBILITY.walkBeforeSleepHours * 60;
@@ -141,13 +151,23 @@ function applyFlights(
     if (b.kind === "SLEEP") {
       const inAir = flights.reduce((sum, f) => sum + overlapMinutes(b, f), 0);
       if (inAir >= INFLIGHT_SLEEP_MINUTES) {
-        result.push({
-          ...b,
-          kind: "SLEEP_INFLIGHT",
-          reasonCode: "SLEEP_INFLIGHT",
-        });
+        // Sleep on board is only the time actually in the air; what falls
+        // on the ground stays ground sleep, so the airport rules apply to it.
+        for (const f of flights) {
+          const air = intersection(b, f);
+          if (air === undefined) continue;
+          result.push({
+            ...air,
+            kind: "SLEEP_INFLIGHT",
+            reasonCode: "SLEEP_INFLIGHT",
+          });
+        }
+        for (const ground of subtract(b, flights)) {
+          const piece = sleepPiece(ground);
+          if (piece !== undefined) result.push(withSpan(b, piece));
+        }
       } else if (inAir > 0) {
-        const kept = longest(subtract(b, flights));
+        const kept = sleepPiece(longest(subtract(b, flights)));
         if (kept !== undefined) result.push(withSpan(b, kept));
         const flight = flights.find((f) => overlaps(b, f));
         const napStart =
@@ -259,12 +279,13 @@ function applyMustBeAwake(
       const events = [
         ...trip.mustBeAwake.filter((e) => overlaps(b, e)),
         ...beforeFlight,
+        ...trip.postArrival.filter((e) => overlaps(b, e)),
       ];
       if (events.length === 0) {
         result.push(b);
         continue;
       }
-      const kept = longest(subtract(b, events));
+      const kept = sleepPiece(longest(subtract(b, events)));
       if (kept !== undefined) result.push(withSpan(b, kept));
       const lastEnd = events
         .map((e) => e.end)
@@ -315,6 +336,17 @@ function applyMustBeAwake(
     result.push(b);
   }
 
+  // A night cut by the airport or an event counts all of its sleep: the
+  // ground pieces left and any sleep on board, before deciding on a nap.
+  if (clip !== undefined && !clip.inFlight) {
+    clip = {
+      ...clip,
+      kept: result
+        .filter((b) => b.kind === "SLEEP" || b.kind === "SLEEP_INFLIGHT")
+        .reduce((sum, b) => sum + length(b), 0),
+    };
+  }
+
   if (
     clip !== undefined &&
     clip.kept < SHORT_SLEEP_MINUTES &&
@@ -326,8 +358,18 @@ function applyMustBeAwake(
       clip.kept < NAP.shortSleepHours * 60
         ? NAP.minutesAfterShortSleep
         : NAP.minutes;
-    // §2.5: never nap in a seek-light block; start after any it would hit.
     let start = clip.nap.start;
+    // A ground nap never falls while leaving the airport or getting to it.
+    if (!clip.inFlight) {
+      for (const busy of [...trip.postArrival, ...trip.preDeparture].sort(
+        (x, y) => compare(x.start, y.start),
+      )) {
+        if (overlaps(busy, { start, end: plus(start, minutes) })) {
+          start = later(start, busy.end);
+        }
+      }
+    }
+    // §2.5: never nap in a seek-light block; start after any it would hit.
     for (const light of result
       .filter((b) => LIGHT_SEEKING.has(b.kind))
       .sort((x, y) => compare(x.start, y.start))) {
@@ -465,7 +507,8 @@ function conflicts(a: BlockKind, b: BlockKind): boolean {
     pair(NAPPING, LIGHT_SEEKING) ||
     pair(NAPPING, EXERCISING) ||
     pair(NAPPING, RESTING) ||
-    pair(EXERCISING, RESTING)
+    pair(EXERCISING, RESTING) ||
+    pair(RESTING, RESTING)
   );
 }
 

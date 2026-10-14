@@ -459,7 +459,7 @@
         {
           "kind": "SLEEP_INFLIGHT",
           "startUtc": "2027-01-15T17:30:00Z",
-          "endUtc": "2027-01-16T01:30:00Z",
+          "endUtc": "2027-01-15T23:00:00Z",
           "localTz": "Europe/Prague",
           "reasonCode": "SLEEP_INFLIGHT",
           "reason": "Sleep on the plane in this window; an eye mask helps.",
@@ -1072,5 +1072,5 @@
   ],
   "warnings": [],
   "droppedBlocks": [],
-  "engineVersion": "0.5.0"
+  "engineVersion": "0.6.0"
 }
