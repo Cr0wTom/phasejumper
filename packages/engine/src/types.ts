@@ -106,6 +106,12 @@ export interface PlanInput {
   constraints?: Constraints;
   /** ISO instant; the injected clock. */
   now: string;
+  /**
+   * Sleep the traveler reported having (ISO instants). A main sleep that
+   * matches a planned night re-anchors the body-clock estimate, and the days
+   * after it are planned from there.
+   */
+  observedSleep?: Array<{ start: string; end: string }>;
 }
 
 export type Direction = "advance" | "delay";
@@ -212,6 +218,7 @@ export const WARNING_CODES = [
   "DAYLIGHT_UNKNOWN",
   "SLEEP_BEFORE_FLIGHT",
   "ARRIVAL_LOCAL_TIME",
+  "PLAN_ADJUSTED_TO_SLEEP",
 ] as const;
 
 export type WarningCode = (typeof WARNING_CODES)[number];

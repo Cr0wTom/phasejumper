@@ -92,6 +92,8 @@ export function warningCopy(code: WarningCode): string {
       return "Your sleep times don't match your chronotype, so the plan uses your sleep times and keeps wider margins around light.";
     case "LIGHT_BLOCK_SHIFTED":
       return "The best light time falls while you sleep, so light windows sit just before your sleep instead.";
+    case "PLAN_ADJUSTED_TO_SLEEP":
+      return "The plan from here on follows the sleep you reported.";
     case "ARRIVAL_LOCAL_TIME":
       return "You chose to switch to local time faster: expect to feel more tired on arrival day, and full adjustment may take about a day longer.";
     case "SLEEP_BEFORE_FLIGHT":

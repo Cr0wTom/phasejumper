@@ -20,6 +20,7 @@
 import { Temporal } from "temporal-polyfill";
 import {
   LIGHT_TOUCH_THRESHOLD_HOURS,
+  OBSERVED_SLEEP,
   PHASE,
   RATES,
   SHORT_TRIP_MIN_DAYS,
@@ -354,6 +355,26 @@ export function validatePlanInput(input: PlanInput): ValidationResult {
   } catch {
     issues.push("now is not an ISO instant");
   }
+  const reports = input.observedSleep ?? [];
+  if (reports.length > OBSERVED_SLEEP.maxReports) {
+    issues.push(
+      `observedSleep may hold at most ${OBSERVED_SLEEP.maxReports} reports`,
+    );
+  }
+  reports.forEach((r, i) => {
+    try {
+      const start = Temporal.Instant.from(r.start);
+      const end = Temporal.Instant.from(r.end);
+      const hours = end.since(start).total({ unit: "hours" });
+      if (hours <= 0 || hours > OBSERVED_SLEEP.maxSleepHours) {
+        issues.push(
+          `observedSleep[${i}] must end after it starts and last at most ${OBSERVED_SLEEP.maxSleepHours} h`,
+        );
+      }
+    } catch {
+      issues.push(`observedSleep[${i}] start and end must be ISO instants`);
+    }
+  });
   return issues.length === 0 ? { ok: true } : { ok: false, issues };
 }
 

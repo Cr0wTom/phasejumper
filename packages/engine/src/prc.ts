@@ -170,6 +170,24 @@ export const FEASIBILITY = {
 } as const;
 
 /**
+ * Reported sleep (PlanInput.observedSleep). Re-anchoring keeps the planned
+ * relation between sleep midpoint and CBTmin (R1 phase estimate) and moves
+ * it to the reported midpoint.
+ */
+export const OBSERVED_SLEEP = {
+  /** Only a main sleep re-anchors; shorter reports are naps. */
+  minMainSleepHours: 3,
+  /** A report matches the planned night whose midpoint is within this. */
+  matchWithinHours: 8,
+  /** Differences smaller than this change nothing. */
+  ignoreUnderMinutes: 15,
+  /** The re-anchored body clock moves at most this far from the plan. */
+  maxShiftHours: 4,
+  maxReports: 60,
+  maxSleepHours: 16,
+} as const;
+
+/**
  * "Switch to local time faster" (traveler.arrivalStyle "local"): practical,
  * not from the cited studies. A daytime sleep after the final landing is cut
  * to a nap, and the next night starts by the local bedtime below.

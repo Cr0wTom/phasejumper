@@ -81,8 +81,19 @@ describe("engine properties", { timeout: 30_000 }, () => {
       if (direction !== "advance" && direction !== "delay") return;
       const sign = direction === "advance" ? -1 : 1;
       const cbt = plan.days.map((d) => Date.parse(d.cbtMinUtc));
+      const followsReport = new Set(
+        plan.warnings
+          .filter((w) => w.code === "PLAN_ADJUSTED_TO_SLEEP")
+          .map((w) => w.dayIndex),
+      );
       for (let i = 1; i < cbt.length; i += 1) {
         const step = ((cbt[i] ?? 0) - (cbt[i - 1] ?? 0)) / 60_000;
+        // A reported sleep may move the body clock either way, by at most
+        // one day's rate plus the 4 h re-anchoring cap.
+        if (followsReport.has(i)) {
+          expect(Math.abs(step - 1440)).toBeLessThanOrEqual(120 + 240);
+          continue;
+        }
         // Each step is one day plus a shift in the chosen direction, never
         // more than the rate (≤ 2 h/day).
         expect(sign * (step - 1440)).toBeGreaterThan(0);

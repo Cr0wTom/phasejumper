@@ -40,7 +40,11 @@ function fromBase64Url(text: string): Uint8Array {
 }
 
 export function encodeShareLink(input: PlanInput): string {
-  return toBase64Url(new TextEncoder().encode(JSON.stringify(input)));
+  // Reported sleep is private: a shared plan is the plan, not the diary.
+  const json = JSON.stringify(input, (key, value: unknown) =>
+    key === "observedSleep" ? undefined : value,
+  );
+  return toBase64Url(new TextEncoder().encode(json));
 }
 
 export type DecodedShare =
