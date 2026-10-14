@@ -39,7 +39,7 @@ import {
   type Segment,
 } from "./layout";
 
-const COLOR: Record<BlockKind, string> = {
+export const COLOR: Record<BlockKind, string> = {
   SLEEP: "var(--sleep)",
   SLEEP_INFLIGHT: "var(--sleep)",
   NAP: "var(--sleep)",

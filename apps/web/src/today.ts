@@ -28,7 +28,7 @@ import {
 import { Temporal } from "temporal-polyfill";
 
 /** Background windows that span most of the day are never "current" or "next". */
-const BACKGROUND: ReadonlySet<BlockKind> = new Set([
+export const BACKGROUND: ReadonlySet<BlockKind> = new Set([
   "CAFFEINE_OK",
   "CAFFEINE_LATE_OK",
   "EXERCISE_AVOID",
