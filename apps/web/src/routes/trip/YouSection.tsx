@@ -18,7 +18,12 @@ import { TimeField } from "../../components/TimeField";
 import { CheckboxField, SelectField, TextField } from "../../components/fields";
 import { legalMessages, messages } from "../../messages";
 import { h2Class, labelClass, surfaceClass } from "../../ui";
-import { isCaffeine, isChronotype, isPreAdjust } from "./formState";
+import {
+  isCaffeine,
+  isChronotype,
+  isPreAdjust,
+  melatoninTimingVisible,
+} from "./formState";
 import { fieldDomId, type FieldErrors, type TripFormValues } from "./schema";
 
 const PRE_ADJUST = { "0": 0, "1": 1, "2": 2, "3": 3 } as const;
@@ -168,11 +173,32 @@ export function YouSection({
                   }
                 />
               </fieldset>
-              {form.melatoninPregnant ||
-              form.melatoninMedication ||
-              form.melatoninUnder18 ? (
+              {melatoninTimingVisible(form) ? (
+                <SelectField
+                  id={fieldDomId("melatoninTiming")}
+                  label={messages.melatoninTiming}
+                  hint={messages.melatoninTimingHint}
+                  value={form.melatoninTiming}
+                  error={errors.melatoninTiming}
+                  options={[
+                    {
+                      value: "strongest",
+                      label: messages.melatoninTimingStrongest,
+                    },
+                    {
+                      value: "evening",
+                      label: messages.melatoninTimingEvening,
+                    },
+                  ]}
+                  onChange={(value) => {
+                    if (value === "strongest" || value === "evening") {
+                      onChange({ melatoninTiming: value });
+                    }
+                  }}
+                />
+              ) : (
                 <p role="status">{legalMessages.melatoninBlocked}</p>
-              ) : null}
+              )}
             </>
           ) : null}
         </>

@@ -23,7 +23,7 @@ import { wallTime, zoneName } from "../../format";
 import { ICON_SIZE, Icon, KIND_ICON } from "../../icons";
 import { phaseMapMessages, planMessages as m } from "../../messages";
 
-const POINT = new Set(["CAFFEINE_STOP", "MEAL", "MELATONIN_WINDOW"]);
+const POINT = new Set(["CAFFEINE_STOP", "MEAL"]);
 
 /** One day's detail: warnings, every block with icon, time and reason. */
 export function DayDetail({

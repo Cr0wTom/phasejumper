@@ -64,6 +64,7 @@ describe("decision", () => {
     expect(kinds).not.toContain("SEEK_LIGHT");
     expect(kinds).not.toContain("AVOID_LIGHT");
     expect(kinds).not.toContain("MELATONIN_WINDOW");
+    expect(kinds).not.toContain("MELATONIN_OK");
   });
 
   it("PRG→SFO with tripDays 2 is short-trip, on home time", () => {

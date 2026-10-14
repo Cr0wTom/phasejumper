@@ -21,9 +21,21 @@
 
 import type { Direction, ReasonCode, WarningCode } from "./types";
 
-/** Fixed by §2.5; do not edit. */
+/** Delay-direction window (§2.5). Do not edit the sentence. */
 export const MELATONIN_REASON =
   "If you use melatonin, research on timing suggests this window.";
+
+/** Advance best time, "strongest" (sleep − 5.5 h). */
+export const MELATONIN_REASON_STRONGEST =
+  "If you use melatonin, research suggests it moves your body clock earlier most when taken about 5 to 6 hours before your new bedtime. It can make you drowsy, so plan not to drive afterwards.";
+
+/** Advance best time, "evening" (sleep − 4.5 h). */
+export const MELATONIN_REASON_EVENING =
+  "If you use melatonin, research suggests about 4 to 5 hours before your new bedtime still works well for moving your body clock earlier, with less of your day spent drowsy. Plan not to drive afterwards.";
+
+/** Advance range around the best time. */
+export const MELATONIN_OK_REASON =
+  "If you use melatonin, research suggests any time in this range moves your body clock earlier. Earlier in the range has more effect; at bedtime the effect is small.";
 
 export function reasonCopy(code: ReasonCode): string {
   switch (code) {
@@ -44,7 +56,13 @@ export function reasonCopy(code: ReasonCode): string {
     case "AVOID_LIGHT_DELAY":
       return "Light now would pull your clock earlier, so keep it dim or wear sunglasses.";
     case "MELATONIN_WINDOW":
+      return MELATONIN_REASON_STRONGEST;
+    case "MELATONIN_WINDOW_EVENING":
+      return MELATONIN_REASON_EVENING;
+    case "MELATONIN_WINDOW_DELAY":
       return MELATONIN_REASON;
+    case "MELATONIN_OK":
+      return MELATONIN_OK_REASON;
     case "EXERCISE_OK":
       return "Exercise fits here if you want it; it neither helps nor works against the shift.";
     case "EXERCISE_GOOD_ADVANCE":
@@ -101,7 +119,7 @@ export function warningCopy(code: WarningCode): string {
     case "SHORT_SLEEP_DAY":
       return "Your sleep window is short today, so the plan adds a nap.";
     case "MELATONIN_MOVED":
-      return "The melatonin window clashed with something you must be awake for, so it moved to just after it.";
+      return "The best time for melatonin clashed with something you must be awake for, or with travel, so it moved to just after it.";
     case "WEAK_DAY":
       return "Today has no light window at the right time, so the plan expects a smaller shift and may run longer.";
     case "DAYLIGHT_UNKNOWN":

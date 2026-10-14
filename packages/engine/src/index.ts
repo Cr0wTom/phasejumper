@@ -17,7 +17,10 @@
 export {
   ADVICE_CODES,
   DROP_CODES,
+  MELATONIN_OK_REASON,
   MELATONIN_REASON,
+  MELATONIN_REASON_EVENING,
+  MELATONIN_REASON_STRONGEST,
   adviceCopy,
   droppedCopy,
   explanationCopy,

@@ -96,6 +96,7 @@ export const KIND_ICON: Partial<Record<BlockKind, IconName>> = {
   CAFFEINE_LATE_OK: "caffeine",
   CAFFEINE_STOP: "caffeine",
   MELATONIN_WINDOW: "melatonin",
+  MELATONIN_OK: "melatonin",
   MEAL: "meal",
   WIND_DOWN: "windDown",
   NSDR: "windDown",

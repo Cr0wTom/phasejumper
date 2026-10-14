@@ -26,9 +26,10 @@ Rather than switching to local time overnight, the plan moves your sleep window 
 
 ## Melatonin timing, only if you already use it (grade A)
 
-If you tell the planner you already use melatonin, it shows when research suggests taking it can help move your clock. It never suggests whether to use melatonin, which product, or how much. In some countries melatonin is sold only with a doctor's order. Its timing is not shown to anyone who is pregnant, takes other medication, or is under 18. Follow the advice of whoever provided it.
+If you tell the planner you already use melatonin, it shows when research suggests taking it can help move your clock. When the plan moves your clock earlier, it shows a range from the afternoon until bedtime when melatonin can help, and a best time inside it, about 5 to 6 hours before your new bedtime. You can choose a later best time, about 4 to 5 hours before bedtime, which research suggests still works well and leaves less of your day drowsy. At bedtime its effect on the clock is small. It never suggests whether to use melatonin, which product, or how much. In some countries melatonin is sold only with a doctor's order. Its timing is not shown to anyone who is pregnant, takes other medication, or is under 18. Follow the advice of whoever provided it.
 
 - How the timing of melatonin shifts the body clock — Burgess and colleagues, 2008 and 2010. [Find on PubMed](https://pubmed.ncbi.nlm.nih.gov/?term=A+three+pulse+phase+response+curve+to+three+milligrams+of+melatonin+in+humans)
+- When melatonin moves the body clock earlier and when it moves it later — Lewy, 2010. [Read the article](https://pmc.ncbi.nlm.nih.gov/articles/PMC2928905/)
 
 ## Exercise: a smaller nudge (grade B)
 

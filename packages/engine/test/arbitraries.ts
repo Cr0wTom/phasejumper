@@ -115,6 +115,12 @@ export const inputs: fc.Arbitrary<PlanInput> = fc
       ),
       { nil: undefined },
     ),
+    // After every other field so the existing seeds keep the same trips.
+    melatoninTiming: fc.constantFrom(
+      undefined,
+      "strongest" as const,
+      "evening" as const,
+    ),
   })
   .map((r) => {
     const bedMinutes =
@@ -148,6 +154,9 @@ export const inputs: fc.Arbitrary<PlanInput> = fc
           : { sleepNeedHours: r.sleepNeedHours }),
         useMelatonin: r.useMelatonin,
         melatoninContraindicated: r.melatoninContraindicated,
+        ...(r.melatoninTiming === undefined
+          ? {}
+          : { melatoninTiming: r.melatoninTiming }),
         caffeine: r.caffeine,
         exercise: { enabled: r.exercise },
         meditation: { enabled: r.meditation },

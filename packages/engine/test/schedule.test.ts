@@ -15,7 +15,12 @@
  */
 
 import { describe, expect, it, vi } from "vitest";
-import { EngineInputError, MELATONIN_REASON, generatePlan } from "../src/index";
+import {
+  EngineInputError,
+  MELATONIN_REASON,
+  MELATONIN_REASON_STRONGEST,
+  generatePlan,
+} from "../src/index";
 import type { Block } from "../src/types";
 import { prgSfo, prgSyd, prgTyo } from "./trips";
 
@@ -105,8 +110,8 @@ describe("melatonin (§2.5)", () => {
     for (const w of windows) {
       expect(Date.parse(w.endUtc) - Date.parse(w.startUtc)).toBe(30 * 60_000);
       expect(localMinutes(w)).toBeGreaterThanOrEqual(13 * 60);
-      expect(w.reason).toBe(MELATONIN_REASON);
-      expect(w.reason).not.toMatch(/\d/);
+      expect(w.reason).toBe(MELATONIN_REASON_STRONGEST);
+      expect(w.reason).not.toMatch(/\d+\s*mg/i);
     }
   });
 
@@ -118,6 +123,7 @@ describe("melatonin (§2.5)", () => {
       }),
     );
     expect(blocks("MELATONIN_WINDOW", blocked)).toHaveLength(0);
+    expect(blocks("MELATONIN_OK", blocked)).toHaveLength(0);
     // Contraindicated melatonin also does not speed the plan up.
     expect(blocked.decision.daysAdvance).toBe(8);
   });
@@ -125,12 +131,11 @@ describe("melatonin (§2.5)", () => {
   it("delaying: off unless allowDelayMelatonin", () => {
     const input = prgSfo({ traveler: { useMelatonin: true } });
     expect(blocks("MELATONIN_WINDOW", generatePlan(input))).toHaveLength(0);
-    expect(
-      blocks(
-        "MELATONIN_WINDOW",
-        generatePlan(input, { allowDelayMelatonin: true }),
-      ).length,
-    ).toBeGreaterThan(0);
+    const delay = generatePlan(input, { allowDelayMelatonin: true });
+    const windows = blocks("MELATONIN_WINDOW", delay);
+    expect(windows.length).toBeGreaterThan(0);
+    expect(blocks("MELATONIN_OK", delay)).toHaveLength(0);
+    for (const w of windows) expect(w.reason).toBe(MELATONIN_REASON);
   });
 });
 
@@ -288,6 +293,6 @@ describe("contract", () => {
   });
 
   it("stamps the engine version", () => {
-    expect(generatePlan(prgTyo()).engineVersion).toBe("0.7.0");
+    expect(generatePlan(prgTyo()).engineVersion).toBe("0.8.0");
   });
 });

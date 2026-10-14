@@ -48,6 +48,11 @@ export const messages = {
   arrivalStyleLocal: "Switch to local time faster",
   arrivalStyleHint:
     "Faster means a short nap after landing and bed by 22:00 local time. You'll feel more tired that day, and full adjustment may take about a day longer.",
+  melatoninTiming: "When would you rather take it?",
+  melatoninTimingStrongest: "Best for your body clock (afternoon)",
+  melatoninTimingEvening: "Later, early evening",
+  melatoninTimingHint:
+    "Both are in the range research finds works best. The earlier time shifts your clock most but can make you drowsy during the day.",
   preAdjustOption: (days: number): string =>
     days === 1 ? "1 day" : `${days} days`,
   fromAirport: "From",
@@ -184,7 +189,8 @@ export const phaseMapMessages = {
     SEEK_LIGHT_ARTIFICIAL: "Bright indoor light",
     LIGHT_INFLIGHT_WINDOW: "Window light",
     AVOID_LIGHT: "Keep it dim",
-    MELATONIN_WINDOW: "Melatonin window",
+    MELATONIN_WINDOW: "Best time for melatonin",
+    MELATONIN_OK: "Melatonin can help",
     EXERCISE_GOOD: "Ideal exercise window",
     EXERCISE_OK: "Can exercise",
     EXERCISE_OPTIONAL_WALK: "Easy walk",
