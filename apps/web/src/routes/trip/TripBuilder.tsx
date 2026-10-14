@@ -27,6 +27,7 @@ import {
   type AirportDirectory,
 } from "../../airports/loadAirports";
 import { airportLabel } from "../../airports/searchAirports";
+import type { ImportedFlight } from "../../calendarImport";
 import { currentInstant } from "../../clock";
 import { TextField } from "../../components/fields";
 import { LegalGate } from "../../components/LegalGate";
@@ -56,6 +57,7 @@ import { ConstraintsSection } from "./ConstraintsSection";
 import { FlightsSection } from "./FlightsSection";
 import {
   createDefaultForm,
+  createId,
   formFromPlanInput,
   emptyAwake,
   emptyLeg,
@@ -201,6 +203,31 @@ export function TripBuilder({ editId }: { editId?: string } = {}) {
       for (const key of keys) delete next[key];
       return next;
     });
+  }
+
+  function importFlights(flights: readonly ImportedFlight[]): void {
+    if (directory === null || flights.length === 0) return;
+    const resolve = directory.lookup;
+    dropErrors((key) => key === "legs" || key.startsWith("legs."));
+    setForm((current) => ({
+      ...current,
+      legs: flights.map((flight) => {
+        const from = resolve(flight.fromIata);
+        const to = resolve(flight.toIata);
+        return {
+          id: createId(),
+          fromQuery: from === undefined ? flight.fromIata : airportLabel(from),
+          fromIata: flight.fromIata,
+          toQuery: to === undefined ? flight.toIata : airportLabel(to),
+          toIata: flight.toIata,
+          departureDate: flight.departureDate,
+          departureTime: flight.departureTime,
+          arrivalDate: flight.arrivalDate,
+          arrivalTime: flight.arrivalTime,
+          flightNumber: flight.flightNumber ?? "",
+        };
+      }),
+    }));
   }
 
   function changeLeg(index: number, legPatch: Partial<LegForm>): void {
@@ -523,7 +550,9 @@ export function TripBuilder({ editId }: { editId?: string } = {}) {
           errors={fieldErrors}
           airports={airports}
           airportsError={airportsError}
+          lookup={directory === null ? null : directory.lookup}
           onChangeLeg={changeLeg}
+          onImport={importFlights}
           onAdd={() =>
             setForm((current) => ({
               ...current,
