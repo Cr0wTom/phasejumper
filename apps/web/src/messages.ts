@@ -475,3 +475,24 @@ export const sharedMessages = {
   deleteFailed:
     "This plan could not be deleted. Reload the page and try again.",
 } as const;
+
+/** Importing flights from a calendar file (.ics). Maintainer copy; never edit. */
+export const calendarImportMessages = {
+  button: "Import from a calendar file (.ics)",
+  hint: "Export your trip from your calendar or travel app as an .ics file. It is read on this device only.",
+  found: (count: number): string =>
+    count === 1 ? "1 flight found" : `${count} flights found`,
+  foundHint:
+    "Untick anything that is not one of your flights, then add them. Adding replaces the flights currently in the form.",
+  add: "Add these flights",
+  cancel: "Cancel",
+  row: (from: string, to: string, when: string): string =>
+    `${from} to ${to}, ${when}`,
+  noneFound:
+    "No flights were found in this file. Only events that name two airports, like “PRG to SFO”, with a start and an end time are used. Enter your flights by hand instead.",
+  notCalendar:
+    "This file is not a calendar file (.ics). Choose the .ics file exported from your calendar or travel app.",
+  tooLarge:
+    "This file is larger than 1 MB, so it is probably more than one trip. Export just this trip, or enter your flights by hand.",
+  readFailed: "This file could not be read. Try exporting it again.",
+} as const;
