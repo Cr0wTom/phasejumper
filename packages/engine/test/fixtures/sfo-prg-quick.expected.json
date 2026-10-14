@@ -84,7 +84,7 @@
         },
         {
           "kind": "SLEEP",
-          "startUtc": "2027-01-16T11:30:00Z",
+          "startUtc": "2027-01-16T12:30:00Z",
           "endUtc": "2027-01-16T15:00:00Z",
           "localTz": "Europe/Prague",
           "reasonCode": "SLEEP_HOME_TIME",

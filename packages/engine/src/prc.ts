@@ -160,8 +160,8 @@ export const FEASIBILITY = {
    * of the lost sleep is recovered with a nap instead (R1).
    */
   earlierBedtimeMaxMinutes: 60,
-  /** Awake after every landing: leaving the plane and getting to a bed. */
-  awakeAfterArrivalMinutes: 60,
+  /** Awake after every landing: passport control, baggage, getting to a bed. */
+  awakeAfterArrivalMinutes: 120,
   /**
    * A ground sleep left shorter than this after flights and must-be-awake
    * events is not shown as "Sleep"; the short-sleep nap covers it instead.

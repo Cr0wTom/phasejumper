@@ -89,7 +89,7 @@ Every number the model uses, as defined in [`packages/engine/src/prc.ts`](../pac
 | `FEASIBILITY.awakeBeforeConnectionMinutes` | 60 min | Awake before a connecting flight (already at the airport) | — |
 | `FEASIBILITY.connectionMaxHours` | 24 h | A flight leaving within this of the previous landing is a connection | — |
 | `FEASIBILITY.earlierBedtimeMaxMinutes` | 60 min | When that cuts a night, bedtime moves at most this much earlier; the rest is a nap | R1, R12 |
-| `FEASIBILITY.awakeAfterArrivalMinutes` | 60 min | Awake after every landing (leaving the plane, getting to a bed); no ground sleep or nap here | — |
+| `FEASIBILITY.awakeAfterArrivalMinutes` | 120 min | Awake after every landing (passport control, baggage, getting to a bed); no ground sleep or nap here | — |
 | `FEASIBILITY.minSleepMinutes` | 120 min | A ground sleep cut shorter than this is not shown; the short-sleep nap covers it | R12 |
 | `DAYLIGHT.sunUpAltitudeDegrees` | −0.35° | Sun below this apparent altitude counts as dark | — |
 | `DAYLIGHT.sampleMinutes` | 5 min | Daylight is checked at this interval | — |

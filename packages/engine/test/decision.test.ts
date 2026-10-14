@@ -80,10 +80,10 @@ describe("decision", () => {
       d.blocks.filter((b) => b.kind === "SLEEP"),
     );
     // 23:00–07:00 Prague every night, except the landing night: the flight
-    // lands 22:05 Prague and bed is at least an hour after landing.
+    // lands 22:05 Prague and bed is at least two hours after landing.
     for (const s of sleeps) {
       expect(s.startUtc.slice(11)).toBe(
-        s.startUtc.startsWith("2027-01-15") ? "22:05:00Z" : "22:00:00Z",
+        s.startUtc.startsWith("2027-01-15") ? "23:05:00Z" : "22:00:00Z",
       );
       expect(s.endUtc.slice(11)).toBe("06:00:00Z");
     }
