@@ -348,3 +348,38 @@ test("a trip name titles both halves and the list, never the share link", async 
   await expect(page.getByText("Seoul conference")).toHaveCount(1);
   await expect(page.getByText(/PRG to SFO and back/)).toBeVisible();
 });
+
+test("Edit trip saves changes to the same plan instead of adding one", async ({
+  page,
+}) => {
+  await openTrip(page);
+  const flights = page.getByRole("region", { name: messages.flightsHeading });
+  await fillLeg(page, flights, 0, OUTBOUND);
+  await page.getByRole("button", { name: returnMessages.add }).click();
+  const returning = page.getByRole("region", { name: returnMessages.heading });
+  await fillLeg(page, returning, 0, homeLeg("2027-01-23", "2027-01-24"));
+  await generate(page);
+  const planUrl = page.url();
+  expect(await planCount(page)).toBe(2);
+
+  await page.getByRole("link", { name: planMessages.editTrip }).click();
+  await expect(
+    page.getByRole("heading", { name: messages.editHeading, level: 1 }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: messages.generate }),
+  ).toHaveCount(0);
+  await page.getByLabel(messages.tripName, { exact: true }).fill("Edited");
+  await page.getByRole("button", { name: returnMessages.removeAll }).click();
+  await page.getByRole("button", { name: messages.saveChanges }).click();
+
+  // Same plan, renamed; the return half is gone; nothing was added.
+  await expect(page).toHaveURL(planUrl);
+  await expect(
+    page.getByRole("heading", { name: "Edited", level: 1 }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("group", { name: returnMessages.partsLabel }),
+  ).toHaveCount(0);
+  expect(await planCount(page)).toBe(1);
+});
