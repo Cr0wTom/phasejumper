@@ -38,7 +38,12 @@ import {
   termsOutdated,
   writeTermsAcceptance,
 } from "../../terms";
-import { deletePlan, loadPlan, savePlan } from "../../storage/plans";
+import {
+  deletePlan,
+  loadPlan,
+  savePlan,
+  type StoredPlan,
+} from "../../storage/plans";
 import {
   buttonClass,
   errorClass,
@@ -107,6 +112,8 @@ const NAME_MAX = 60;
 
 export function TripBuilder({ editId }: { editId?: string } = {}) {
   const [name, setName] = useState("");
+  /** The saved plan being edited: saving updates it instead of adding one. */
+  const [editing, setEditing] = useState<StoredPlan | null>(null);
   const [form, setForm] = useState<TripFormValues>(createDefaultForm);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [formAlert, setFormAlert] = useState<FormAlert | null>(null);
@@ -149,6 +156,7 @@ export function TripBuilder({ editId }: { editId?: string } = {}) {
           setFormAlert({ title: messages.editMissing, issues: [] });
           return;
         }
+        setEditing(plan);
         setName(plan.name ?? "");
         setForm(
           formFromPlanInput(plan.input, (iata) => {
@@ -349,11 +357,28 @@ export function TripBuilder({ editId }: { editId?: string } = {}) {
         }
       }
 
-      const id = crypto.randomUUID();
-      const returnId = crypto.randomUUID();
+      // Editing keeps the plan's id (its link, calendar event ids and place
+      // in the list) and its return half's id; a new trip gets new ids.
+      const id = editing?.id ?? crypto.randomUUID();
+      const returnId = editing?.returnPlanId ?? crypto.randomUUID();
       const trimmedName = name.trim().slice(0, NAME_MAX);
       const named = trimmedName === "" ? {} : { name: trimmedName };
-      const createdAt = currentInstant();
+      const createdAt = editing?.createdAt ?? currentInstant();
+      const kept = {
+        ...(editing?.source === undefined ? {} : { source: editing.source }),
+        ...(editing?.icsSequence === undefined
+          ? {}
+          : { icsSequence: editing.icsSequence }),
+      };
+      // What an edit overwrites, to put back if a write fails.
+      let before: StoredPlan[] = [];
+      if (editing !== null) {
+        const oldReturn =
+          editing.returnPlanId === undefined
+            ? undefined
+            : await loadPlan(editing.returnPlanId).catch(() => undefined);
+        before = oldReturn === undefined ? [editing] : [editing, oldReturn];
+      }
       const savedIds: string[] = [];
       try {
         await savePlan({
@@ -362,6 +387,7 @@ export function TripBuilder({ editId }: { editId?: string } = {}) {
           result,
           engineVersion: ENGINE_VERSION,
           createdAt,
+          ...kept,
           ...named,
           ...(returnResult === undefined ? {} : { returnPlanId: returnId }),
         });
@@ -377,11 +403,18 @@ export function TripBuilder({ editId }: { editId?: string } = {}) {
             outboundPlanId: id,
           });
           savedIds.push(returnId);
+        } else if (editing?.returnPlanId !== undefined) {
+          // The trip no longer has a return plan: remove the old one.
+          await deletePlan(editing.returnPlanId);
         }
       } catch {
-        await Promise.allSettled(
-          savedIds.map((savedId) => deletePlan(savedId)),
-        );
+        const restored = new Set(before.map((p) => p.id));
+        await Promise.allSettled([
+          ...savedIds
+            .filter((savedId) => !restored.has(savedId))
+            .map((savedId) => deletePlan(savedId)),
+          ...before.map((p) => savePlan(p)),
+        ]);
         setFormAlert({ title: messages.saveFailed, issues: [] });
         return;
       }
@@ -440,7 +473,9 @@ export function TripBuilder({ editId }: { editId?: string } = {}) {
 
   return (
     <main className={pageClass}>
-      <h1 className={h1Class}>{messages.tripHeading}</h1>
+      <h1 className={h1Class}>
+        {editId === undefined ? messages.tripHeading : messages.editHeading}
+      </h1>
       <form className="mt-8 flex flex-col gap-6" noValidate onSubmit={onSubmit}>
         {formAlert === null ? null : (
           <div
@@ -607,7 +642,13 @@ export function TripBuilder({ editId }: { editId?: string } = {}) {
               disabled={saving || directory === null}
               aria-busy={saving ? true : undefined}
             >
-              {saving ? messages.generating : messages.generate}
+              {saving
+                ? editing === null
+                  ? messages.generating
+                  : messages.savingChanges
+                : editing === null
+                  ? messages.generate
+                  : messages.saveChanges}
             </button>
           </>
         )}

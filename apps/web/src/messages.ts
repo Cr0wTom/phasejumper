@@ -78,6 +78,9 @@ export const messages = {
   tripDaysHint: "Optional. Leave blank if you are not sure.",
   generate: "Generate plan",
   generating: "Generating your plan.",
+  editHeading: "Edit trip",
+  saveChanges: "Save changes",
+  savingChanges: "Saving your changes.",
   airportsLoading: "Loading airports.",
   airportsFailed:
     "The airport list did not load. Reload the page and try again.",
