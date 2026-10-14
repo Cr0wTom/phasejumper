@@ -29,8 +29,24 @@ import {
 } from "react";
 import { Temporal } from "temporal-polyfill";
 import { phaseMapMessages as m } from "../../messages";
-import { ICON_SIZE_RIBBON, Icon, KIND_ICON, type IconName } from "../../icons";
+import { KIND_ICON } from "../../icons";
 import { focusRing } from "../../ui";
+import {
+  COLOR,
+  DETAIL_KINDS,
+  FAINT,
+  Hatch,
+  KEY_ORDER,
+  KeyIcon,
+  MARKER_ICON,
+  QUIET_FILL,
+  SOFT,
+  SOFT_STROKE,
+  markerName,
+  markerSwatch,
+  swatch,
+  type Marker,
+} from "./legend";
 import {
   axisZone,
   layoutPlan,
@@ -39,43 +55,13 @@ import {
   type Segment,
 } from "./layout";
 
-export const COLOR: Record<BlockKind, string> = {
-  SLEEP: "var(--sleep)",
-  SLEEP_INFLIGHT: "var(--sleep)",
-  NAP: "var(--sleep)",
-  SEEK_LIGHT: "var(--light)",
-  SEEK_LIGHT_ARTIFICIAL: "var(--light)",
-  LIGHT_INFLIGHT_WINDOW: "var(--light)",
-  AVOID_LIGHT: "var(--dark)",
-  MELATONIN_WINDOW: "var(--melatonin)",
-  MELATONIN_OK: "var(--melatonin)",
-  EXERCISE_GOOD: "var(--move)",
-  EXERCISE_OK: "var(--move)",
-  EXERCISE_OPTIONAL_WALK: "var(--move)",
-  EXERCISE_AVOID: "var(--move)",
-  CAFFEINE_OK: "var(--caffeine)",
-  CAFFEINE_LATE_OK: "var(--caffeine)",
-  CAFFEINE_STOP: "var(--caffeine)",
-  MEAL: "var(--fg-muted)",
-  // Wind-down and rest share the sleep band, as pale sleep.
-  WIND_DOWN: "var(--sleep)",
-  NSDR: "var(--sleep)",
-};
+export { COLOR } from "./legend";
 
 const FG = "var(--fg)";
 const MUTED = "var(--fg-muted)";
 const SURFACE = "var(--surface)";
 const LINE = "var(--line)";
 const ACCENT = "var(--accent)";
-
-/** Keeps legend rows aligned when an item has no icon. */
-function LegendIcon({ name }: { name: IconName | undefined }) {
-  return name === undefined ? (
-    <span className="inline-block w-4" aria-hidden="true" />
-  ) : (
-    <Icon name={name} size={ICON_SIZE_RIBBON} />
-  );
-}
 
 /** Label text on a band: theme-aware, chosen for WCAG contrast. */
 function inkFor(kind: BlockKind): string {
@@ -113,9 +99,36 @@ interface Geometry {
   compact: boolean;
 }
 
-function geometry(width: number, scaleCount: number): Geometry {
-  const compact = width < 600;
+/** Phones: below this width the map shows key moments unless asked for all. */
+const PHONE_WIDTH = 600;
+
+function geometry(
+  width: number,
+  scaleCount: number,
+  keyMoments: boolean,
+): Geometry {
+  const compact = width < PHONE_WIDTH;
   const gutter = compact ? 52 : 96;
+  if (keyMoments) {
+    // Three bands: sleep and light larger, then one band for the moments to
+    // act on (best exercise time, best time for melatonin, last caffeine).
+    const moments = { y: 56, h: 12 };
+    return {
+      width,
+      gutter,
+      ribbon: Math.max(1, width - gutter - 8),
+      header: 4 + 18 * scaleCount,
+      rowH: 78,
+      lanes: {
+        sleep: { y: 6, h: 24 },
+        light: { y: 34, h: 16 },
+        move: moments,
+        intake: moments,
+      },
+      tickEvery: 6,
+      compact,
+    };
+  }
   const k = compact ? 1.3 : 1;
   return {
     width,
@@ -228,6 +241,10 @@ export function PhaseMap({
   const otherAxis: Axis = axis === "destination" ? "home" : "destination";
   const shownScales: Axis[] = scales[otherAxis] ? [axis, otherAxis] : [axis];
   const [width, setWidth] = useState(1040);
+  // Phones show key moments; the background ranges come back on request.
+  const [details, setDetails] = useState(false);
+  const phone = width < PHONE_WIDTH;
+  const keyMoments = phone && !details && !compact;
   const [open, setOpen] = useState<{ id: string; x: number; y: number } | null>(
     null,
   );
@@ -252,18 +269,28 @@ export function PhaseMap({
 
   const rows = useMemo(() => {
     const all = layoutPlan(input, result, axis);
-    return onlyDate === undefined
-      ? all
-      : all.filter((r) => r.date === onlyDate);
-  }, [input, result, axis, onlyDate]);
-  const shownKinds = useMemo(() => {
+    const dated =
+      onlyDate === undefined ? all : all.filter((r) => r.date === onlyDate);
+    return keyMoments
+      ? dated.map((r) => ({
+          ...r,
+          segments: r.segments.filter((s) => !DETAIL_KINDS.has(s.block.kind)),
+        }))
+      : dated;
+  }, [input, result, axis, onlyDate, keyMoments]);
+  // The key lists only what is drawn right now, in band order.
+  const keyKinds = useMemo(() => {
     const kinds = new Set<BlockKind>();
-    for (const day of result.days) {
-      for (const block of day.blocks) kinds.add(block.kind);
-    }
-    return kinds;
-  }, [result]);
-  const g = geometry(width, shownScales.length);
+    for (const row of rows)
+      for (const s of row.segments) kinds.add(s.block.kind);
+    return KEY_ORDER.filter((k) => kinds.has(k));
+  }, [rows]);
+  const keyMarkers: Marker[] = [
+    ...(rows.some((r) => r.flights.length > 0) ? (["flight"] as const) : []),
+    ...(rows.some((r) => r.cbtMin.length > 0) ? (["cbtMin"] as const) : []),
+    ...(rows.some((r) => r.targetMin !== null) ? (["target"] as const) : []),
+  ];
+  const g = geometry(width, shownScales.length, keyMoments);
   const height = g.header + rows.length * g.rowH;
   const zone = axisZone(axis, input);
   const nowAt =
@@ -426,6 +453,60 @@ export function PhaseMap({
         )}
       </div>
 
+      {compact ? null : (
+        <div className="flex flex-col gap-2">
+          {/* The key: only the marks drawn right now, in band order. */}
+          <ul
+            aria-label={m.keyLabel}
+            className="flex flex-wrap gap-x-3 gap-y-1 text-13 leading-body text-fg-muted"
+          >
+            {keyKinds.map((k) => (
+              <li key={k} className="flex items-center gap-1">
+                <KeyIcon name={KIND_ICON[k]} />
+                <svg width="14" height="10" aria-hidden="true">
+                  {swatch(k)}
+                </svg>
+                {m.kinds[k]}
+              </li>
+            ))}
+            {keyMarkers.map((k) => (
+              <li key={k} className="flex items-center gap-1">
+                <KeyIcon name={MARKER_ICON[k]} />
+                <svg width="14" height="10" aria-hidden="true">
+                  {markerSwatch(k, patternId)}
+                </svg>
+                {markerName(k)}
+              </li>
+            ))}
+          </ul>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-13 leading-body">
+            {phone ? (
+              <button
+                type="button"
+                aria-pressed={details}
+                onClick={() => {
+                  setOpen(null);
+                  setDetails((on) => !on);
+                }}
+                className={`rounded-full border px-3 py-1 transition-colors ${
+                  details
+                    ? "border-accent/50 bg-accent/15 text-fg"
+                    : "border-line text-fg-muted hover:text-fg"
+                } ${focusRing}`}
+              >
+                {m.showDetails}
+              </button>
+            ) : null}
+            <a
+              href="#/evidence/key"
+              className={`text-fg-muted underline-offset-2 hover:text-fg hover:underline ${focusRing}`}
+            >
+              {m.fullKey}
+            </a>
+          </div>
+        </div>
+      )}
+
       <div ref={containerRef} className="relative w-full">
         <svg
           role="group"
@@ -442,24 +523,7 @@ export function PhaseMap({
               <stop offset="0" stopColor="#ffffff" stopOpacity="0.28" />
               <stop offset="0.6" stopColor="#ffffff" stopOpacity="0" />
             </linearGradient>
-            <pattern
-              id={patternId}
-              width="6"
-              height="6"
-              patternUnits="userSpaceOnUse"
-              patternTransform="rotate(45)"
-            >
-              <rect width="6" height="6" fill={SURFACE} />
-              <line
-                x1="0"
-                y1="0"
-                x2="0"
-                y2="6"
-                stroke={MUTED}
-                strokeWidth="2"
-                strokeOpacity="0.3"
-              />
-            </pattern>
+            <Hatch id={patternId} />
           </defs>
 
           {/* Hour scales, shown once: the grid's, then the other zone's. */}
@@ -497,6 +561,30 @@ export function PhaseMap({
             const past = nowAt !== undefined && rowIndex < nowAt.rowIndex;
             const dotXs = row.cbtMin.map((c) => x(c.min));
             const list = row.segments;
+            // Key moments carry their start time when it fits beside them.
+            const momentLabels = new Map<string, number>();
+            if (keyMoments) {
+              let free = 0;
+              const moments = list
+                .filter((s) => s.lane === "move" || s.lane === "intake")
+                .sort((a, b) => a.startMin - b.startMin);
+              for (const s of moments) {
+                const at = x(s.endMin) + 3;
+                const textW = s.from.length * 6.2;
+                const nextStart = moments.find(
+                  (o) => o.startMin > s.startMin,
+                )?.startMin;
+                const room =
+                  nextStart === undefined ? g.gutter + g.ribbon : x(nextStart);
+                if (
+                  at >= free &&
+                  at + textW <= Math.min(room - 2, g.gutter + g.ribbon - 2)
+                ) {
+                  momentLabels.set(s.id, at);
+                  free = at + textW + 4;
+                }
+              }
+            }
             return (
               <g
                 key={row.date}
@@ -631,6 +719,10 @@ export function PhaseMap({
                   const lane = g.lanes[seg.lane];
                   const color = COLOR[seg.block.kind];
                   const name = m.kinds[seg.block.kind];
+                  // On phones a band shows a short name, so more of them fit.
+                  const bandName = phone
+                    ? (m.shortKinds[seg.block.kind] ?? name)
+                    : name;
                   const label = m.itemLabel(name, seg.from, seg.to, seg.point);
                   const x0 = x(seg.startMin);
                   const w = Math.max(2, x(seg.endMin) - x0);
@@ -695,7 +787,7 @@ export function PhaseMap({
                             y1={lane.y + lane.h / 2}
                             y2={lane.y + lane.h / 2}
                             stroke={color}
-                            strokeOpacity={0.6}
+                            style={SOFT_STROKE}
                             strokeWidth={2}
                             strokeLinecap="round"
                             strokeDasharray="0.1 4"
@@ -712,8 +804,8 @@ export function PhaseMap({
                           height={3}
                           rx={1.5}
                           fill={color}
-                          fillOpacity={
-                            seg.block.kind === "CAFFEINE_OK" ? 0.6 : 0.35
+                          style={
+                            seg.block.kind === "CAFFEINE_OK" ? SOFT : QUIET_FILL
                           }
                         />
                       ) : seg.block.kind === "EXERCISE_OK" ||
@@ -728,8 +820,8 @@ export function PhaseMap({
                           height={3}
                           rx={1.5}
                           fill={color}
-                          fillOpacity={
-                            seg.block.kind === "MELATONIN_OK" ? 0.3 : 0.6
+                          style={
+                            seg.block.kind === "MELATONIN_OK" ? FAINT : SOFT
                           }
                         />
                       ) : (
@@ -742,7 +834,7 @@ export function PhaseMap({
                             height={lane.h}
                             rx={Math.min(6, lane.h / 2)}
                             fill={color}
-                            fillOpacity={quiet ? 0.35 : 1}
+                            style={quiet ? QUIET_FILL : undefined}
                           />
                           {quiet || lane.h < 8 ? null : (
                             <rect
@@ -761,9 +853,9 @@ export function PhaseMap({
                       {!seg.point &&
                       !quiet &&
                       lane.h >= LABEL_FONT + 4 &&
-                      labelX(name, x0, w, dotXs) !== null ? (
+                      labelX(bandName, x0, w, dotXs) !== null ? (
                         <text
-                          x={labelX(name, x0, w, dotXs) ?? x0 + 4}
+                          x={labelX(bandName, x0, w, dotXs) ?? x0 + 4}
                           y={lane.y + lane.h / 2}
                           dominantBaseline="central"
                           fontSize={LABEL_FONT}
@@ -771,9 +863,23 @@ export function PhaseMap({
                           fill={inkFor(seg.block.kind)}
                           aria-hidden="true"
                         >
-                          {name}
+                          {bandName}
                         </text>
                       ) : null}
+                      {momentLabels.get(seg.id) === undefined ? null : (
+                        <text
+                          x={momentLabels.get(seg.id)}
+                          y={lane.y + lane.h / 2}
+                          dominantBaseline="central"
+                          fontSize={10}
+                          fill={MUTED}
+                          className="font-mono"
+                          aria-hidden="true"
+                          data-beside=""
+                        >
+                          {seg.from}
+                        </text>
+                      )}
                     </g>
                   );
                 })}
@@ -886,220 +992,6 @@ export function PhaseMap({
             </button>
           </div>
         )}
-      </div>
-
-      <div className={compact ? "hidden" : undefined}>
-        <h3 className="text-13 font-medium leading-body">{m.legend}</h3>
-        {/* Grouped like the bands in each row, top to bottom. */}
-        <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-3 text-13 leading-body text-fg-muted sm:grid-cols-3 lg:grid-cols-5">
-          {(
-            [
-              [
-                m.legendGroups.sleep,
-                [
-                  [
-                    "SLEEP",
-                    <rect width="14" height="10" rx="2" fill={COLOR.SLEEP} />,
-                  ],
-                  [
-                    "WIND_DOWN",
-                    <rect
-                      width="14"
-                      height="10"
-                      rx="2"
-                      fill={COLOR.WIND_DOWN}
-                      fillOpacity={0.35}
-                    />,
-                  ],
-                  [
-                    "NSDR",
-                    <rect
-                      width="14"
-                      height="10"
-                      rx="2"
-                      fill={COLOR.NSDR}
-                      fillOpacity={0.35}
-                    />,
-                  ],
-                ],
-              ],
-              [
-                m.legendGroups.light,
-                [
-                  [
-                    "SEEK_LIGHT",
-                    <rect
-                      width="14"
-                      height="10"
-                      rx="2"
-                      fill={COLOR.SEEK_LIGHT}
-                    />,
-                  ],
-                  [
-                    "AVOID_LIGHT",
-                    <rect
-                      width="14"
-                      height="10"
-                      rx="2"
-                      fill={COLOR.AVOID_LIGHT}
-                    />,
-                  ],
-                ],
-              ],
-              [
-                m.legendGroups.exercise,
-                [
-                  [
-                    "EXERCISE_GOOD",
-                    <rect
-                      width="14"
-                      height="10"
-                      rx="2"
-                      fill={COLOR.EXERCISE_GOOD}
-                    />,
-                  ],
-                  [
-                    "EXERCISE_OK",
-                    <rect
-                      y="4"
-                      width="14"
-                      height="3"
-                      rx="1.5"
-                      fill={COLOR.EXERCISE_OK}
-                      fillOpacity={0.6}
-                    />,
-                  ],
-                  [
-                    "EXERCISE_AVOID",
-                    <line
-                      x1="1"
-                      x2="13"
-                      y1="5"
-                      y2="5"
-                      stroke={COLOR.EXERCISE_AVOID}
-                      strokeOpacity={0.6}
-                      strokeWidth={2}
-                      strokeLinecap="round"
-                      strokeDasharray="0.1 4"
-                    />,
-                  ],
-                ],
-              ],
-              [
-                m.legendGroups.intake,
-                [
-                  [
-                    "CAFFEINE_OK",
-                    <rect
-                      y="4"
-                      width="14"
-                      height="3"
-                      rx="1.5"
-                      fill={COLOR.CAFFEINE_OK}
-                      fillOpacity={0.6}
-                    />,
-                  ],
-                  [
-                    "CAFFEINE_STOP",
-                    <rect
-                      x="5.5"
-                      width="3"
-                      height="10"
-                      fill={COLOR.CAFFEINE_STOP}
-                    />,
-                  ],
-                  [
-                    "MEAL",
-                    <rect
-                      x="6"
-                      width="2"
-                      height="10"
-                      rx="1"
-                      fill={COLOR.MEAL}
-                    />,
-                  ],
-                  [
-                    "MELATONIN_OK",
-                    <rect
-                      y="4"
-                      width="14"
-                      height="3"
-                      rx="1.5"
-                      fill={COLOR.MELATONIN_OK}
-                      fillOpacity={0.3}
-                    />,
-                  ],
-                  [
-                    "MELATONIN_WINDOW",
-                    <rect
-                      width="14"
-                      height="10"
-                      rx="2"
-                      fill={COLOR.MELATONIN_WINDOW}
-                    />,
-                  ],
-                ],
-              ],
-            ] as const
-          ).map(([title, items]) => (
-            <div key={title}>
-              <h4 className="text-13 font-medium text-fg">{title}</h4>
-              <ul className="mt-1 flex flex-col gap-1">
-                {items
-                  .filter(
-                    ([k]) =>
-                      (k !== "MELATONIN_OK" && k !== "MELATONIN_WINDOW") ||
-                      shownKinds.has(k),
-                  )
-                  .map(([k, shape]) => (
-                    <li key={k} className="flex items-center gap-1">
-                      <LegendIcon name={KIND_ICON[k]} />
-                      <svg width="14" height="10" aria-hidden="true">
-                        {shape}
-                      </svg>
-                      {m.kinds[k]}
-                    </li>
-                  ))}
-              </ul>
-            </div>
-          ))}
-          <div>
-            <h4 className="text-13 font-medium text-fg">
-              {m.legendGroups.markers}
-            </h4>
-            <ul className="mt-1 flex flex-col gap-1">
-              <li className="flex items-center gap-1">
-                <LegendIcon name="flight" />
-                <svg width="14" height="10" aria-hidden="true">
-                  <rect width="14" height="10" fill={`url(#${patternId})`} />
-                </svg>
-                {m.flight("")}
-              </li>
-              <li className="flex items-center gap-1">
-                <LegendIcon name="cbtMin" />
-                <svg width="14" height="10" aria-hidden="true">
-                  <circle cx="7" cy="5" r="4" fill={FG} />
-                </svg>
-                {m.cbtMin}
-              </li>
-              <li className="flex items-center gap-1">
-                <LegendIcon name={undefined} />
-                <svg width="14" height="10" aria-hidden="true">
-                  <line
-                    x1="7"
-                    x2="7"
-                    y1="0"
-                    y2="10"
-                    stroke={FG}
-                    strokeOpacity={0.5}
-                    strokeDasharray="2 2"
-                  />
-                </svg>
-                {m.target}
-              </li>
-            </ul>
-          </div>
-        </div>
       </div>
     </section>
   );

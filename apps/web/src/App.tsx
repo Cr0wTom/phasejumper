@@ -38,7 +38,7 @@ export function App() {
           ) : route.name === "settings" ? (
             <SettingsScreen />
           ) : route.name === "evidence" ? (
-            <EvidenceScreen />
+            <EvidenceScreen section={route.section} />
           ) : route.name === "legal" ? (
             <LegalScreen />
           ) : route.name === "plan" ? (

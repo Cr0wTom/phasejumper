@@ -24,7 +24,7 @@ import { useEffect, useState } from "react";
 export type Route =
   | { name: "start" }
   | { name: "settings" }
-  | { name: "evidence" }
+  | { name: "evidence"; section?: "key" }
   | { name: "legal" }
   | { name: "trip"; editId?: string }
   | { name: "plan"; id?: string }
@@ -46,6 +46,7 @@ export function parseHash(hash: string): Route | null {
   if (path === "/today") return { name: "today" };
   if (path === "/settings") return { name: "settings" };
   if (path === "/evidence") return { name: "evidence" };
+  if (path === "/evidence/key") return { name: "evidence", section: "key" };
   if (path === "/legal") return { name: "legal" };
   const plan = PLAN_HASH.exec(path);
   if (plan !== null) {

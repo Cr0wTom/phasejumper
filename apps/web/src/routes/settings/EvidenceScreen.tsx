@@ -17,12 +17,22 @@
 // The evidence page (§1.1, paraphrased): docs/EVIDENCE.md, bundled at build
 // time and rendered on the device. Its links open only when tapped.
 
+import { useEffect, useRef } from "react";
 import evidence from "../../../../../docs/EVIDENCE.md?raw";
 import { Markdown } from "../../components/Markdown";
-import { messages, settingsMessages as m } from "../../messages";
+import { PhaseMapKey } from "../../components/PhaseMap/legend";
+import {
+  messages,
+  phaseMapMessages,
+  settingsMessages as m,
+} from "../../messages";
 import { linkClass, pageClass } from "../../ui";
 
-export function EvidenceScreen() {
+export function EvidenceScreen({ section }: { section?: "key" }) {
+  const keyRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    if (section === "key") keyRef.current?.scrollIntoView();
+  }, [section]);
   return (
     <main className={pageClass}>
       <p className="mb-4">
@@ -33,6 +43,21 @@ export function EvidenceScreen() {
       <article className="max-w-[70ch]">
         <Markdown source={evidence} />
       </article>
+      <section
+        ref={keyRef}
+        aria-labelledby="phase-map-key"
+        className="mt-10 max-w-[70ch] scroll-mt-24"
+      >
+        <h2 id="phase-map-key" className="text-17 font-medium leading-display">
+          {phaseMapMessages.keyHeading}
+        </h2>
+        <p className="mt-2 text-15 leading-body text-fg-muted">
+          {phaseMapMessages.keyIntro}
+        </p>
+        <div className="mt-4">
+          <PhaseMapKey />
+        </div>
+      </section>
       <footer className="mt-8 border-t border-line pt-4 text-13 leading-body text-fg-muted">
         <p>{messages.footer}</p>
       </footer>
