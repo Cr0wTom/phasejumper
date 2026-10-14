@@ -32,7 +32,8 @@ test("text, date, time and select controls share one box size", async ({
   const boxes = await page.evaluate(() =>
     [
       ...document.querySelectorAll<HTMLElement>(
-        "main input:not([type=checkbox]), main select",
+        // File pickers are buttons, not text boxes; they are not compared.
+        "main input:not([type=checkbox]):not([type=file]), main select",
       ),
     ]
       .filter((el) => el.offsetParent !== null)
