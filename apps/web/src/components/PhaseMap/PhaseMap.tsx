@@ -664,13 +664,16 @@ export function PhaseMap({
                             fill={color}
                           />
                         ) : (
-                          <circle
+                          // A meal is a thin full-height tick, so it stays
+                          // visible on top of the melatonin and caffeine lines.
+                          <rect
                             className="pj-mark"
-                            cx={x0}
-                            cy={lane.y + lane.h / 2}
-                            r={3}
+                            x={x0 - 1}
+                            y={lane.y - 1}
+                            width={2}
+                            height={lane.h + 2}
+                            rx={1}
                             fill={color}
-                            fillOpacity={seg.block.kind === "MEAL" ? 0.55 : 1}
                           />
                         )
                       ) : seg.block.kind === "EXERCISE_AVOID" ? (
@@ -715,7 +718,8 @@ export function PhaseMap({
                         />
                       ) : seg.block.kind === "EXERCISE_OK" ||
                         seg.block.kind === "MELATONIN_OK" ? (
-                        // Thin line, same as "Can exercise".
+                        // Thin line, same as "Can exercise". The melatonin
+                        // range is only a suggestion, so it is fainter.
                         <rect
                           className="pj-mark"
                           x={x0}
@@ -724,7 +728,9 @@ export function PhaseMap({
                           height={3}
                           rx={1.5}
                           fill={color}
-                          fillOpacity={0.6}
+                          fillOpacity={
+                            seg.block.kind === "MELATONIN_OK" ? 0.3 : 0.6
+                          }
                         />
                       ) : (
                         <>
@@ -1002,7 +1008,16 @@ export function PhaseMap({
                       fill={COLOR.CAFFEINE_STOP}
                     />,
                   ],
-                  ["MEAL", <circle cx="7" cy="5" r="3.5" fill={COLOR.MEAL} />],
+                  [
+                    "MEAL",
+                    <rect
+                      x="6"
+                      width="2"
+                      height="10"
+                      rx="1"
+                      fill={COLOR.MEAL}
+                    />,
+                  ],
                   [
                     "MELATONIN_OK",
                     <rect
@@ -1011,7 +1026,7 @@ export function PhaseMap({
                       height="3"
                       rx="1.5"
                       fill={COLOR.MELATONIN_OK}
-                      fillOpacity={0.6}
+                      fillOpacity={0.3}
                     />,
                   ],
                   [
