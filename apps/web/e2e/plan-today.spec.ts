@@ -237,3 +237,34 @@ for (const theme of ["dark", "light"] as const) {
     });
   }
 }
+
+for (const width of [390, 1280]) {
+  test(`Today puts the dial right after what is happening now at ${width} px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.clock.install({ time: new Date("2027-01-16T03:00:00Z") });
+    await openShared(page);
+    await page.goto("#/today");
+    const now = await page
+      .getByRole("region", { name: planMessages.current })
+      .boundingBox();
+    const next = await page
+      .getByRole("region", { name: planMessages.next })
+      .boundingBox();
+    const dial = await page.getByTestId("day-dial").boundingBox();
+    if (now === null || next === null || dial === null) {
+      throw new Error("Today cards or dial not rendered");
+    }
+    if (width < 768) {
+      // One column: now, dial, next.
+      expect(dial.y).toBeGreaterThan(now.y + now.height - 1);
+      expect(next.y).toBeGreaterThan(dial.y + dial.height - 1);
+    } else {
+      // Two columns: the dial beside now, next under now.
+      expect(dial.x).toBeGreaterThan(now.x + now.width - 1);
+      expect(Math.abs(dial.y - now.y)).toBeLessThan(40);
+      expect(next.y).toBeGreaterThan(now.y + now.height - 1);
+    }
+  });
+}

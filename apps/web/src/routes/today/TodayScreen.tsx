@@ -177,8 +177,10 @@ export function TodayScreen() {
         <p className="mt-2 text-15 text-fg-muted">{m.after}</p>
       ) : null}
 
-      <div className="mt-6 grid min-w-0 grid-cols-1 gap-6 md:grid-cols-[minmax(0,1fr)_minmax(0,360px)] md:items-start">
-        <div className="flex min-w-0 flex-col gap-4">
+      {/* Phone: now, then the dial, then the rest. Wide: the dial sits in
+          its own column next to both. */}
+      <div className="mt-6 grid min-w-0 grid-cols-1 gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,360px)] md:grid-rows-[auto_1fr] md:items-start md:gap-x-6">
+        <div className="min-w-0 md:col-start-1 md:row-start-1">
           {view.current === undefined ? (
             <p className={`${surfaceClass} text-fg-muted`}>{m.nothingNow}</p>
           ) : (
@@ -189,6 +191,17 @@ export function TodayScreen() {
               progress={doneShare(view.current)}
             />
           )}
+        </div>
+        <div className="min-w-0 md:col-start-2 md:row-span-2 md:row-start-1">
+          <DayDial
+            input={plan.input}
+            result={plan.result}
+            now={now}
+            zone={view.zone}
+            date={view.date}
+          />
+        </div>
+        <div className="flex min-w-0 flex-col gap-4 md:col-start-1 md:row-start-2">
           {view.next === undefined ? (
             <p className={`${surfaceClass} text-fg-muted`}>{m.nothingNext}</p>
           ) : (
@@ -239,13 +252,6 @@ export function TodayScreen() {
             </section>
           )}
         </div>
-        <DayDial
-          input={plan.input}
-          result={plan.result}
-          now={now}
-          zone={view.zone}
-          date={view.date}
-        />
       </div>
 
       <p className="mt-6">
