@@ -233,7 +233,6 @@ export function PhaseMap({
   const headingId = useId();
   const patternId = `${useId().replace(/:/g, "")}-hatch`;
   const sheenId = `${patternId}-sheen`;
-  const exerciseOkId = `${patternId}-ok`;
 
   useEffect(() => {
     const el = containerRef.current;
@@ -448,23 +447,6 @@ export function PhaseMap({
                 stroke={MUTED}
                 strokeWidth="2"
                 strokeOpacity="0.3"
-              />
-            </pattern>
-            <pattern
-              id={exerciseOkId}
-              width="6"
-              height="6"
-              patternUnits="userSpaceOnUse"
-              patternTransform="rotate(45)"
-            >
-              <line
-                x1="0"
-                y1="0"
-                x2="0"
-                y2="6"
-                stroke={COLOR.EXERCISE_OK}
-                strokeWidth="2"
-                strokeOpacity="0.35"
               />
             </pattern>
           </defs>
@@ -704,30 +686,17 @@ export function PhaseMap({
                           strokeDasharray="3 2"
                         />
                       ) : seg.block.kind === "EXERCISE_OK" ? (
-                        <>
-                          <rect
-                            x={x0}
-                            y={lane.y}
-                            width={w}
-                            height={lane.h}
-                            rx={2}
-                            fill={`url(#${exerciseOkId})`}
-                            pointerEvents="none"
-                            aria-hidden="true"
-                          />
-                          <rect
-                            className="pj-mark"
-                            x={x0 + 0.5}
-                            y={lane.y + 0.5}
-                            width={Math.max(1, w - 1)}
-                            height={lane.h - 1}
-                            rx={2}
-                            fill="none"
-                            stroke={color}
-                            strokeOpacity={0.35}
-                            strokeDasharray="3 2"
-                          />
-                        </>
+                        // "Can exercise" reads like "Caffeine fits": a thin line.
+                        <rect
+                          className="pj-mark"
+                          x={x0}
+                          y={lane.y + lane.h / 2 - 1.5}
+                          width={w}
+                          height={3}
+                          rx={1.5}
+                          fill={color}
+                          fillOpacity={0.6}
+                        />
                       ) : (
                         <>
                           <rect
@@ -912,24 +881,14 @@ export function PhaseMap({
               ],
               [
                 "EXERCISE_OK",
-                <g>
-                  <rect
-                    width="14"
-                    height="10"
-                    rx="2"
-                    fill={`url(#${exerciseOkId})`}
-                  />
-                  <rect
-                    x="0.5"
-                    y="0.5"
-                    width="13"
-                    height="9"
-                    rx="2"
-                    fill="none"
-                    stroke={COLOR.EXERCISE_OK}
-                    strokeDasharray="3 2"
-                  />
-                </g>,
+                <rect
+                  y="4"
+                  width="14"
+                  height="3"
+                  rx="1.5"
+                  fill={COLOR.EXERCISE_OK}
+                  fillOpacity={0.6}
+                />,
               ],
               [
                 "EXERCISE_AVOID",
