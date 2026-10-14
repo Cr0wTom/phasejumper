@@ -59,6 +59,7 @@ describe("today view", () => {
           "CAFFEINE_OK",
           "CAFFEINE_LATE_OK",
           "EXERCISE_AVOID",
+          "EXERCISE_OK",
         ]).not.toContain(item?.block.kind);
       }
     }

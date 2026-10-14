@@ -90,7 +90,8 @@ export const EXERCISE = {
   advanceMorningZone: [2, 3],
   advanceAfternoonZone: [8.5, 11.5],
   delayZone: [14.5, 17.5],
-  defaultMinutes: 45,
+  /** Default session length; R9 (Youngstedt et al. 2019) used 1-hour sessions. */
+  defaultMinutes: 60,
   /** No exercise in the 3 h before sleep (sleep hygiene; §11.3 item 5). */
   avoidBeforeSleepHours: 3,
   /** Forecast weight relative to light (§2.8). */

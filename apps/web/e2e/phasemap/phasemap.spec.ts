@@ -16,6 +16,7 @@
 
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { phaseMapMessages } from "../../src/messages";
 
 // T08 acceptance on the test-only harness (golden fixtures, spec §9.3).
 
@@ -171,6 +172,22 @@ test("DST fixture shows the right wall times on both time scales", async ({
   await expect(page.getByRole("button", { name: /^Home time/ })).toBeDisabled();
   await page.getByRole("button", { name: /^Destination time/ }).click();
   await expect(lastSleep()).toHaveAccessibleName("Sleep, 23:00 to 07:00");
+});
+
+test("legend lists the three exercise windows in order", async ({ page }) => {
+  await open(page, "prg-tyo-advance", 1280);
+  const items = page
+    .getByRole("heading", { name: phaseMapMessages.legend })
+    .locator("xpath=following-sibling::ul[1]")
+    .locator("li");
+  const labels = (await items.allTextContents()).map((t) => t.trim());
+  const good = labels.findIndex((t) =>
+    t.includes(phaseMapMessages.kinds.EXERCISE_GOOD),
+  );
+  expect(good).toBeGreaterThanOrEqual(0);
+  expect(labels[good]).toContain(phaseMapMessages.kinds.EXERCISE_GOOD);
+  expect(labels[good + 1]).toContain(phaseMapMessages.kinds.EXERCISE_OK);
+  expect(labels[good + 2]).toContain(phaseMapMessages.kinds.EXERCISE_AVOID);
 });
 
 test("both time scales show by default and can be switched", async ({

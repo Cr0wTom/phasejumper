@@ -77,6 +77,7 @@ import {
   minutesBetween,
   overlaps,
   plus,
+  subtract,
   type Instant,
   type Interval,
 } from "./time";
@@ -98,7 +99,7 @@ import type {
 } from "./types";
 
 /** Bumped whenever plan output changes (§7.4). */
-export const ENGINE_VERSION = "0.4.0";
+export const ENGINE_VERSION = "0.5.0";
 
 /** Guard against a non-terminating loop; weak days at half rate stay far below. */
 const MAX_PLAN_DAYS = 60;
@@ -115,6 +116,7 @@ const META: Record<
   AVOID_LIGHT: { source: "R2", confidence: "A", movable: false },
   MELATONIN_WINDOW: { source: "R4", confidence: "A", movable: true },
   EXERCISE_GOOD: { source: "R9", confidence: "B", movable: true },
+  EXERCISE_OK: { source: "R9", confidence: "B", movable: true },
   EXERCISE_OPTIONAL_WALK: { source: "R9", confidence: "C", movable: true },
   EXERCISE_AVOID: { source: "R9", confidence: "B", movable: false },
   CAFFEINE_OK: { source: "R10", confidence: "B", movable: false },
@@ -322,12 +324,14 @@ function buildRaw(
   // Exercise (R9): shifting plans only.
   if (ctx.shifting && t.exercise.enabled) {
     const bedtimeAvoid = plus(nextSleep, -EXERCISE.avoidBeforeSleepHours * 60);
+    const bedtimeAvoidStart = later(bedtimeAvoid, wake);
     add(
       "EXERCISE_AVOID",
-      later(bedtimeAvoid, wake),
+      bedtimeAvoidStart,
       nextSleep,
       "EXERCISE_AVOID_BEDTIME",
     );
+    const cuts: Interval[] = [];
     if (shiftingToday) {
       const preferred = Math.round(
         t.exercise.preferredMinutes ?? EXERCISE.defaultMinutes,
@@ -352,6 +356,7 @@ function buildRaw(
               ? "EXERCISE_GOOD_ADVANCE"
               : "EXERCISE_GOOD_DELAY",
           );
+          cuts.push({ start: zone.start, end });
           break;
         }
       }
@@ -362,6 +367,21 @@ function buildRaw(
       for (const [from, to] of opposite) {
         const zone = awakePart(from, to);
         add("EXERCISE_AVOID", zone.start, zone.end, "EXERCISE_AVOID_DIRECTION");
+        if (minutesBetween(zone.start, zone.end) > 0) {
+          cuts.push(zone);
+        }
+      }
+    }
+    // Leftover awake time from wake to the bedtime no-exercise block,
+    // minus the ideal window and any wrong-direction no-exercise window.
+    for (const piece of subtract(
+      { start: wake, end: bedtimeAvoidStart },
+      cuts,
+    )) {
+      if (
+        minutesBetween(piece.start, piece.end) >= FEASIBILITY.minBlockMinutes
+      ) {
+        add("EXERCISE_OK", piece.start, piece.end, "EXERCISE_OK");
       }
     }
   }

@@ -171,6 +171,17 @@
           "movable": false
         },
         {
+          "kind": "EXERCISE_OK",
+          "startUtc": "2027-01-19T08:30:00Z",
+          "endUtc": "2027-01-19T14:00:00Z",
+          "localTz": "America/New_York",
+          "reasonCode": "EXERCISE_OK",
+          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": true
+        },
+        {
           "kind": "EXERCISE_AVOID",
           "startUtc": "2027-01-19T14:00:00Z",
           "endUtc": "2027-01-19T17:00:00Z",
@@ -180,6 +191,17 @@
           "source": "R9",
           "confidence": "B",
           "movable": false
+        },
+        {
+          "kind": "EXERCISE_OK",
+          "startUtc": "2027-01-19T17:00:00Z",
+          "endUtc": "2027-01-19T20:00:00Z",
+          "localTz": "America/New_York",
+          "reasonCode": "EXERCISE_OK",
+          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": true
         },
         {
           "kind": "CAFFEINE_STOP",
@@ -195,10 +217,21 @@
         {
           "kind": "EXERCISE_GOOD",
           "startUtc": "2027-01-19T20:00:00Z",
-          "endUtc": "2027-01-19T20:45:00Z",
+          "endUtc": "2027-01-19T21:00:00Z",
           "localTz": "America/New_York",
           "reasonCode": "EXERCISE_GOOD_DELAY",
           "reason": "Exercise in this window can help move your clock later.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": true
+        },
+        {
+          "kind": "EXERCISE_OK",
+          "startUtc": "2027-01-19T21:00:00Z",
+          "endUtc": "2027-01-19T23:00:00Z",
+          "localTz": "America/New_York",
+          "reasonCode": "EXERCISE_OK",
+          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
           "source": "R9",
           "confidence": "B",
           "movable": true
@@ -281,6 +314,17 @@
           "movable": false
         },
         {
+          "kind": "EXERCISE_OK",
+          "startUtc": "2027-01-20T10:30:00Z",
+          "endUtc": "2027-01-20T12:15:00Z",
+          "localTz": "America/New_York",
+          "reasonCode": "EXERCISE_OK",
+          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": true
+        },
+        {
           "kind": "AVOID_LIGHT",
           "startUtc": "2027-01-20T12:15:00Z",
           "endUtc": "2027-01-20T13:30:00Z",
@@ -292,6 +336,17 @@
           "movable": false
         },
         {
+          "kind": "EXERCISE_OK",
+          "startUtc": "2027-01-20T13:30:00Z",
+          "endUtc": "2027-01-20T16:00:00Z",
+          "localTz": "America/New_York",
+          "reasonCode": "EXERCISE_OK",
+          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": true
+        },
+        {
           "kind": "EXERCISE_AVOID",
           "startUtc": "2027-01-20T16:00:00Z",
           "endUtc": "2027-01-20T19:00:00Z",
@@ -301,6 +356,17 @@
           "source": "R9",
           "confidence": "B",
           "movable": false
+        },
+        {
+          "kind": "EXERCISE_OK",
+          "startUtc": "2027-01-20T19:00:00Z",
+          "endUtc": "2027-01-20T22:00:00Z",
+          "localTz": "America/New_York",
+          "reasonCode": "EXERCISE_OK",
+          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": true
         },
         {
           "kind": "CAFFEINE_STOP",
@@ -316,10 +382,21 @@
         {
           "kind": "EXERCISE_GOOD",
           "startUtc": "2027-01-20T22:00:00Z",
-          "endUtc": "2027-01-20T22:45:00Z",
+          "endUtc": "2027-01-20T23:00:00Z",
           "localTz": "America/New_York",
           "reasonCode": "EXERCISE_GOOD_DELAY",
           "reason": "Exercise in this window can help move your clock later.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": true
+        },
+        {
+          "kind": "EXERCISE_OK",
+          "startUtc": "2027-01-20T23:00:00Z",
+          "endUtc": "2027-01-21T01:00:00Z",
+          "localTz": "America/New_York",
+          "reasonCode": "EXERCISE_OK",
+          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
           "source": "R9",
           "confidence": "B",
           "movable": true
@@ -380,6 +457,17 @@
           "source": "R1",
           "confidence": "A",
           "movable": false
+        },
+        {
+          "kind": "EXERCISE_OK",
+          "startUtc": "2027-01-21T12:00:00Z",
+          "endUtc": "2027-01-22T01:00:00Z",
+          "localTz": "America/New_York",
+          "reasonCode": "EXERCISE_OK",
+          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": true
         },
         {
           "kind": "CAFFEINE_OK",
@@ -492,5 +580,5 @@
       "reason": "It overlapped a more important window and was too short to keep."
     }
   ],
-  "engineVersion": "0.4.0"
+  "engineVersion": "0.5.0"
 }

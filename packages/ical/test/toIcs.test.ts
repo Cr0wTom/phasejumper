@@ -48,7 +48,13 @@ const EXPORTED = new Set([
   "MELATONIN_WINDOW",
 ]);
 
-const HIDDEN = ["MEAL", "EXERCISE_AVOID", "CAFFEINE_OK", "CAFFEINE_LATE_OK"];
+const HIDDEN = [
+  "MEAL",
+  "EXERCISE_AVOID",
+  "EXERCISE_OK",
+  "CAFFEINE_OK",
+  "CAFFEINE_LATE_OK",
+];
 
 const TEN_MIN = new Set([
   "SEEK_LIGHT",

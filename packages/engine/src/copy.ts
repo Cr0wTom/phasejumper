@@ -45,6 +45,8 @@ export function reasonCopy(code: ReasonCode): string {
       return "Light now would pull your clock earlier, so keep it dim or wear sunglasses.";
     case "MELATONIN_WINDOW":
       return MELATONIN_REASON;
+    case "EXERCISE_OK":
+      return "Exercise fits here if you want it; it neither helps nor works against the shift.";
     case "EXERCISE_GOOD_ADVANCE":
       return "Exercise in this window can help move your clock earlier.";
     case "EXERCISE_GOOD_DELAY":

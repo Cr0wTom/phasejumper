@@ -17,7 +17,11 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { readFileSync } from "node:fs";
-import { planMessages as m, sharedMessages } from "../src/messages";
+import {
+  phaseMapMessages,
+  planMessages as m,
+  sharedMessages,
+} from "../src/messages";
 import { preAcceptTerms } from "./acceptTerms";
 
 // The plan page shows the map and day chips; a day's detail opens in a sheet.
@@ -73,6 +77,24 @@ test("a day chip opens the sheet; arrows move days; Escape closes", async ({
   ).toBeDisabled();
   await page.keyboard.press("Escape");
   await expect(page.getByRole("dialog")).toHaveCount(0);
+});
+
+test("the day sheet lists the three exercise windows", async ({ page }) => {
+  await openPlan(page);
+  const chips = page
+    .getByRole("navigation", { name: m.daysHeading })
+    .getByRole("button");
+  await chips.nth(2).click();
+  const sheet = page.getByRole("dialog");
+  await expect(
+    sheet.getByText(phaseMapMessages.kinds.EXERCISE_GOOD).first(),
+  ).toBeVisible();
+  await expect(
+    sheet.getByText(phaseMapMessages.kinds.EXERCISE_OK).first(),
+  ).toBeVisible();
+  await expect(
+    sheet.getByText(phaseMapMessages.kinds.EXERCISE_AVOID).first(),
+  ).toBeVisible();
 });
 
 test("choosing a phase-map row opens that day", async ({ page }) => {

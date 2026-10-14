@@ -49,6 +49,7 @@ const COLOR: Record<BlockKind, string> = {
   AVOID_LIGHT: "var(--dark)",
   MELATONIN_WINDOW: "var(--melatonin)",
   EXERCISE_GOOD: "var(--move)",
+  EXERCISE_OK: "var(--move)",
   EXERCISE_OPTIONAL_WALK: "var(--move)",
   EXERCISE_AVOID: "var(--move)",
   CAFFEINE_OK: "var(--caffeine)",
@@ -92,6 +93,7 @@ const LABEL_FONT = 11;
 /** Kinds drawn faintly (lighter weight, no text) so stronger bands read on top. */
 const QUIET: ReadonlySet<BlockKind> = new Set([
   "EXERCISE_AVOID",
+  "EXERCISE_OK",
   "CAFFEINE_OK",
   "CAFFEINE_LATE_OK",
 ]);
@@ -683,6 +685,18 @@ export function PhaseMap({
                           strokeOpacity={0.35}
                           strokeDasharray="3 2"
                         />
+                      ) : seg.block.kind === "EXERCISE_OK" ? (
+                        // "Can exercise" reads like "Caffeine fits": a thin line.
+                        <rect
+                          className="pj-mark"
+                          x={x0}
+                          y={lane.y + lane.h / 2 - 1.5}
+                          width={w}
+                          height={3}
+                          rx={1.5}
+                          fill={color}
+                          fillOpacity={0.6}
+                        />
                       ) : (
                         <>
                           <rect
@@ -863,6 +877,17 @@ export function PhaseMap({
                   height="10"
                   rx="2"
                   fill={COLOR.EXERCISE_GOOD}
+                />,
+              ],
+              [
+                "EXERCISE_OK",
+                <rect
+                  y="4"
+                  width="14"
+                  height="3"
+                  rx="1.5"
+                  fill={COLOR.EXERCISE_OK}
+                  fillOpacity={0.6}
                 />,
               ],
               [

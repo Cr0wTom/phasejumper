@@ -132,7 +132,10 @@ describe("rule 1: flights", () => {
     );
     const flightDays = plan.days.filter((d) => d.flags.includes("FLIGHT_DAY"));
     expect(flightDays.length).toBeGreaterThan(0);
-    for (const d of flightDays) expect(kinds(d)).not.toContain("EXERCISE_GOOD");
+    for (const d of flightDays) {
+      expect(kinds(d)).not.toContain("EXERCISE_GOOD");
+      expect(kinds(d)).not.toContain("EXERCISE_OK");
+    }
     const walk = plan.days[0]?.blocks.find(
       (b) => b.kind === "EXERCISE_OPTIONAL_WALK",
     );
@@ -280,6 +283,35 @@ describe("rule 2: must-be-awake", () => {
     expect(kinds(plan.days[3])).not.toContain("EXERCISE_GOOD");
     expect(plan.droppedBlocks).toContainEqual(
       expect.objectContaining({ dayIndex: 3, kind: "EXERCISE_GOOD" }),
+    );
+  });
+
+  it("noWorkoutWindows trim EXERCISE_OK silently", () => {
+    const base = generatePlan(prgTyo());
+    const ok = base.days[3]?.blocks.find((b) => b.kind === "EXERCISE_OK");
+    if (ok === undefined) throw new Error("fixture: no EXERCISE_OK window");
+    const plan = generatePlan(
+      prgTyo({
+        constraints: {
+          noWorkoutWindows: [
+            {
+              start: local(ok.startUtc, "Asia/Tokyo"),
+              end: local(ok.endUtc, "Asia/Tokyo"),
+              tz: "Asia/Tokyo",
+            },
+          ],
+        },
+      }),
+    );
+    const leftover = plan.days[3]?.blocks.filter(
+      (b) =>
+        b.kind === "EXERCISE_OK" &&
+        b.startUtc < ok.endUtc &&
+        ok.startUtc < b.endUtc,
+    );
+    expect(leftover).toEqual([]);
+    expect(plan.droppedBlocks).not.toContainEqual(
+      expect.objectContaining({ kind: "EXERCISE_OK" }),
     );
   });
 });
