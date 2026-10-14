@@ -102,7 +102,7 @@ import type {
 } from "./types";
 
 /** Bumped whenever plan output changes (§7.4). */
-export const ENGINE_VERSION = "0.7.0";
+export const ENGINE_VERSION = "0.8.0";
 
 /** Guard against a non-terminating loop; weak days at half rate stay far below. */
 const MAX_PLAN_DAYS = 60;
@@ -118,6 +118,7 @@ const META: Record<
   LIGHT_INFLIGHT_WINDOW: { source: "R2", confidence: "C", movable: false },
   AVOID_LIGHT: { source: "R2", confidence: "A", movable: false },
   MELATONIN_WINDOW: { source: "R4", confidence: "A", movable: true },
+  MELATONIN_OK: { source: "R4", confidence: "A", movable: false },
   EXERCISE_GOOD: { source: "R9", confidence: "B", movable: true },
   EXERCISE_OK: { source: "R9", confidence: "B", movable: true },
   EXERCISE_OPTIONAL_WALK: { source: "R9", confidence: "C", movable: true },
@@ -229,6 +230,20 @@ function localInterval(start: string, end: string, tz: string): Interval {
   return { start: at(start), end: at(end) };
 }
 
+/** Never earlier than MELATONIN.earliestLocalTime on the local date of `start`. */
+function notBeforeEarliest(
+  start: Instant,
+  zoneAt: (at: Instant) => string,
+): Instant {
+  const zone = zoneAt(start);
+  const local = start.toZonedDateTimeISO(zone);
+  const earliest = parseClock(MELATONIN.earliestLocalTime) ?? 0;
+  if (local.hour * 60 + local.minute < earliest) {
+    return instantAt(local.toPlainDate(), earliest, zone);
+  }
+  return start;
+}
+
 /** Raw (unfiltered) blocks for one day, from §2.5. */
 function buildRaw(
   ctx: PlanContext,
@@ -301,6 +316,8 @@ function buildRaw(
     }
 
     // Melatonin (R4, R5): opted in and not contraindicated.
+    // Advance: a range up to sleep, with a 30 min best time inside it.
+    // Delay: the opt-in wake window only; no range.
     if (t.useMelatonin && t.melatoninContraindicated !== true) {
       if (direction === "delay") {
         if (opts.allowDelayMelatonin === true) {
@@ -308,20 +325,55 @@ function buildRaw(
             "MELATONIN_WINDOW",
             wake,
             plus(wake, MELATONIN.delayAfterWakeMinutes),
-            "MELATONIN_WINDOW",
+            "MELATONIN_WINDOW_DELAY",
           );
         }
       } else {
-        let start = plus(nextSleep, -MELATONIN.advanceBeforeSleepHours * 60);
-        const zone = ctx.trip.zoneAt(start);
-        const local = start.toZonedDateTimeISO(zone);
-        const earliest = parseClock(MELATONIN.earliestLocalTime) ?? 0;
-        if (local.hour * 60 + local.minute < earliest) {
-          start = instantAt(local.toPlainDate(), earliest, zone);
-        }
+        const hours =
+          t.melatoninTiming === "evening"
+            ? MELATONIN.eveningBeforeSleepHours
+            : MELATONIN.advanceBeforeSleepHours;
+        const start = notBeforeEarliest(
+          plus(nextSleep, -hours * 60),
+          ctx.trip.zoneAt,
+        );
         const end = plus(start, MELATONIN.windowMinutes);
-        if (compare(end, nextSleep) > 0) melatoninDropped = true;
-        else add("MELATONIN_WINDOW", start, end, "MELATONIN_WINDOW");
+        const window: Interval | undefined =
+          compare(end, nextSleep) > 0 ? undefined : { start, end };
+        if (window === undefined) melatoninDropped = true;
+        else {
+          add(
+            "MELATONIN_WINDOW",
+            window.start,
+            window.end,
+            t.melatoninTiming === "evening"
+              ? "MELATONIN_WINDOW_EVENING"
+              : "MELATONIN_WINDOW",
+          );
+        }
+        const rangeStart = notBeforeEarliest(
+          plus(nextSleep, -MELATONIN.rangeBeforeSleepHours * 60),
+          ctx.trip.zoneAt,
+        );
+        if (compare(rangeStart, nextSleep) < 0) {
+          const cuts: Interval[] = [
+            ...ctx.trip.preDeparture,
+            ...ctx.trip.postArrival,
+          ];
+          // The best time is cut out where it finally lands (applyCollisions),
+          // so a moved best time leaves no gap in the range.
+          for (const piece of subtract(
+            { start: rangeStart, end: nextSleep },
+            cuts,
+          )) {
+            if (
+              minutesBetween(piece.start, piece.end) >=
+              FEASIBILITY.minBlockMinutes
+            ) {
+              add("MELATONIN_OK", piece.start, piece.end, "MELATONIN_OK");
+            }
+          }
+        }
       }
     }
   }

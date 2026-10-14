@@ -99,6 +99,9 @@ export const tripFormSchema = z
         return hours > 0 && hours < 24;
       }, messages.sleepNeedInvalid),
     useMelatonin: z.boolean(),
+    melatoninTiming: z.enum(["strongest", "evening"], {
+      error: messages.fieldInvalid,
+    }),
     melatoninPregnant: z.boolean(),
     melatoninMedication: z.boolean(),
     melatoninUnder18: z.boolean(),

@@ -33,6 +33,7 @@ export const BACKGROUND: ReadonlySet<BlockKind> = new Set([
   "CAFFEINE_LATE_OK",
   "EXERCISE_AVOID",
   "EXERCISE_OK",
+  "MELATONIN_OK",
 ]);
 
 /** When several blocks overlap, the first in this list is "current". */

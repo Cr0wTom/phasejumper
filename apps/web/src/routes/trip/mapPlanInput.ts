@@ -265,6 +265,10 @@ export function mapTripForm(
       mealTiming: { enabled: form.mealTimingEnabled },
       preAdjustDays: form.preAdjustDays,
       // Only stored when chosen, so default plans and share links are unchanged.
+      // Absent means "strongest" in the engine.
+      ...(form.melatoninTiming === "evening"
+        ? { melatoninTiming: "evening" as const }
+        : {}),
       ...(form.arrivalStyle === "local" ? { arrivalStyle: "local" } : {}),
     },
     itinerary: {

@@ -59,6 +59,21 @@ describe("share links (§3.3)", () => {
     ).toBe("Café → 会議");
   });
 
+  it("keeps an evening melatonin choice", () => {
+    const input = {
+      ...(prgTyo as unknown as PlanInput),
+      traveler: {
+        ...(prgTyo as unknown as PlanInput).traveler,
+        melatoninTiming: "evening" as const,
+      },
+    };
+    const decoded = decodeShareLink(encodeShareLink(input));
+    expect(decoded.ok).toBe(true);
+    if (decoded.ok) {
+      expect(decoded.input.traveler.melatoninTiming).toBe("evening");
+    }
+  });
+
   it("never includes reported sleep", () => {
     const input = {
       ...(prgTyo as unknown as PlanInput),

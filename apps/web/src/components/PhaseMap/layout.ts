@@ -45,7 +45,7 @@ export interface Segment {
   /** Wall-clock minutes in the row's zone, 0–1440. */
   startMin: number;
   endMin: number;
-  /** Point events (melatonin, caffeine stop, meals) render as glyphs at startMin. */
+  /** Point events (caffeine stop, meals) render as glyphs at startMin. */
   point: boolean;
   /** Wall-clock times of the whole block in this axis, "HH:MM". */
   from: string;
@@ -87,17 +87,14 @@ export const LANE: Record<BlockKind, Lane> = {
   WIND_DOWN: "sleep",
   NSDR: "sleep",
   MELATONIN_WINDOW: "intake",
+  MELATONIN_OK: "intake",
   MEAL: "intake",
   CAFFEINE_OK: "intake",
   CAFFEINE_LATE_OK: "intake",
   CAFFEINE_STOP: "intake",
 };
 
-export const POINT: ReadonlySet<BlockKind> = new Set([
-  "MELATONIN_WINDOW",
-  "CAFFEINE_STOP",
-  "MEAL",
-]);
+export const POINT: ReadonlySet<BlockKind> = new Set(["CAFFEINE_STOP", "MEAL"]);
 
 /** The IANA zone an axis reads in. */
 export function axisZone(axis: Axis, input: PlanInput): string {

@@ -17,7 +17,11 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { MELATONIN_REASON, generatePlan } from "../src/index";
+import {
+  MELATONIN_OK_REASON,
+  MELATONIN_REASON_STRONGEST,
+  generatePlan,
+} from "../src/index";
 import type { PlanInput, PlanResult } from "../src/types";
 
 // Golden fixtures (§9.3). The .expected.json files are written only by
@@ -166,7 +170,7 @@ describe("fixture coverage", () => {
 
 describe("melatonin windows on every fixture (T12)", () => {
   it.each(NAMES)(
-    "%s: fixed copy, no digits, none when contraindicated",
+    "%s: fixed copy, no amount, none when contraindicated",
     (name) => {
       const base = load(name);
       for (const input of [
@@ -178,9 +182,18 @@ describe("melatonin windows on every fixture (T12)", () => {
       ]) {
         const result = generatePlan(input);
         for (const block of result.days.flatMap((day) => day.blocks)) {
-          if (block.kind !== "MELATONIN_WINDOW") continue;
-          expect(block.reason).toBe(MELATONIN_REASON);
-          expect(block.reason).not.toMatch(/\d/);
+          if (
+            block.kind !== "MELATONIN_WINDOW" &&
+            block.kind !== "MELATONIN_OK"
+          ) {
+            continue;
+          }
+          expect(block.reason).not.toMatch(/\d+\s*mg/i);
+          expect(block.reason).toBe(
+            block.kind === "MELATONIN_WINDOW"
+              ? MELATONIN_REASON_STRONGEST
+              : MELATONIN_OK_REASON,
+          );
         }
       }
       const blocked = generatePlan({
@@ -194,7 +207,11 @@ describe("melatonin windows on every fixture (T12)", () => {
       expect(
         blocked.days
           .flatMap((day) => day.blocks)
-          .filter((block) => block.kind === "MELATONIN_WINDOW"),
+          .filter(
+            (block) =>
+              block.kind === "MELATONIN_WINDOW" ||
+              block.kind === "MELATONIN_OK",
+          ),
       ).toEqual([]);
     },
   );

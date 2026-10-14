@@ -33,6 +33,7 @@ const EXPORTABLE = {
   NSDR: true,
   CAFFEINE_STOP: true,
   MELATONIN_WINDOW: true,
+  MELATONIN_OK: false,
   MEAL: false,
   EXERCISE_AVOID: false,
   EXERCISE_OK: false,
@@ -59,7 +60,7 @@ const SUMMARY: Record<ExportedKind, string> = {
   WIND_DOWN: "Wind down",
   NSDR: "Rest",
   CAFFEINE_STOP: "Last caffeine",
-  MELATONIN_WINDOW: "Melatonin window",
+  MELATONIN_WINDOW: "Best time for melatonin",
 };
 
 /** Minutes before the event. Null means the event has no alert. */

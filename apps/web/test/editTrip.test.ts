@@ -62,4 +62,30 @@ describe("Edit trip", () => {
     if (!mapped.ok) return;
     expect(mapped.input.traveler.melatoninContraindicated).toBe(true);
   });
+
+  it("round-trips an evening melatonin choice and defaults the rest to strongest", () => {
+    const saved = {
+      ...(jfk as unknown as PlanInput),
+      traveler: {
+        ...(jfk as unknown as PlanInput).traveler,
+        useMelatonin: true,
+        melatoninTiming: "evening" as const,
+      },
+    };
+    const form = formFromPlanInput(saved, (iata) => iata);
+    expect(form.melatoninTiming).toBe("evening");
+    const parsed = parseTripForm(form);
+    expect(parsed.ok).toBe(true);
+    if (!parsed.ok) return;
+    const mapped = mapTripForm(parsed.value, lookup, saved.now);
+    expect(mapped.ok).toBe(true);
+    if (!mapped.ok) return;
+    expect(mapped.input.traveler.melatoninTiming).toBe("evening");
+
+    const plain = formFromPlanInput(
+      jfk as unknown as PlanInput,
+      (iata) => iata,
+    );
+    expect(plain.melatoninTiming).toBe("strongest");
+  });
 });

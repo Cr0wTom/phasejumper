@@ -54,6 +54,7 @@ const HIDDEN = [
   "EXERCISE_OK",
   "CAFFEINE_OK",
   "CAFFEINE_LATE_OK",
+  "MELATONIN_OK",
 ];
 
 const TEN_MIN = new Set([
@@ -289,6 +290,21 @@ describe("toIcs", () => {
     expect(uids(second)).toEqual(uids(first));
     expect(new Set(sequences(first))).toEqual(new Set(["4"]));
     expect(new Set(sequences(second))).toEqual(new Set(["5"]));
+  });
+
+  it("names the melatonin best time and leaves the range out", () => {
+    const input = load("prg-tyo-advance");
+    const text = unfold(
+      toIcs({
+        planId: "mel",
+        input,
+        result: generatePlan(input),
+        sequence: 0,
+      }),
+    );
+    expect(text).toContain("SUMMARY:Best time for melatonin (5 min)");
+    expect(text).not.toContain("-MELATONIN_OK-");
+    expect(text).not.toContain("Melatonin window");
   });
 
   it("adds the flight number when the leg has one", () => {

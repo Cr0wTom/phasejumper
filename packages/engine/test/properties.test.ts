@@ -135,6 +135,7 @@ describe("engine properties", { timeout: 30_000 }, () => {
       if (t.useMelatonin && t.melatoninContraindicated !== true) return;
       for (const day of plan.days) {
         expect(day.blocks.map((b) => b.kind)).not.toContain("MELATONIN_WINDOW");
+        expect(day.blocks.map((b) => b.kind)).not.toContain("MELATONIN_OK");
       }
     });
   });

@@ -92,6 +92,17 @@
           "movable": true
         },
         {
+          "kind": "MELATONIN_OK",
+          "startUtc": "2027-01-13T12:00:00Z",
+          "endUtc": "2027-01-13T15:00:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "MELATONIN_OK",
+          "reason": "If you use melatonin, research suggests any time in this range moves your body clock earlier. Earlier in the range has more effect; at bedtime the effect is small.",
+          "source": "R4",
+          "confidence": "A",
+          "movable": false
+        },
+        {
           "kind": "EXERCISE_OK",
           "startUtc": "2027-01-13T13:00:00Z",
           "endUtc": "2027-01-13T17:30:00Z",
@@ -119,10 +130,21 @@
           "endUtc": "2027-01-13T15:30:00Z",
           "localTz": "Europe/Prague",
           "reasonCode": "MELATONIN_WINDOW",
-          "reason": "If you use melatonin, research on timing suggests this window.",
+          "reason": "If you use melatonin, research suggests it moves your body clock earlier most when taken about 5 to 6 hours before your new bedtime. It can make you drowsy, so plan not to drive afterwards.",
           "source": "R4",
           "confidence": "A",
           "movable": true
+        },
+        {
+          "kind": "MELATONIN_OK",
+          "startUtc": "2027-01-13T15:30:00Z",
+          "endUtc": "2027-01-13T20:30:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "MELATONIN_OK",
+          "reason": "If you use melatonin, research suggests any time in this range moves your body clock earlier. Earlier in the range has more effect; at bedtime the effect is small.",
+          "source": "R4",
+          "confidence": "A",
+          "movable": false
         },
         {
           "kind": "EXERCISE_AVOID",
@@ -268,15 +290,37 @@
           "movable": true
         },
         {
+          "kind": "MELATONIN_OK",
+          "startUtc": "2027-01-14T12:00:00Z",
+          "endUtc": "2027-01-14T13:30:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "MELATONIN_OK",
+          "reason": "If you use melatonin, research suggests any time in this range moves your body clock earlier. Earlier in the range has more effect; at bedtime the effect is small.",
+          "source": "R4",
+          "confidence": "A",
+          "movable": false
+        },
+        {
           "kind": "MELATONIN_WINDOW",
           "startUtc": "2027-01-14T13:30:00Z",
           "endUtc": "2027-01-14T14:00:00Z",
           "localTz": "Europe/Prague",
           "reasonCode": "MELATONIN_WINDOW",
-          "reason": "If you use melatonin, research on timing suggests this window.",
+          "reason": "If you use melatonin, research suggests it moves your body clock earlier most when taken about 5 to 6 hours before your new bedtime. It can make you drowsy, so plan not to drive afterwards.",
           "source": "R4",
           "confidence": "A",
           "movable": true
+        },
+        {
+          "kind": "MELATONIN_OK",
+          "startUtc": "2027-01-14T14:00:00Z",
+          "endUtc": "2027-01-14T19:00:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "MELATONIN_OK",
+          "reason": "If you use melatonin, research suggests any time in this range moves your body clock earlier. Earlier in the range has more effect; at bedtime the effect is small.",
+          "source": "R4",
+          "confidence": "A",
+          "movable": false
         },
         {
           "kind": "EXERCISE_AVOID",
@@ -394,10 +438,21 @@
           "endUtc": "2027-01-15T12:30:00Z",
           "localTz": "Europe/Prague",
           "reasonCode": "MELATONIN_WINDOW",
-          "reason": "If you use melatonin, research on timing suggests this window.",
+          "reason": "If you use melatonin, research suggests it moves your body clock earlier most when taken about 5 to 6 hours before your new bedtime. It can make you drowsy, so plan not to drive afterwards.",
           "source": "R4",
           "confidence": "A",
           "movable": true
+        },
+        {
+          "kind": "MELATONIN_OK",
+          "startUtc": "2027-01-15T12:30:00Z",
+          "endUtc": "2027-01-15T17:30:00Z",
+          "localTz": "Europe/Prague",
+          "reasonCode": "MELATONIN_OK",
+          "reason": "If you use melatonin, research suggests any time in this range moves your body clock earlier. Earlier in the range has more effect; at bedtime the effect is small.",
+          "source": "R4",
+          "confidence": "A",
+          "movable": false
         },
         {
           "kind": "EXERCISE_AVOID",
@@ -501,6 +556,17 @@
           "movable": true
         },
         {
+          "kind": "MELATONIN_OK",
+          "startUtc": "2027-01-16T06:00:00Z",
+          "endUtc": "2027-01-16T10:30:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "MELATONIN_OK",
+          "reason": "If you use melatonin, research suggests any time in this range moves your body clock earlier. Earlier in the range has more effect; at bedtime the effect is small.",
+          "source": "R4",
+          "confidence": "A",
+          "movable": false
+        },
+        {
           "kind": "CAFFEINE_STOP",
           "startUtc": "2027-01-16T07:00:00Z",
           "endUtc": "2027-01-16T07:05:00Z",
@@ -528,10 +594,21 @@
           "endUtc": "2027-01-16T11:00:00Z",
           "localTz": "Asia/Tokyo",
           "reasonCode": "MELATONIN_WINDOW",
-          "reason": "If you use melatonin, research on timing suggests this window.",
+          "reason": "If you use melatonin, research suggests it moves your body clock earlier most when taken about 5 to 6 hours before your new bedtime. It can make you drowsy, so plan not to drive afterwards.",
           "source": "R4",
           "confidence": "A",
           "movable": true
+        },
+        {
+          "kind": "MELATONIN_OK",
+          "startUtc": "2027-01-16T11:00:00Z",
+          "endUtc": "2027-01-16T16:00:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "MELATONIN_OK",
+          "reason": "If you use melatonin, research suggests any time in this range moves your body clock earlier. Earlier in the range has more effect; at bedtime the effect is small.",
+          "source": "R4",
+          "confidence": "A",
+          "movable": false
         },
         {
           "kind": "EXERCISE_AVOID",
@@ -635,6 +712,17 @@
           "movable": true
         },
         {
+          "kind": "MELATONIN_OK",
+          "startUtc": "2027-01-17T04:30:00Z",
+          "endUtc": "2027-01-17T09:00:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "MELATONIN_OK",
+          "reason": "If you use melatonin, research suggests any time in this range moves your body clock earlier. Earlier in the range has more effect; at bedtime the effect is small.",
+          "source": "R4",
+          "confidence": "A",
+          "movable": false
+        },
+        {
           "kind": "CAFFEINE_STOP",
           "startUtc": "2027-01-17T05:30:00Z",
           "endUtc": "2027-01-17T05:35:00Z",
@@ -684,10 +772,21 @@
           "endUtc": "2027-01-17T09:30:00Z",
           "localTz": "Asia/Tokyo",
           "reasonCode": "MELATONIN_WINDOW",
-          "reason": "If you use melatonin, research on timing suggests this window.",
+          "reason": "If you use melatonin, research suggests it moves your body clock earlier most when taken about 5 to 6 hours before your new bedtime. It can make you drowsy, so plan not to drive afterwards.",
           "source": "R4",
           "confidence": "A",
           "movable": true
+        },
+        {
+          "kind": "MELATONIN_OK",
+          "startUtc": "2027-01-17T09:30:00Z",
+          "endUtc": "2027-01-17T14:30:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "MELATONIN_OK",
+          "reason": "If you use melatonin, research suggests any time in this range moves your body clock earlier. Earlier in the range has more effect; at bedtime the effect is small.",
+          "source": "R4",
+          "confidence": "A",
+          "movable": false
         },
         {
           "kind": "EXERCISE_AVOID",
@@ -789,6 +888,17 @@
           "movable": true
         },
         {
+          "kind": "MELATONIN_OK",
+          "startUtc": "2027-01-18T04:00:00Z",
+          "endUtc": "2027-01-18T08:30:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "MELATONIN_OK",
+          "reason": "If you use melatonin, research suggests any time in this range moves your body clock earlier. Earlier in the range has more effect; at bedtime the effect is small.",
+          "source": "R4",
+          "confidence": "A",
+          "movable": false
+        },
+        {
           "kind": "CAFFEINE_STOP",
           "startUtc": "2027-01-18T04:00:00Z",
           "endUtc": "2027-01-18T04:05:00Z",
@@ -838,10 +948,21 @@
           "endUtc": "2027-01-18T09:00:00Z",
           "localTz": "Asia/Tokyo",
           "reasonCode": "MELATONIN_WINDOW",
-          "reason": "If you use melatonin, research on timing suggests this window.",
+          "reason": "If you use melatonin, research suggests it moves your body clock earlier most when taken about 5 to 6 hours before your new bedtime. It can make you drowsy, so plan not to drive afterwards.",
           "source": "R4",
           "confidence": "A",
           "movable": true
+        },
+        {
+          "kind": "MELATONIN_OK",
+          "startUtc": "2027-01-18T09:00:00Z",
+          "endUtc": "2027-01-18T14:00:00Z",
+          "localTz": "Asia/Tokyo",
+          "reasonCode": "MELATONIN_OK",
+          "reason": "If you use melatonin, research suggests any time in this range moves your body clock earlier. Earlier in the range has more effect; at bedtime the effect is small.",
+          "source": "R4",
+          "confidence": "A",
+          "movable": false
         },
         {
           "kind": "EXERCISE_AVOID",
@@ -1072,5 +1193,5 @@
   ],
   "warnings": [],
   "droppedBlocks": [],
-  "engineVersion": "0.7.0"
+  "engineVersion": "0.8.0"
 }

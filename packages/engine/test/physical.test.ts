@@ -63,6 +63,7 @@ const AWAKE: BlockKind[] = [
   "NSDR",
   "NAP",
   "MELATONIN_WINDOW",
+  "MELATONIN_OK",
 ];
 
 // Physical invariants over 500 random trips: what no real day can contain.
@@ -191,6 +192,37 @@ function audit(trips: fc.Arbitrary<PlanInput>, seed: number): string[] {
         if (sleeps.some((s) => ov(s.i, x.i)))
           hit(`R7 ${x.b.kind} overlaps sleep`, tag(x.b));
       }
+      const melatoninOk = all.filter((x) => x.b.kind === "MELATONIN_OK");
+      const melatoninWin = all.filter((x) => x.b.kind === "MELATONIN_WINDOW");
+      const amount = /\d+\s*mg/i;
+      for (const ok of melatoninOk) {
+        if (melatoninWin.some((w) => ov(ok.i, w.i)))
+          hit("R12 MELATONIN_OK overlaps MELATONIN_WINDOW", tag(ok.b));
+        if (sleeps.some((s) => ov(ok.i, s.i)))
+          hit("R12 MELATONIN_OK overlaps sleep", tag(ok.b));
+        if (legs.some((f) => ov(ok.i, { s: f.s - f.before, e: f.s })))
+          hit("R12 MELATONIN_OK overlaps pre-departure", tag(ok.b));
+        if (legs.some((f) => ov(ok.i, { s: f.e, e: f.e + 2 * H })))
+          hit("R12 MELATONIN_OK overlaps post-arrival", tag(ok.b));
+        if (amount.test(ok.b.reason))
+          hit("R12 melatonin reason contains an amount", ok.b.reason);
+      }
+      for (const w of melatoninWin) {
+        if (amount.test(w.b.reason))
+          hit("R12 melatonin reason contains an amount", w.b.reason);
+      }
+      if (
+        !input.traveler.useMelatonin ||
+        input.traveler.melatoninContraindicated === true
+      ) {
+        if (melatoninOk.length > 0 || melatoninWin.length > 0)
+          hit(
+            "R12 melatonin when blocked or off",
+            input.traveler.useMelatonin ? "blocked" : "off",
+          );
+      }
+      if (plan.decision.direction === "delay" && melatoninOk.length > 0)
+        hit("R12 delay plan has MELATONIN_OK", tag(melatoninOk[0]!.b));
     }),
     { numRuns: 500, seed },
   );

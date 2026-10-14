@@ -17,7 +17,7 @@ All time math is done on UTC instants (Temporal) in whole minutes; wall-clock ti
 1. **Phase estimate.** The body-clock marker is the core body temperature minimum (CBTmin), estimated as habitual wake − 2.5 h plus a chronotype offset. If that disagrees with the sleep-midpoint estimate by more than 1.5 h, the midpoint estimate is used and the plan warns.
 2. **Required shift.** CBTmin on the first planned day is read in destination wall time and compared with the target (the same clock time at the destination). Under 2 h there is no shifting plan.
 3. **Direction.** Days to advance and days to delay are both computed; the one with fewer days wins, a tie goes to advancing. For large eastward trips this can mean delaying the long way round. Trips of at most `max(2, days needed)` days stay on home time (short-trip).
-4. **Day loop.** A day is the main sleep that contains that day's CBTmin plus the waking period after it. Morning blocks are placed from today's CBTmin, evening blocks from tomorrow's. Each day moves CBTmin by `min(rate, remaining)`; a clock change at the destination is absorbed into the remaining shift. Pre-adjust days are simply the first days of the loop.
+4. **Day loop.** A day is the main sleep that contains that day's CBTmin plus the waking period after it. Morning blocks are placed from today's CBTmin, evening blocks from tomorrow's. Each day moves CBTmin by `min(rate, remaining)`; a clock change at the destination is absorbed into the remaining shift. Pre-adjust days are simply the first days of the loop. On an advancing plan, melatonin is a range up to sleep with a shorter best time inside it.
 5. **Feasibility pass**, in order: flights (in-flight sleep and light, flight-day walk, arrival-day rest), must-be-awake events (clipped sleep, short-sleep nap, melatonin moves, no-workout windows), daylight (seek-light in darkness becomes bright indoor light; avoid-light in darkness is dropped with a note), then collisions by priority. A day left without a seek-light block at the right time is a *weak day*: it shifts at half rate and the plan grows.
 6. **Forecast.** Each day reports the expected shift (halved on weak days, plus a small exercise bonus that never moves the plan itself) and the misalignment before and after.
 
@@ -58,6 +58,8 @@ Every number the model uses, as defined in [`packages/engine/src/prc.ts`](../pac
 | `MELATONIN.windowMinutes` | 30 min | Window length; timing only, never an amount | R4 |
 | `MELATONIN.earliestLocalTime` | 13:00 | Never earlier than this local time | R4 |
 | `MELATONIN.delayAfterWakeMinutes` | 30 min | Delaying (opt-in): window right after wake | R4 |
+| `MELATONIN.eveningBeforeSleepHours` | 4.5 h | Evening choice: best time starts this long before sleep, still inside the strongest zone | R4b |
+| `MELATONIN.rangeBeforeSleepHours` | 10 h | Range when melatonin can help moves the clock earlier starts this long before sleep (≈ CT6) | R4b |
 | `EXERCISE.advanceMorningZone` | [2, 3] h | Morning advance zone (our translation of R9 clock times) | R9 |
 | `EXERCISE.advanceAfternoonZone` | [8.5, 11.5] h | Afternoon advance zone (preferred) | R9 |
 | `EXERCISE.delayZone` | [14.5, 17.5] h | Evening delay zone | R9 |
@@ -112,6 +114,7 @@ Every number the model uses, as defined in [`packages/engine/src/prc.ts`](../pac
 - **R2** Khalsa SBS, Jewett ME, Cajochen C, Czeisler CA. A phase response curve to single bright light pulses in human subjects. *J Physiol.* 2003;549(Pt 3):945–952.
 - **R3** St Hilaire MA, Gooley JJ, Khalsa SBS, Kronauer RE, Czeisler CA, Lockley SW. Human phase response curve to a 1 h pulse of bright white light. *J Physiol.* 2012;590(13):3035–3045.
 - **R4** Burgess HJ, Revell VL, Eastman CI. A three pulse phase response curve to three milligrams of melatonin in humans. *J Physiol.* 2008;586(2):639–647; and Burgess HJ, Revell VL, Molina TA, Eastman CI. *J Clin Endocrinol Metab.* 2010;95(7):3325–3331.
+- **R4b** Lewy AJ. Clinical implications of the melatonin phase response curve. *J Clin Endocrinol Metab.* 2010;95(7):3158–3160. [PMC2928905](https://pmc.ncbi.nlm.nih.gov/articles/PMC2928905/)
 - **R5** Eastman CI, Gazda CJ, Burgess HJ, Crowley SJ, Fogg LF. Advancing circadian rhythms before eastward flight: a strategy to prevent or reduce jet lag. *Sleep.* 2005;28(1):33–44. [PMC1262683](https://pmc.ncbi.nlm.nih.gov/articles/PMC1262683/)
 - **R9** Youngstedt SD, Elliott JA, Kripke DF. Human circadian phase–response curves for exercise. *J Physiol.* 2019;597(8):2253–2268. [PMC6462487](https://pmc.ncbi.nlm.nih.gov/articles/PMC6462487/) — the mapping from the paper's clock times to CBTmin-relative zones is our own (assumes CBTmin ≈ 04:30).
 - **R10** Burke TM, Markwald RR, McHill AW, et al. Effects of caffeine on the human circadian clock in vivo and in vitro. *Sci Transl Med.* 2015;7(305):305ra146.

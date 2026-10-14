@@ -78,6 +78,10 @@ export const MELATONIN = {
   earliestLocalTime: "13:00",
   /** Delaying (opt-in): window within this many minutes of wake. */
   delayAfterWakeMinutes: 30,
+  /** Evening choice: best time starts this long before sleep, still inside the strongest zone, R4 */
+  eveningBeforeSleepHours: 4.5,
+  /** Range when melatonin can help moves the clock earlier starts this long before sleep (≈ CT6), R4 */
+  rangeBeforeSleepHours: 10,
 } as const;
 
 /**

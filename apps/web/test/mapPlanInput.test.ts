@@ -18,6 +18,7 @@ import { lookup } from "@phasejumper/airports";
 import { generatePlan, validatePlanInput } from "@phasejumper/engine";
 import { describe, expect, it } from "vitest";
 import { messages } from "../src/messages";
+import { melatoninTimingVisible } from "../src/routes/trip/formState";
 import { mapTripForm } from "../src/routes/trip/mapPlanInput";
 import type { TripFormValues } from "../src/routes/trip/schema";
 
@@ -30,6 +31,7 @@ function form(overrides: Partial<TripFormValues> = {}): TripFormValues {
     chronotype: "intermediate",
     sleepNeedHours: "8",
     useMelatonin: false,
+    melatoninTiming: "strongest",
     melatoninPregnant: false,
     melatoninMedication: false,
     melatoninUnder18: false,
@@ -227,6 +229,41 @@ describe("mapTripForm", () => {
     if (!mapped.ok) return;
     expect(mapped.input.traveler.useMelatonin).toBe(true);
     expect(mapped.input.traveler.melatoninContraindicated).toBe(true);
+  });
+
+  it("stores melatonin timing only when evening is chosen", () => {
+    const evening = mapTripForm(
+      form({ useMelatonin: true, melatoninTiming: "evening" }),
+      lookup,
+      NOW,
+    );
+    expect(evening.ok).toBe(true);
+    if (!evening.ok) return;
+    expect(evening.input.traveler.melatoninTiming).toBe("evening");
+    const strongest = mapTripForm(
+      form({ useMelatonin: true, melatoninTiming: "strongest" }),
+      lookup,
+      NOW,
+    );
+    expect(strongest.ok).toBe(true);
+    if (!strongest.ok) return;
+    expect(strongest.input.traveler).not.toHaveProperty("melatoninTiming");
+  });
+
+  it("hides the timing choice when melatonin is off or contraindicated", () => {
+    const off = form();
+    expect(melatoninTimingVisible(off)).toBe(false);
+    const on = form({ useMelatonin: true });
+    expect(melatoninTimingVisible(on)).toBe(true);
+    expect(melatoninTimingVisible({ ...on, melatoninPregnant: true })).toBe(
+      false,
+    );
+    expect(melatoninTimingVisible({ ...on, melatoninMedication: true })).toBe(
+      false,
+    );
+    expect(melatoninTimingVisible({ ...on, melatoninUnder18: true })).toBe(
+      false,
+    );
   });
 
   it("stores the arrival style only when 'local' is chosen", () => {

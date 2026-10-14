@@ -25,6 +25,7 @@ function validForm(): TripFormValues {
     chronotype: "intermediate",
     sleepNeedHours: "8",
     useMelatonin: false,
+    melatoninTiming: "strongest",
     melatoninPregnant: false,
     melatoninMedication: false,
     melatoninUnder18: false,
@@ -62,6 +63,30 @@ describe("trip form schema", () => {
     if (!parsed.ok) return;
     expect(parsed.value.legs[0]?.flightNumber).toBe("OK123");
     expect(parsed.value.habitualBedtime).toBe("23:00");
+  });
+
+  it("round-trips melatonin timing and rejects an unknown choice", () => {
+    const evening = parseTripForm({
+      ...validForm(),
+      useMelatonin: true,
+      melatoninTiming: "evening",
+    });
+    expect(evening.ok).toBe(true);
+    if (evening.ok) expect(evening.value.melatoninTiming).toBe("evening");
+    const strongest = parseTripForm({
+      ...validForm(),
+      melatoninTiming: "strongest",
+    });
+    expect(strongest.ok).toBe(true);
+    if (strongest.ok) expect(strongest.value.melatoninTiming).toBe("strongest");
+    const bad = parseTripForm({
+      ...validForm(),
+      melatoninTiming: "later" as "strongest",
+    });
+    expect(bad.ok).toBe(false);
+    if (!bad.ok) {
+      expect(bad.fieldErrors.melatoninTiming).toBe(messages.fieldInvalid);
+    }
   });
 
   it("reports an invalid bedtime on that field", () => {

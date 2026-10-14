@@ -48,6 +48,7 @@ export const COLOR: Record<BlockKind, string> = {
   LIGHT_INFLIGHT_WINDOW: "var(--light)",
   AVOID_LIGHT: "var(--dark)",
   MELATONIN_WINDOW: "var(--melatonin)",
+  MELATONIN_OK: "var(--melatonin)",
   EXERCISE_GOOD: "var(--move)",
   EXERCISE_OK: "var(--move)",
   EXERCISE_OPTIONAL_WALK: "var(--move)",
@@ -255,6 +256,13 @@ export function PhaseMap({
       ? all
       : all.filter((r) => r.date === onlyDate);
   }, [input, result, axis, onlyDate]);
+  const shownKinds = useMemo(() => {
+    const kinds = new Set<BlockKind>();
+    for (const day of result.days) {
+      for (const block of day.blocks) kinds.add(block.kind);
+    }
+    return kinds;
+  }, [result]);
   const g = geometry(width, shownScales.length);
   const height = g.header + rows.length * g.rowH;
   const zone = axisZone(axis, input);
@@ -646,17 +654,7 @@ export function PhaseMap({
                       data-end-min={seg.endMin}
                     >
                       {seg.point ? (
-                        seg.block.kind === "MELATONIN_WINDOW" ? (
-                          <rect
-                            className="pj-mark"
-                            x={x0 - 4}
-                            y={lane.y + lane.h / 2 - 4}
-                            width={8}
-                            height={8}
-                            fill={color}
-                            transform={`rotate(45 ${x0} ${lane.y + lane.h / 2})`}
-                          />
-                        ) : seg.block.kind === "CAFFEINE_STOP" ? (
+                        seg.block.kind === "CAFFEINE_STOP" ? (
                           <rect
                             className="pj-mark"
                             x={x0 - 1.5}
@@ -715,8 +713,9 @@ export function PhaseMap({
                             seg.block.kind === "CAFFEINE_OK" ? 0.6 : 0.35
                           }
                         />
-                      ) : seg.block.kind === "EXERCISE_OK" ? (
-                        // "Can exercise" reads like "Caffeine fits": a thin line.
+                      ) : seg.block.kind === "EXERCISE_OK" ||
+                        seg.block.kind === "MELATONIN_OK" ? (
+                        // Thin line, same as "Can exercise".
                         <rect
                           className="pj-mark"
                           x={x0}
@@ -1005,14 +1004,23 @@ export function PhaseMap({
                   ],
                   ["MEAL", <circle cx="7" cy="5" r="3.5" fill={COLOR.MEAL} />],
                   [
+                    "MELATONIN_OK",
+                    <rect
+                      y="4"
+                      width="14"
+                      height="3"
+                      rx="1.5"
+                      fill={COLOR.MELATONIN_OK}
+                      fillOpacity={0.6}
+                    />,
+                  ],
+                  [
                     "MELATONIN_WINDOW",
                     <rect
-                      x="3"
-                      y="1"
-                      width="7"
-                      height="7"
+                      width="14"
+                      height="10"
+                      rx="2"
                       fill={COLOR.MELATONIN_WINDOW}
-                      transform="rotate(45 7 5)"
                     />,
                   ],
                 ],
@@ -1022,15 +1030,21 @@ export function PhaseMap({
             <div key={title}>
               <h4 className="text-13 font-medium text-fg">{title}</h4>
               <ul className="mt-1 flex flex-col gap-1">
-                {items.map(([k, shape]) => (
-                  <li key={k} className="flex items-center gap-1">
-                    <LegendIcon name={KIND_ICON[k]} />
-                    <svg width="14" height="10" aria-hidden="true">
-                      {shape}
-                    </svg>
-                    {m.kinds[k]}
-                  </li>
-                ))}
+                {items
+                  .filter(
+                    ([k]) =>
+                      (k !== "MELATONIN_OK" && k !== "MELATONIN_WINDOW") ||
+                      shownKinds.has(k),
+                  )
+                  .map(([k, shape]) => (
+                    <li key={k} className="flex items-center gap-1">
+                      <LegendIcon name={KIND_ICON[k]} />
+                      <svg width="14" height="10" aria-hidden="true">
+                        {shape}
+                      </svg>
+                      {m.kinds[k]}
+                    </li>
+                  ))}
               </ul>
             </div>
           ))}

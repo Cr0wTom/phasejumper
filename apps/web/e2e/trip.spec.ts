@@ -16,7 +16,7 @@
 
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
-import { messages, planMessages } from "../src/messages";
+import { legalMessages, messages, planMessages } from "../src/messages";
 import { preAcceptTerms } from "./acceptTerms";
 
 test.beforeEach(async ({ page }) => {
@@ -197,6 +197,23 @@ test("shows a field error when arrival is before departure", async ({
     messages.arrivalBeforeDeparture,
   );
   await expect(page).toHaveURL(/#\/trip$/);
+});
+
+test("the melatonin timing choice appears after opting in", async ({
+  page,
+}) => {
+  await page.goto("#/trip");
+  const timing = labeled(page, messages.melatoninTiming);
+  await expect(timing).toBeHidden();
+  await page
+    .getByLabel(legalMessages.melatoninQuestion, { exact: true })
+    .check();
+  await expect(timing).toBeVisible();
+  await expect(timing).toHaveValue("strongest");
+  await page
+    .getByLabel(legalMessages.melatoninPregnant, { exact: true })
+    .check();
+  await expect(timing).toBeHidden();
 });
 
 for (const theme of ["dark", "light"] as const) {

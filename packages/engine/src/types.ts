@@ -32,6 +32,11 @@ export interface Traveler {
   sleepNeedHours?: number;
   /** Set only when the traveler says they already use melatonin (§2.5). */
   useMelatonin: boolean;
+  /**
+   * Advance best time. "strongest" (default when absent): sleep − 5.5 h.
+   * "evening": sleep − 4.5 h, still inside the strongest zone.
+   */
+  melatoninTiming?: "strongest" | "evening";
   /** Pregnancy, medication or under 18: the melatonin layer is hard-blocked. */
   melatoninContraindicated?: boolean;
   caffeine: CaffeineUse;
@@ -128,6 +133,7 @@ export type BlockKind =
   | "SEEK_LIGHT"
   | "AVOID_LIGHT"
   | "MELATONIN_WINDOW"
+  | "MELATONIN_OK"
   | "EXERCISE_GOOD"
   | "EXERCISE_OK"
   | "EXERCISE_AVOID"
@@ -172,6 +178,9 @@ export const REASON_CODES = [
   "AVOID_LIGHT_ADVANCE",
   "AVOID_LIGHT_DELAY",
   "MELATONIN_WINDOW",
+  "MELATONIN_WINDOW_EVENING",
+  "MELATONIN_WINDOW_DELAY",
+  "MELATONIN_OK",
   "EXERCISE_GOOD_ADVANCE",
   "EXERCISE_GOOD_DELAY",
   "EXERCISE_OK",

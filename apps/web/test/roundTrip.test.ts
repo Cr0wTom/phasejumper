@@ -67,6 +67,7 @@ function form(overrides: Partial<TripFormValues> = {}): TripFormValues {
     chronotype: "intermediate",
     sleepNeedHours: "8",
     useMelatonin: false,
+    melatoninTiming: "strongest",
     melatoninPregnant: false,
     melatoninMedication: false,
     melatoninUnder18: false,

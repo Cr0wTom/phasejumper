@@ -313,7 +313,11 @@ function applyMustBeAwake(
       continue;
     }
     if (b.kind === "MELATONIN_WINDOW") {
-      const events = trip.mustBeAwake.filter((e) => overlaps(b, e));
+      const events = [
+        ...trip.mustBeAwake,
+        ...trip.preDeparture,
+        ...trip.postArrival,
+      ].filter((e) => overlaps(b, e));
       if (events.length === 0) {
         result.push(b);
         continue;
@@ -580,19 +584,38 @@ function applyCollisions(blocks: RawBlock[], out: FilterResult): RawBlock[] {
     for (const s of kept) placed.push(withSpan(b, s));
   }
   // Advisory windows (caffeine, meals, melatonin, exercise-avoid) only give
-  // way to sleep and naps.
+  // way to sleep and naps. The best-time block is placed first so a move
+  // onto the range (applyMustBeAwake) is cut out of MELATONIN_OK. The
+  // original slot stays a hole. An empty range is not reported, same as
+  // EXERCISE_OK.
   const sleeping = placed.filter(
     (p) => HARD_SLEEP.has(p.kind) || p.kind === "NAP",
   );
-  for (const b of blocks) {
-    if (HARD_SLEEP.has(b.kind) || OCCUPYING_RANK[b.kind] !== undefined)
-      continue;
-    const segments = subtract(b, sleeping);
+  const placeAdvisory = (b: RawBlock, blockers: readonly RawBlock[]): void => {
+    const segments = subtract(b, blockers);
     const kept = MARKERS.has(b.kind)
       ? segments.filter((s) => length(s) === length(b))
       : segments.filter((s) => length(s) >= MIN_BLOCK_MINUTES);
-    if (kept.length === 0) out.dropped.push({ kind: b.kind, code: "TRIMMED" });
+    if (kept.length === 0 && b.kind !== "MELATONIN_OK") {
+      out.dropped.push({ kind: b.kind, code: "TRIMMED" });
+    }
     for (const s of kept) placed.push(withSpan(b, s));
+  };
+  for (const b of blocks) {
+    if (b.kind === "MELATONIN_WINDOW") placeAdvisory(b, sleeping);
+  }
+  for (const b of blocks) {
+    if (HARD_SLEEP.has(b.kind) || OCCUPYING_RANK[b.kind] !== undefined)
+      continue;
+    if (b.kind === "MELATONIN_WINDOW") continue;
+    if (b.kind === "MELATONIN_OK") {
+      placeAdvisory(b, [
+        ...sleeping,
+        ...placed.filter((p) => p.kind === "MELATONIN_WINDOW"),
+      ]);
+      continue;
+    }
+    placeAdvisory(b, sleeping);
   }
   return placed.sort(byTime);
 }

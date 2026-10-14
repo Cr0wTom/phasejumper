@@ -66,6 +66,7 @@ export function createDefaultForm(): TripFormValues {
     chronotype: "intermediate",
     sleepNeedHours: "8",
     useMelatonin: false,
+    melatoninTiming: "strongest",
     melatoninPregnant: false,
     melatoninMedication: false,
     melatoninUnder18: false,
@@ -91,6 +92,21 @@ export function isChronotype(
 
 export function isCaffeine(value: string): value is TripFormValues["caffeine"] {
   return value === "none" || value === "normal" || value === "heavy";
+}
+
+/** The timing choice is shown only after opting in, with no contraindication ticked. */
+export function melatoninTimingVisible(form: {
+  useMelatonin: boolean;
+  melatoninPregnant: boolean;
+  melatoninMedication: boolean;
+  melatoninUnder18: boolean;
+}): boolean {
+  return (
+    form.useMelatonin &&
+    !form.melatoninPregnant &&
+    !form.melatoninMedication &&
+    !form.melatoninUnder18
+  );
 }
 
 export function isPreAdjust(value: string): value is "0" | "1" | "2" | "3" {
@@ -125,6 +141,7 @@ export function formFromPlanInput(
     chronotype: t.chronotype,
     sleepNeedHours: String(t.sleepNeedHours ?? 8),
     useMelatonin: t.useMelatonin,
+    melatoninTiming: t.melatoninTiming === "evening" ? "evening" : "strongest",
     melatoninPregnant: false,
     melatoninMedication: t.melatoninContraindicated === true,
     melatoninUnder18: false,
