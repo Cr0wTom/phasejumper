@@ -73,11 +73,7 @@
   --pj-faint: 0.3;
   --pj-soft: 0.6;
   --pj-quiet: 0.35;
-  /* The sky behind a day, where the traveler is. */
-  --sky-day: #1d2a3d;
-  --sky-twilight: #2a2350;
-  --sky-night: #0a0d22;
-  --sky-air: var(--surface);
+  --pj-band: 0.82;
   /* Hatched in-air band: muted text at 30%. The hatch itself is --flight-hatch. */
   --flight: color-mix(in srgb, var(--fg-muted) 30%, transparent);
   --flight-hatch: repeating-linear-gradient(
@@ -122,10 +118,7 @@
   --pj-faint: 0.45;
   --pj-soft: 0.85;
   --pj-quiet: 0.5;
-  --sky-day: #fff6dd;
-  --sky-twilight: #eee5f7;
-  --sky-night: #dde2f6;
-  --sky-air: var(--surface);
+  --pj-band: 0.78;
 }
 
 @theme inline {

@@ -175,6 +175,8 @@ export const phaseMapMessages = {
   close: "Close",
   legend: "Legend",
   fullKey: "Full key",
+  legendSleep: "Sleep",
+  legendLight: "Light",
   stripHint:
     "Each line is one day: sleep, light, meals and flights. Tap a day to see all of it.",
   stripRowLabel: (date: string): string =>

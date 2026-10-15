@@ -36,7 +36,15 @@ import {
 import { Temporal } from "temporal-polyfill";
 import { phaseMapMessages as m } from "../../messages";
 import { axisZone, layoutPlan, type Row } from "./layout";
-import { COLOR, FAINT, Hatch, QUIET_FILL, SOFT, SOFT_STROKE } from "./legend";
+import {
+  BAND,
+  COLOR,
+  FAINT,
+  Hatch,
+  QUIET_FILL,
+  SOFT,
+  SOFT_STROKE,
+} from "./legend";
 
 /** Same as the engine's daylight check: the sun's centre at sunrise. */
 const SUN_UP_DEG = -0.35;
@@ -50,17 +58,20 @@ const NIGHT_AFTER_MIN = 2 * 60;
 
 type Sky = "day" | "twilight" | "night" | "air";
 
+/** Thin rails: daylight where you are along the top, your body's night along the bottom. */
+const SUN_RAIL = { y: 30, h: 4 };
 const LANES = {
-  sleep: { y: 18, h: 22 },
-  light: { y: 48, h: 16 },
-  move: { y: 72, h: 10 },
-  intake: { y: 90, h: 12 },
+  sleep: { y: 46, h: 22 },
+  light: { y: 76, h: 16 },
+  move: { y: 100, h: 10 },
+  intake: { y: 118, h: 12 },
 } as const;
-const HEIGHT = 128;
-/** The sky runs edge to edge; the day itself is inset by this much. */
+const NIGHT_RAIL = { y: 142, h: 4 };
+const HEIGHT = 156;
+/** The day is inset by this much from the sheet's edges. */
 const PAD = 16;
-/** The bottom of the drawing fades into the sheet below it. */
-const FADE = 22;
+/** Meals are drawn this many minutes wide, so they read as a mark. */
+const MEAL_MIN = 30;
 
 const POINT_KINDS = new Set(["CAFFEINE_STOP", "MEAL"]);
 const LINE_KINDS = new Set([
@@ -106,10 +117,7 @@ export function DayView({
   );
   const ids = useId().replace(/:/g, "");
   const hatchId = `${ids}-hatch`;
-  const skyId = `${ids}-sky`;
-  const glowId = `${ids}-glow`;
   const clipId = `${ids}-clip`;
-  const fadeId = `${ids}-fade`;
   const wrapRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(340);
   const [cursor, setCursor] = useState<number | null>(null);
@@ -138,13 +146,17 @@ export function DayView({
         .toZonedDateTime(zone)
         .toInstant();
   }, [rowDate, zone]);
+  // Runs of daylight, twilight, darkness or flight across the day.
   const sky = useMemo(() => {
-    const stops: Array<{ at: number; sky: Sky }> = [];
-    for (let min = 0; min <= 1440; min += SKY_STEP_MIN) {
-      const at = instantAt(Math.min(min, 1439)).toString();
-      stops.push({ at: min / 1440, sky: skyOf(sunAltitudeAt(input, at)) });
+    const runs: Array<{ from: number; to: number; sky: Sky }> = [];
+    for (let min = 0; min < 1440; min += SKY_STEP_MIN) {
+      const mid = instantAt(min + Math.floor(SKY_STEP_MIN / 2)).toString();
+      const here = skyOf(sunAltitudeAt(input, mid));
+      const last = runs[runs.length - 1];
+      if (last !== undefined && last.sky === here) last.to = min + SKY_STEP_MIN;
+      else runs.push({ from: min, to: min + SKY_STEP_MIN, sky: here });
     }
-    return stops;
+    return runs;
   }, [input, instantAt]);
   const nights = useMemo(() => {
     const start = instantAt(0).epochMilliseconds;
@@ -188,55 +200,17 @@ export function DayView({
           <clipPath id={clipId}>
             <rect width={width} height={HEIGHT} />
           </clipPath>
-          <linearGradient
-            id={fadeId}
-            x1="0"
-            x2="0"
-            y1={HEIGHT - FADE}
-            y2={HEIGHT}
-            gradientUnits="userSpaceOnUse"
-          >
-            <stop offset="0" stopColor="var(--surface-2)" stopOpacity="0" />
-            <stop offset="1" stopColor="var(--surface-2)" stopOpacity="1" />
-          </linearGradient>
-          {/* Placed on the inset day; the ends carry on to the edges. */}
-          <linearGradient
-            id={skyId}
-            x1={PAD}
-            x2={width - PAD}
-            y1="0"
-            y2="0"
-            gradientUnits="userSpaceOnUse"
-          >
-            {sky.map((s, i) => (
-              <stop key={i} offset={s.at} stopColor={`var(--sky-${s.sky})`} />
-            ))}
-          </linearGradient>
-          <linearGradient id={glowId} x1="0" x2="1" y1="0" y2="0">
-            <stop offset="0" stopColor="var(--sleep)" stopOpacity="0" />
-            <stop
-              offset={NIGHT_BEFORE_MIN / (NIGHT_BEFORE_MIN + NIGHT_AFTER_MIN)}
-              stopColor="var(--sleep)"
-              stopOpacity="0.4"
-            />
-            <stop offset="1" stopColor="var(--sleep)" stopOpacity="0" />
-          </linearGradient>
         </defs>
 
         <g clipPath={`url(#${clipId})`} aria-hidden="true">
-          <rect
-            width={width}
-            height={HEIGHT}
-            fill={`url(#${skyId})`}
-            data-testid="day-view-sky"
-          />
           {row.flights.map((f) => (
             <rect
               key={f.id}
               x={x(f.startMin)}
-              y={0}
+              y={SUN_RAIL.y - 6}
               width={x(f.endMin) - x(f.startMin)}
-              height={HEIGHT}
+              height={NIGHT_RAIL.y + NIGHT_RAIL.h + 6 - (SUN_RAIL.y - 6)}
+              rx={8}
               fill={`url(#${hatchId})`}
               fillOpacity={0.6}
             />
@@ -246,24 +220,57 @@ export function DayView({
               key={min}
               x1={x(min)}
               x2={x(min)}
-              y1={8}
-              y2={HEIGHT - FADE}
+              y1={SUN_RAIL.y + SUN_RAIL.h + 4}
+              y2={NIGHT_RAIL.y - 4}
               stroke="var(--fg-muted)"
               strokeOpacity={0.12}
             />
           ))}
-          {/* Drawn whole and clipped, so the glow peaks on the low point. */}
-          {nights.map((peak) => (
+          {/* Both rails sit on a faint track the width of the day. */}
+          {[SUN_RAIL, NIGHT_RAIL].map((rail) => (
             <rect
-              key={peak}
-              x={x(peak - NIGHT_BEFORE_MIN)}
-              y={0}
-              width={x(peak + NIGHT_AFTER_MIN) - x(peak - NIGHT_BEFORE_MIN)}
-              height={HEIGHT}
-              fill={`url(#${glowId})`}
-              data-testid="day-view-night"
+              key={rail.y}
+              x={x(0)}
+              y={rail.y}
+              width={x(1440) - x(0)}
+              height={rail.h}
+              rx={rail.h / 2}
+              fill="var(--fg-muted)"
+              fillOpacity={0.12}
             />
           ))}
+          {sky
+            .filter((r) => r.sky === "day" || r.sky === "twilight")
+            .map((r) => (
+              <rect
+                key={r.from}
+                x={x(r.from)}
+                y={SUN_RAIL.y}
+                width={x(r.to) - x(r.from)}
+                height={SUN_RAIL.h}
+                rx={SUN_RAIL.h / 2}
+                fill="var(--light)"
+                fillOpacity={r.sky === "day" ? 0.9 : 0.35}
+                data-testid="day-view-sun"
+              />
+            ))}
+          {nights.map((peak) => {
+            const from = Math.max(0, peak - NIGHT_BEFORE_MIN);
+            const to = Math.min(1440, peak + NIGHT_AFTER_MIN);
+            return (
+              <rect
+                key={peak}
+                x={x(from)}
+                y={NIGHT_RAIL.y}
+                width={x(to) - x(from)}
+                height={NIGHT_RAIL.h}
+                rx={NIGHT_RAIL.h / 2}
+                fill="var(--sleep)"
+                fillOpacity={0.8}
+                data-testid="day-view-night"
+              />
+            );
+          })}
 
           {row.segments.map((seg) => {
             const kind = seg.block.kind;
@@ -271,8 +278,23 @@ export function DayView({
             const color = COLOR[kind];
             const x0 = x(seg.startMin);
             const w = Math.max(2, x(seg.endMin) - x0);
+            if (kind === "MEAL") {
+              const mw = Math.max(5, x(MEAL_MIN) - x(0));
+              return (
+                <rect
+                  key={seg.id}
+                  x={x0}
+                  y={lane.y - 2}
+                  width={mw}
+                  height={lane.h + 4}
+                  rx={Math.min(3, mw / 2)}
+                  fill={color}
+                  style={SOFT}
+                />
+              );
+            }
             if (POINT_KINDS.has(kind)) {
-              const tick = kind === "MEAL" ? 2 : 3;
+              const tick = 3;
               return (
                 <rect
                   key={seg.id}
@@ -324,7 +346,7 @@ export function DayView({
                 height={lane.h}
                 rx={Math.min(8, lane.h / 2)}
                 fill={color}
-                style={QUIET_KINDS.has(kind) ? QUIET_FILL : undefined}
+                style={QUIET_KINDS.has(kind) ? QUIET_FILL : BAND}
               />
             );
           })}
@@ -340,19 +362,13 @@ export function DayView({
               strokeWidth={1.5}
             />
           ))}
-          <rect
-            y={HEIGHT - FADE}
-            width={width}
-            height={FADE}
-            fill={`url(#${fadeId})`}
-          />
         </g>
         {cursor === null ? null : (
           <line
             x1={x(cursor)}
             x2={x(cursor)}
-            y1={8}
-            y2={HEIGHT - FADE + 4}
+            y1={SUN_RAIL.y - 4}
+            y2={NIGHT_RAIL.y + NIGHT_RAIL.h + 4}
             stroke="var(--accent)"
             strokeWidth={2}
             pointerEvents="none"
