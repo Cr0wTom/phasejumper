@@ -38,6 +38,8 @@ import {
   KEY_GROUPS,
   KEY_ORDER,
   KeyIcon,
+  LEGEND_AS,
+  BAND,
   MARKER_ICON,
   QUIET_FILL,
   SOFT,
@@ -259,7 +261,6 @@ export function PhaseMap({
   const segRefs = useRef(new Map<string, SVGGElement>());
   const headingId = useId();
   const patternId = `${useId().replace(/:/g, "")}-hatch`;
-  const sheenId = `${patternId}-sheen`;
 
   useEffect(() => {
     const el = containerRef.current;
@@ -291,6 +292,7 @@ export function PhaseMap({
       for (const s of row.segments) kinds.add(s.block.kind);
     return KEY_ORDER.filter((k) => kinds.has(k));
   }, [rows]);
+  const legendKinds = new Set(keyKinds.map((k) => LEGEND_AS[k] ?? k));
   const keyMarkers: Marker[] = [
     ...(rows.some((r) => r.flights.length > 0) ? (["flight"] as const) : []),
     ...(rows.some((r) => r.cbtMin.length > 0) ? (["cbtMin"] as const) : []),
@@ -470,11 +472,6 @@ export function PhaseMap({
           data-testid="phase-map"
         >
           <defs>
-            {/* A soft top-lit sheen laid over the main bands. */}
-            <linearGradient id={sheenId} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stopColor="#ffffff" stopOpacity="0.28" />
-              <stop offset="0.6" stopColor="#ffffff" stopOpacity="0" />
-            </linearGradient>
             <Hatch id={patternId} />
           </defs>
 
@@ -690,16 +687,17 @@ export function PhaseMap({
                             fill={color}
                           />
                         ) : (
-                          // A meal is a thin full-height tick, so it stays
-                          // visible on top of the melatonin and caffeine lines.
+                          // A meal is a half-hour-wide mark, full band height,
+                          // so it reads on top of the caffeine and melatonin lines.
                           <rect
                             className="pj-mark"
-                            x={x0 - 1}
+                            x={x0}
                             y={lane.y - 1}
-                            width={2}
+                            width={Math.max(5, x(30) - x(0))}
                             height={lane.h + 2}
-                            rx={1}
+                            rx={Math.min(3, (x(30) - x(0)) / 2)}
                             fill={color}
+                            style={SOFT}
                           />
                         )
                       ) : seg.block.kind === "EXERCISE_AVOID" ? (
@@ -768,24 +766,13 @@ export function PhaseMap({
                             height={lane.h}
                             rx={Math.min(6, lane.h / 2)}
                             fill={color}
-                            style={quiet ? QUIET_FILL : undefined}
+                            style={quiet ? QUIET_FILL : BAND}
                           />
-                          {quiet || lane.h < 8 ? null : (
-                            <rect
-                              x={x0}
-                              y={lane.y}
-                              width={w}
-                              height={lane.h}
-                              rx={Math.min(6, lane.h / 2)}
-                              fill={`url(#${sheenId})`}
-                              pointerEvents="none"
-                              aria-hidden="true"
-                            />
-                          )}
                         </>
                       )}
                       {!seg.point &&
                       !quiet &&
+                      !strip &&
                       lane.h >= LABEL_FONT + 4 &&
                       labelX(bandName, x0, w, dotXs) !== null ? (
                         <text
@@ -924,7 +911,9 @@ export function PhaseMap({
           {/* Grouped like the bands in each row; only what is drawn. */}
           <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-3 text-13 leading-body text-fg-muted sm:grid-cols-3 lg:grid-cols-5">
             {KEY_GROUPS.map(([group, kinds]) => {
-              const shown = kinds.filter((k) => keyKinds.includes(k));
+              const shown = kinds.filter(
+                (k) => LEGEND_AS[k] === undefined && legendKinds.has(k),
+              );
               return shown.length === 0 ? null : (
                 <div key={group}>
                   <h4 className="text-13 font-medium text-fg">
@@ -937,7 +926,11 @@ export function PhaseMap({
                         <svg width="14" height="10" aria-hidden="true">
                           {strip ? stripSwatch(k) : swatch(k)}
                         </svg>
-                        {m.kinds[k]}
+                        {k === "SEEK_LIGHT"
+                          ? m.legendLight
+                          : k === "SLEEP"
+                            ? m.legendSleep
+                            : m.kinds[k]}
                       </li>
                     ))}
                   </ul>

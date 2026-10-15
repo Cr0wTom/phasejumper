@@ -617,8 +617,6 @@ input[type="file"]::file-selector-button {
    rounded corners and fades into the list. */
 .pj-sheet-day {
   flex: none;
-  overflow: hidden;
-  border-radius: 20px 20px 0 0;
 }
 
 /* Items going on at the moment touched on the drawn day. */
@@ -643,9 +641,16 @@ input[type="file"]::file-selector-button {
   padding: 0 0 env(safe-area-inset-bottom);
   border: 1px solid var(--line-strong);
   border-bottom: 0;
-  border-radius: 20px 20px 0 0;
+  border-radius: 22px 22px 0 0;
   background: var(--surface-2);
-  box-shadow: var(--card-shadow);
+  /* Rounded top, softened into the frosted backdrop: it starts faint and
+     is solid a little below the corners. */
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgb(0 0 0 / 0.35) 0,
+    #000 32px
+  );
+  mask-image: linear-gradient(to bottom, rgb(0 0 0 / 0.35) 0, #000 32px);
   animation: pj-sheet-up 220ms ease-out both;
 }
 
@@ -673,6 +678,9 @@ input[type="file"]::file-selector-button {
     max-height: none;
     margin-top: 0;
     padding: 0;
+    -webkit-mask-image: none;
+    mask-image: none;
+    box-shadow: var(--card-shadow);
     border: 1px solid var(--line-strong);
     border-radius: 20px;
   }

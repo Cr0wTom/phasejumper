@@ -54,6 +54,20 @@ export const FAINT = { fillOpacity: "var(--pj-faint)" } as const;
 export const SOFT = { fillOpacity: "var(--pj-soft)" } as const;
 export const SOFT_STROKE = { strokeOpacity: "var(--pj-soft)" } as const;
 export const QUIET_FILL = { fillOpacity: "var(--pj-quiet)" } as const;
+/** Solid bands are slightly see-through, so the map reads softer. */
+export const BAND = { fillOpacity: "var(--pj-band)" } as const;
+
+/**
+ * On the plan's legend, kinds drawn the same are one entry: every kind of
+ * sleep is "Sleep", every kind of light is "Light". The day sheet and the
+ * full key keep them apart.
+ */
+export const LEGEND_AS: Partial<Record<BlockKind, BlockKind>> = {
+  SLEEP_INFLIGHT: "SLEEP",
+  NAP: "SLEEP",
+  SEEK_LIGHT_ARTIFICIAL: "SEEK_LIGHT",
+  LIGHT_INFLIGHT_WINDOW: "SEEK_LIGHT",
+};
 
 const FG = "var(--fg)";
 
@@ -93,16 +107,27 @@ export function swatch(kind: BlockKind): ReactNode {
     case "CAFFEINE_STOP":
       return <rect x="5.5" width="3" height="10" fill={color} />;
     case "MEAL":
-      return <rect x="6" width="2" height="10" rx="1" fill={color} />;
+      return (
+        <rect x="5" width="4" height="10" rx="2" fill={color} style={SOFT} />
+      );
     default:
-      return <rect width="14" height="10" rx="2" fill={color} />;
+      return <rect width="14" height="10" rx="2" fill={color} style={BAND} />;
   }
 }
 
 /** Light on a one-line day is a thinner band on the sleep line. */
 export function stripSwatch(kind: BlockKind): ReactNode {
   if (LIGHT_KINDS.has(kind)) {
-    return <rect y="2" width="14" height="6" rx="3" fill={COLOR[kind]} />;
+    return (
+      <rect
+        y="2"
+        width="14"
+        height="6"
+        rx="3"
+        fill={COLOR[kind]}
+        style={BAND}
+      />
+    );
   }
   return swatch(kind);
 }
