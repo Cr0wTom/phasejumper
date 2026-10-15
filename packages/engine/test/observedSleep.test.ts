@@ -79,7 +79,12 @@ describe("reported sleep", () => {
     expect(next).toBeDefined();
     expect(before).toBeDefined();
     if (next === undefined || before === undefined) return;
-    expect(Date.parse(next.startUtc)).toBeGreaterThan(
+    // The body clock moves later. At the destination the night stays in the
+    // local-night window, so its bedtime moves later or stays at the edge.
+    expect(Date.parse(later.days[5]?.cbtMinUtc ?? "")).toBeGreaterThan(
+      Date.parse(plan.days[5]?.cbtMinUtc ?? ""),
+    );
+    expect(Date.parse(next.startUtc)).toBeGreaterThanOrEqual(
       Date.parse(before.startUtc),
     );
     expect(later.days.length).toBeGreaterThanOrEqual(plan.days.length);

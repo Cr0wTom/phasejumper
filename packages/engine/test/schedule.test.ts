@@ -180,9 +180,11 @@ describe("exercise and caffeine (§2.5)", () => {
     const kinds = new Set(
       plan.days.flatMap((d) => d.blocks.map((b) => b.kind)),
     );
-    // Sleep on board is part of sleep, not an optional layer.
+    // Sleep on board and the nap after a daytime landing are part of sleep,
+    // not optional layers.
     expect([...kinds].sort()).toEqual([
       "AVOID_LIGHT",
+      "NAP",
       "SEEK_LIGHT",
       "SLEEP",
       "SLEEP_INFLIGHT",
@@ -293,6 +295,6 @@ describe("contract", () => {
   });
 
   it("stamps the engine version", () => {
-    expect(generatePlan(prgTyo()).engineVersion).toBe("0.8.0");
+    expect(generatePlan(prgTyo()).engineVersion).toBe("0.9.0");
   });
 });

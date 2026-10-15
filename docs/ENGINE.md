@@ -17,7 +17,7 @@ All time math is done on UTC instants (Temporal) in whole minutes; wall-clock ti
 1. **Phase estimate.** The body-clock marker is the core body temperature minimum (CBTmin), estimated as habitual wake − 2.5 h plus a chronotype offset. If that disagrees with the sleep-midpoint estimate by more than 1.5 h, the midpoint estimate is used and the plan warns.
 2. **Required shift.** CBTmin on the first planned day is read in destination wall time and compared with the target (the same clock time at the destination). Under 2 h there is no shifting plan.
 3. **Direction.** Days to advance and days to delay are both computed; the one with fewer days wins, a tie goes to advancing. For large eastward trips this can mean delaying the long way round. Trips of at most `max(2, days needed)` days stay on home time (short-trip).
-4. **Day loop.** A day is the main sleep that contains that day's CBTmin plus the waking period after it. Morning blocks are placed from today's CBTmin, evening blocks from tomorrow's. Each day moves CBTmin by `min(rate, remaining)`; a clock change at the destination is absorbed into the remaining shift. Pre-adjust days are simply the first days of the loop. On an advancing plan, melatonin is a range up to sleep with a shorter best time inside it.
+4. **Day loop.** A day is the main sleep that contains that day's CBTmin plus the waking period after it. Morning blocks are placed from today's CBTmin, evening blocks from tomorrow's. Each day moves CBTmin by `min(rate, remaining)`; a clock change at the destination is absorbed into the remaining shift. Pre-adjust days are the first days of the loop: only as many as the shift needs (up to the traveler's choice), moving 1 h a day (R5). From the first night at the destination, sleep stays in the local night: bedtime follows the body clock but stays from 1 h before to 2 h after the usual bedtime, local time, and never starts before landing + 2 h. The first night there is the earliest local night that starts a while after the night before (often the one on the plane); a daytime sleep on the ground after landing becomes a nap. Each later day takes the next local night. Light keeps following the body clock, which is what moves it. Anything that would fall inside a planned sleep, on any day, is trimmed or dropped. On an advancing plan, melatonin is a range up to sleep with a shorter best time inside it.
 5. **Feasibility pass**, in order: flights (in-flight sleep and light, flight-day walk, arrival-day rest), must-be-awake events (clipped sleep, short-sleep nap, melatonin moves, no-workout windows), daylight (seek-light in darkness becomes bright indoor light; avoid-light in darkness is dropped with a note), then collisions by priority. A day left without a seek-light block at the right time is a *weak day*: it shifts at half rate and the plan grows.
 6. **Forecast.** Each day reports the expected shift (halved on weak days, plus a small exercise bonus that never moves the plan itself) and the misalignment before and after.
 
@@ -99,11 +99,13 @@ Every number the model uses, as defined in [`packages/engine/src/prc.ts`](../pac
 | `OBSERVED_SLEEP.maxShiftHours` | 4 h | The re-anchored body clock moves at most this far from the plan | — |
 | `OBSERVED_SLEEP.maxReports` | 60 | Reports accepted per plan | — |
 | `OBSERVED_SLEEP.maxSleepHours` | 16 h | Longest accepted report | — |
-| `ARRIVAL_LOCAL.napMaxMinutes` | 90 min | Arrival style "local": a daytime sleep after the final landing becomes a nap this long at most | — |
+| `ARRIVAL_LOCAL.napMaxMinutes` | 90 min | A daytime sleep on the ground after the final landing becomes a nap this long at most | — |
 | `ARRIVAL_LOCAL.daytimeFromHour` | 8 h | …a ground sleep whose middle falls from this local hour… | — |
 | `ARRIVAL_LOCAL.daytimeToHour` | 20 h | …to this local hour is "daytime" | — |
-| `ARRIVAL_LOCAL.localBedtimeHour` | 22 h | …and the next night starts by this local hour | — |
-| `ARRIVAL_LOCAL.minAwakeBeforeBedHours` | 4 h | …if that is at least this long after landing + 2 h | — |
+| `ARRIVAL_LOCAL.minAwakeBeforeBedHours` | 4 h | …and the first night there starts at least this long after landing + 2 h and after the night before (with "Switch to local time faster", at the start of its window) | — |
+| `LOCAL_NIGHT.earliestBeforeBedtimeMinutes` | 60 min | At the destination, bedtime is no earlier than this before the usual bedtime, local time | — |
+| `LOCAL_NIGHT.latestAfterBedtimeMinutes` | 120 min | …and no later than this after it | — |
+| `PREP.shiftMinutesPerDay` | 60 min | Before the flight, sleep and light move this much a day | R5 |
 | `DAYLIGHT.sunUpAltitudeDegrees` | −0.35° | Sun below this apparent altitude counts as dark | — |
 | `DAYLIGHT.sampleMinutes` | 5 min | Daylight is checked at this interval | — |
 | `MARKER_MINUTES` | 5 min | Length of point events (caffeine stop, meals) | — |

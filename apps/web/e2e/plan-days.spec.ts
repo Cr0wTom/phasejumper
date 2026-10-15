@@ -161,7 +161,6 @@ test("on phones the whole day is drawn at the top of the sheet; touching it high
   expect((viewBox?.y ?? 0) + (viewBox?.height ?? 0)).toBeLessThan(
     heading?.y ?? 0,
   );
-  await expect(dialog.getByTestId("day-view-night").first()).toBeAttached();
   // Shapes only: the drawing carries no text.
   await expect(view.locator("text")).toHaveCount(0);
   // Touching the drawing highlights what is going on then in the list.
@@ -170,21 +169,21 @@ test("on phones the whole day is drawn at the top of the sheet; touching it high
   const at = (hour: number): number => box.x + (box.width * hour) / 24;
   const active = dialog.locator("li[data-active]");
   await expect(active).toHaveCount(0);
-  await page.mouse.move(at(5), box.y + box.height / 2);
+  await page.mouse.move(at(8), box.y + box.height / 2);
   await page.mouse.down();
-  // 05:00 in Los Angeles: caffeine fits, can exercise.
+  // 08:00 in Los Angeles: caffeine fits; the ideal exercise window is later.
   await expect(
     active.filter({ hasText: phaseMapMessages.kinds.CAFFEINE_OK }),
   ).toHaveCount(1);
-  // Dragging to 13:00: the ideal exercise window.
-  await page.mouse.move(at(13.25), box.y + box.height / 2, { steps: 8 });
+  await expect(
+    active.filter({ hasText: phaseMapMessages.kinds.EXERCISE_GOOD }),
+  ).toHaveCount(0);
+  // Dragging to 13:30: the ideal exercise window.
+  await page.mouse.move(at(13.5), box.y + box.height / 2, { steps: 8 });
   await page.mouse.up();
   await expect(
     active.filter({ hasText: phaseMapMessages.kinds.EXERCISE_GOOD }),
   ).toHaveCount(1);
-  await expect(
-    active.filter({ hasText: phaseMapMessages.kinds.CAFFEINE_OK }),
-  ).toHaveCount(0);
   await expect(dialog.getByTestId("day-view-cursor")).toBeAttached();
   // Tapping above the sheet closes it.
   await page.mouse.click(195, 40);

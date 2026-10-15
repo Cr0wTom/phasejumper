@@ -80,10 +80,12 @@ export interface DayContext {
   wake: Instant;
   nextSleepStart: Instant;
   /**
-   * Arrival style "local": this day's sleep after the final landing falls in
-   * local daytime, so it becomes a short nap.
+   * This day's sleep on the ground after the final landing falls in local
+   * daytime, so it becomes a short nap.
    */
   arrivalNap?: boolean;
+  /** The traveler chose "Switch to local time faster" (warned about once). */
+  arrivalLocal?: boolean;
 }
 
 export interface FilterResult {
@@ -353,8 +355,8 @@ function applyMustBeAwake(
     result.push(b);
   }
 
-  // Arrival style "local": a daytime sleep after the final landing becomes
-  // one short nap; the next night starts at the local bedtime instead.
+  // A daytime sleep on the ground after the final landing becomes one short
+  // nap; the night comes in the local night instead.
   const finalLanding = trip.legs[trip.legs.length - 1]?.end;
   if (day.arrivalNap === true && finalLanding !== undefined) {
     const after = result.filter(
@@ -375,7 +377,7 @@ function applyMustBeAwake(
       });
       result.length = 0;
       result.push(...rest);
-      out.warnings.push("ARRIVAL_LOCAL_TIME");
+      if (day.arrivalLocal === true) out.warnings.push("ARRIVAL_LOCAL_TIME");
       clip = undefined;
     }
   }
@@ -618,6 +620,48 @@ function applyCollisions(blocks: RawBlock[], out: FilterResult): RawBlock[] {
     placeAdvisory(b, sleeping);
   }
   return placed.sort(byTime);
+}
+
+/**
+ * Rules that cross day boundaries. Sleep is planned in the local night while
+ * light follows the body clock, so one day's blocks can reach another day's
+ * night. Within a day the collision pass already handles both rules.
+ * 1. Nothing is scheduled while asleep: a block that runs into any day's
+ *    sleep is trimmed, or dropped when too little is left (a marker is
+ *    dropped).
+ * 2. Keep-it-dim beats seek-light (§2.7 rule 4).
+ */
+export function trimAcrossDays(days: FilterResult[]): void {
+  const asleep = days.flatMap((d) =>
+    d.blocks.filter((b) => HARD_SLEEP.has(b.kind)),
+  );
+  const dim = days.flatMap((d) =>
+    d.blocks.filter((b) => b.kind === "AVOID_LIGHT"),
+  );
+  for (const day of days) {
+    const next: RawBlock[] = [];
+    for (const b of day.blocks) {
+      const cuts = HARD_SLEEP.has(b.kind)
+        ? []
+        : [
+            ...asleep.filter((a) => overlaps(a, b)),
+            ...(LIGHT_SEEKING.has(b.kind)
+              ? dim.filter((a) => overlaps(a, b))
+              : []),
+          ];
+      if (cuts.length === 0) {
+        next.push(b);
+        continue;
+      }
+      const kept = MARKERS.has(b.kind)
+        ? []
+        : subtract(b, cuts).filter((s) => length(s) >= MIN_BLOCK_MINUTES);
+      if (kept.length === 0)
+        day.dropped.push({ kind: b.kind, code: "TRIMMED" });
+      for (const s of kept) next.push(withSpan(b, s));
+    }
+    day.blocks = next.sort((x, y) => compare(x.start, y.start));
+  }
 }
 
 export function feasibilityPass(

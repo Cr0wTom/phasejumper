@@ -22,7 +22,6 @@
 // the next night's CBTmin and sleep start (the spec's "sleepStart_d" for that
 // evening).
 
-import { getPosition } from "suncalc";
 import { Temporal } from "temporal-polyfill";
 import {
   adviceCopy,
@@ -34,6 +33,7 @@ import {
 } from "./copy";
 import {
   feasibilityPass,
+  trimAcrossDays,
   type FilterResult,
   type Leg,
   type RawBlock,
@@ -50,10 +50,12 @@ import {
   EXERCISE,
   FEASIBILITY,
   LIGHT,
+  LOCAL_NIGHT,
   MARKER_MINUTES,
   MEALS,
   MELATONIN,
   OBSERVED_SLEEP,
+  PREP,
   WIND_DOWN,
 } from "./prc";
 import {
@@ -103,7 +105,7 @@ import type {
 } from "./types";
 
 /** Bumped whenever plan output changes (§7.4). */
-export const ENGINE_VERSION = "0.8.0";
+export const ENGINE_VERSION = "0.9.0";
 
 /** Guard against a non-terminating loop; weak days at half rate stay far below. */
 const MAX_PLAN_DAYS = 60;
@@ -150,8 +152,16 @@ interface PlanContext {
   direction: Direction;
   shifting: boolean;
   sleepReason: (frame: DayFrame) => ReasonCode;
+  /**
+   * The nights take the plan's day `index` (a frame's night is its own
+   * index; its next night is index + 1).
+   */
   /** Bedtime for the night around `cbtMin`, moved earlier before a flight. */
-  sleepStart: (cbtMin: Instant) => Instant;
+  sleepStart: (cbtMin: Instant, index: number) => Instant;
+  /** Wake time for the night around `cbtMin`. */
+  wake: (cbtMin: Instant, index: number) => Instant;
+  /** The planned night: the body's night, kept in the local night at the destination. */
+  night: (cbtMin: Instant, index: number) => Interval;
   /** Arrival style "local": the night from `start` to `wake` becomes a nap. */
   arrivalNap: (start: Instant, wake: Instant) => boolean;
 }
@@ -177,6 +187,71 @@ function wakeOf(cbtMin: Instant, phase: PhaseEstimate): Instant {
 
 function sleepStartOf(cbtMin: Instant, phase: PhaseEstimate): Instant {
   return plus(wakeOf(cbtMin, phase), -phase.sleepNeedMinutes);
+}
+
+/** The local-night window around the usual bedtime on `date` (LOCAL_NIGHT). */
+function localNightOn(
+  date: Temporal.PlainDate,
+  bedtimeClock: number,
+  tz: string,
+): Interval {
+  const bed = instantAt(date, bedtimeClock, tz);
+  return {
+    start: plus(bed, -LOCAL_NIGHT.earliestBeforeBedtimeMinutes),
+    end: plus(bed, LOCAL_NIGHT.latestAfterBedtimeMinutes),
+  };
+}
+
+/**
+ * The first local night at the destination: the earliest date whose window,
+ * with `start` moved into it, begins at least `afterPrevious` (a while after
+ * the night before ends) and still leaves the minimum sleep once the
+ * traveler is out of the airport (`settled`). Only `settled` may push the
+ * start past the window: a late landing gives a shorter first night.
+ */
+function firstLocalNight(
+  start: Instant,
+  bedtimeClock: number,
+  tz: string,
+  needMinutes: number,
+  settled: Instant,
+  afterPrevious: Instant,
+): Temporal.PlainDate {
+  const date = settled.toZonedDateTimeISO(tz).toPlainDate();
+  for (const d of [-1, 0, 1, 2]) {
+    const on = date.add({ days: d });
+    const clamped = clampInto(start, localNightOn(on, bedtimeClock, tz));
+    if (compare(clamped, afterPrevious) < 0) continue;
+    const left = minutesBetween(
+      later(clamped, settled),
+      plus(clamped, needMinutes),
+    );
+    if (left >= FEASIBILITY.minSleepMinutes) return on;
+  }
+  return date.add({ days: 2 });
+}
+
+/** The first date whose local night starts at or after `at`. */
+function firstLocalNightAfter(
+  at: Instant,
+  bedtimeClock: number,
+  tz: string,
+): Temporal.PlainDate {
+  const date = at.toZonedDateTimeISO(tz).toPlainDate();
+  for (const d of [-1, 0, 1]) {
+    const on = date.add({ days: d });
+    if (compare(localNightOn(on, bedtimeClock, tz).start, at) >= 0) return on;
+  }
+  return date.add({ days: 2 });
+}
+
+/** `start` moved into `window` when it falls outside it. */
+function clampInto(start: Instant, window: Interval): Instant {
+  return compare(start, window.start) < 0
+    ? window.start
+    : compare(start, window.end) > 0
+      ? window.end
+      : start;
 }
 
 /** Where the traveler is: home, a leg's departure zone in the air, a layover, the destination. */
@@ -244,23 +319,6 @@ function legsWithPlaces(input: PlanInput): Leg[] {
   });
 }
 
-/**
- * The sun's altitude in degrees where the traveler is at an instant, as the
- * daylight check sees it. Undefined in the air or when the airport has no
- * coordinates. Assumes validated input.
- */
-export function sunAltitudeAt(
-  input: PlanInput,
-  atUtc: string,
-): number | undefined {
-  const at = Temporal.Instant.from(atUtc);
-  const where = latLonLocator(legsWithPlaces(input))(at);
-  if (where === undefined) return undefined;
-  // suncalc 2 reports altitude in degrees.
-  return getPosition(new Date(at.epochMilliseconds), where.lat, where.lon)
-    .altitude;
-}
-
 function localInterval(start: string, end: string, tz: string): Interval {
   const at = (v: string): Instant =>
     Temporal.PlainDateTime.from(v).toZonedDateTime(tz).toInstant();
@@ -300,15 +358,20 @@ function buildRaw(
       raw.push({ kind, start, end, reasonCode });
     }
   };
-  const wake = wakeOf(frame.cbtMin, phase);
-  const nextSleep = ctx.sleepStart(frame.nextCbtMin);
-  const nextWake = wakeOf(frame.nextCbtMin, phase);
+  const wake = ctx.wake(frame.cbtMin, frame.index);
+  const nextSleep = ctx.sleepStart(frame.nextCbtMin, frame.index + 1);
+  const nextWake = ctx.wake(frame.nextCbtMin, frame.index + 1);
   const at = (hours: number): Instant => plus(frame.cbtMin, hours * 60);
   const shiftingToday = ctx.shifting && frame.shift > 0;
   let lightShifted = false;
   let melatoninDropped = false;
 
-  add("SLEEP", ctx.sleepStart(frame.cbtMin), wake, ctx.sleepReason(frame));
+  add(
+    "SLEEP",
+    ctx.sleepStart(frame.cbtMin, frame.index),
+    wake,
+    ctx.sleepReason(frame),
+  );
 
   if (shiftingToday) {
     // Light (R2, R3).
@@ -534,12 +597,14 @@ function buildRaw(
  * difference is negligible.
  */
 function reportedShiftMinutes(
-  cbtMin: Instant,
+  planned: Interval,
   phase: PhaseEstimate,
   observed: readonly Interval[],
 ): number {
-  const start = sleepStartOf(cbtMin, phase);
-  const plannedMid = plus(start, Math.round(phase.sleepNeedMinutes / 2));
+  const plannedMid = plus(
+    planned.start,
+    Math.round(phase.sleepNeedMinutes / 2),
+  );
   let best: number | undefined;
   for (const sleep of observed) {
     if (length(sleep) < OBSERVED_SLEEP.minMainSleepHours * 60) continue;
@@ -568,13 +633,14 @@ function buildDay(
     raw,
     {
       index: frame.index,
-      sleepStart: ctx.sleepStart(frame.cbtMin),
-      wake: wakeOf(frame.cbtMin, ctx.phase),
-      nextSleepStart: ctx.sleepStart(frame.nextCbtMin),
+      sleepStart: ctx.sleepStart(frame.cbtMin, frame.index),
+      wake: ctx.wake(frame.cbtMin, frame.index),
+      nextSleepStart: ctx.sleepStart(frame.nextCbtMin, frame.index + 1),
       arrivalNap: ctx.arrivalNap(
-        ctx.sleepStart(frame.cbtMin),
-        wakeOf(frame.cbtMin, ctx.phase),
+        ctx.sleepStart(frame.cbtMin, frame.index),
+        ctx.wake(frame.cbtMin, frame.index),
       ),
+      arrivalLocal: ctx.input.traveler.arrivalStyle === "local",
     },
     ctx.trip,
   );
@@ -665,15 +731,26 @@ export function generatePlan(
     .toPlainDate();
 
   // §2.3: delta from CBTmin on the first planned day, read in destination time.
-  const firstDay = departureDate.subtract({ days: traveler.preAdjustDays });
+  const choice = (from: Temporal.PlainDate) => {
+    const cbtMin = instantAt(from, target, itinerary.homeTz);
+    const delta = signedMinutes(clockIn(cbtMin, destinationTz) - target);
+    return chooseDirection(delta, ratesFor(traveler), itinerary.tripDays, opts);
+  };
+  // Prep days (R5): only as many as the shift needs, up to the traveler's
+  // choice, so a small shift does not start days early for nothing.
+  const prepDays = (() => {
+    const d = choice(departureDate.subtract({ days: traveler.preAdjustDays }));
+    if (d.direction !== "advance" && d.direction !== "delay") return 0;
+    const needed =
+      d.direction === "advance" ? d.advanceMinutes : d.delayMinutes;
+    return Math.min(
+      traveler.preAdjustDays,
+      Math.ceil(needed / PREP.shiftMinutesPerDay),
+    );
+  })();
+  const firstDay = departureDate.subtract({ days: prepDays });
   const cbtMin0 = instantAt(firstDay, target, itinerary.homeTz);
-  const deltaMinutes = signedMinutes(clockIn(cbtMin0, destinationTz) - target);
-  const decision = chooseDirection(
-    deltaMinutes,
-    ratesFor(traveler),
-    itinerary.tripDays,
-    opts,
-  );
+  const decision = choice(firstDay);
 
   const constraints = input.constraints ?? {};
   const zoneAt = zoneLocator(input, legs);
@@ -726,21 +803,65 @@ export function generatePlan(
     traveler.arrivalStyle === "local" && shifting && finalLanding !== undefined
       ? plus(finalLanding, FEASIBILITY.awakeAfterArrivalMinutes)
       : undefined;
-  const localBedtime = (() => {
-    if (outOfAirport === undefined) return undefined;
-    const bed = outOfAirport
-      .toZonedDateTimeISO(destinationTz)
-      .toPlainDate()
-      .toZonedDateTime({
-        timeZone: destinationTz,
-        plainTime: new Temporal.PlainTime(ARRIVAL_LOCAL.localBedtimeHour),
-      })
-      .toInstant();
-    return minutesBetween(outOfAirport, bed) >=
-      ARRIVAL_LOCAL.minAwakeBeforeBedHours * 60
-      ? bed
-      : undefined;
-  })();
+  // The planned night: the body's night, but at the destination kept in the
+  // local night around the usual bedtime (LOCAL_NIGHT). Light still follows
+  // the body clock; that is what moves it.
+  const bedtimeClock = parseClock(traveler.habitualBedtime) ?? 0;
+  // The first night at the destination takes the nearest local night; each
+  // later day of the plan takes the next one, so two days never share one.
+  let anchor: { index: number; date: Temporal.PlainDate } | undefined;
+  const settled = plus(lastLeg.end, FEASIBILITY.awakeAfterArrivalMinutes);
+  // Each day's planned night, so the first one at the destination can start
+  // a while after the night before (often the one on the plane) ends.
+  const planned = new Map<number, Interval>();
+  const night = (cbtMin: Instant, index: number): Interval => {
+    const start = sleepStartOf(cbtMin, phase);
+    const body = { start, end: wakeOf(cbtMin, phase) };
+    if (!shifting || compare(start, lastLeg.end) < 0) {
+      planned.set(index, body);
+      return body;
+    }
+    if (anchor === undefined || index < anchor.index) {
+      anchor = {
+        index,
+        // Arrival style "local": the first night is the arrival evening's,
+        // once there has been time to get out of the airport and settle.
+        date:
+          outOfAirport === undefined
+            ? firstLocalNight(
+                start,
+                bedtimeClock,
+                destinationTz,
+                phase.sleepNeedMinutes,
+                settled,
+                plus(
+                  planned.get(index - 1)?.end ?? lastLeg.end,
+                  ARRIVAL_LOCAL.minAwakeBeforeBedHours * 60,
+                ),
+              )
+            : firstLocalNightAfter(
+                plus(outOfAirport, ARRIVAL_LOCAL.minAwakeBeforeBedHours * 60),
+                bedtimeClock,
+                destinationTz,
+              ),
+      };
+    }
+    const date = anchor.date.add({ days: index - anchor.index });
+    const window = localNightOn(date, bedtimeClock, destinationTz);
+    // Arrival style "local" starts that first night at the window's start.
+    const local =
+      outOfAirport !== undefined && index === anchor.index
+        ? window.start
+        : clampInto(start, window);
+    // A night never starts before landing plus the time to get out of the
+    // airport; a late first night keeps its wake time and is shorter.
+    const result = {
+      start: later(local, settled),
+      end: plus(local, phase.sleepNeedMinutes),
+    };
+    planned.set(index, result);
+    return result;
+  };
   const direction = decision.shiftDirection;
   const ctx: PlanContext = {
     input,
@@ -755,18 +876,10 @@ export function generatePlan(
         : decision.direction === "short-trip"
           ? () => "SLEEP_HOME_TIME"
           : (f) => (f.shift > 0 ? "SLEEP_SHIFTING" : "SLEEP_SETTLED"),
-    sleepStart: (cbtMin) => {
-      const start = sleepStartOf(cbtMin, phase);
-      const wake = wakeOf(cbtMin, phase);
-      // Arrival style "local": the first night after landing starts at the
-      // local bedtime when the body clock would start it later.
-      if (
-        localBedtime !== undefined &&
-        compare(start, localBedtime) > 0 &&
-        minutesBetween(localBedtime, start) < 12 * 60
-      ) {
-        return localBedtime;
-      }
+    night,
+    wake: (cbtMin, index) => night(cbtMin, index).end,
+    sleepStart: (cbtMin, index) => {
+      const { start, end: wake } = night(cbtMin, index);
       // A departure buffer that begins after bedtime cuts the end of this
       // night; recover up to an hour of it by going to bed earlier.
       const cut = preDeparture.find(
@@ -776,11 +889,13 @@ export function generatePlan(
       const lost = minutesBetween(cut.start, wake);
       return plus(start, -Math.min(FEASIBILITY.earlierBedtimeMaxMinutes, lost));
     },
+    // A daytime sleep on the ground after the final landing becomes a nap,
+    // whichever arrival style: the night comes in the local night.
     arrivalNap: (start, wake) => {
-      if (outOfAirport === undefined) return false;
-      if (compare(wake, outOfAirport) <= 0) return false;
-      if (minutesBetween(outOfAirport, start) > 12 * 60) return false;
-      const ground = { start: later(start, outOfAirport), end: wake };
+      if (!shifting) return false;
+      if (compare(wake, settled) <= 0) return false;
+      if (minutesBetween(settled, start) > 12 * 60) return false;
+      const ground = { start: later(start, settled), end: wake };
       if (length(ground) < 15) return false;
       const middle = plus(ground.start, Math.round(length(ground) / 2));
       const hour = middle.toZonedDateTimeISO(destinationTz).hour;
@@ -849,7 +964,10 @@ export function generatePlan(
           `engine invariant: plan did not converge within ${MAX_PLAN_DAYS} days`,
         );
       }
-      const planned = Math.min(rate, remaining);
+      // Before the flight, 1 h a day (R5).
+      const dayRate =
+        index < prepDays ? Math.min(rate, PREP.shiftMinutesPerDay) : rate;
+      const planned = Math.min(dayRate, remaining);
       const frameFor = (shift: number): DayFrame => {
         const next = plus(cbtMin, MINUTES_PER_DAY + sign * shift);
         // A report counts as progress at most up to the target, never past
@@ -859,7 +977,9 @@ export function generatePlan(
         // planned, the evening and the nights after it follow the report.
         // The plan's last day (no shift) has nothing left to re-plan.
         const reported =
-          shift === 0 ? 0 : reportedShiftMinutes(cbtMin, phase, observed);
+          shift === 0
+            ? 0
+            : reportedShiftMinutes(night(cbtMin, index), phase, observed);
         const progress = Math.min(
           sign * reported,
           Math.max(0, remaining - shift),
@@ -874,7 +994,7 @@ export function generatePlan(
         weak = true;
         day = buildDay(
           ctx,
-          frameFor(Math.min(Math.round(rate / 2), remaining)),
+          frameFor(Math.min(Math.round(dayRate / 2), remaining)),
           behindSchedule,
         );
       }
@@ -889,7 +1009,7 @@ export function generatePlan(
                 direction,
               )
             : 0,
-        rate,
+        rate: dayRate,
         sign,
         destinationTz,
       });
@@ -927,6 +1047,7 @@ export function generatePlan(
   }
 
   // Assemble.
+  trimAcrossDays(outcomes.map((o) => o.day.filtered));
   const warnings: PlanWarning[] = [];
   const warn = (code: PlanWarning["code"], dayIndex?: number): void => {
     warnings.push({
@@ -971,7 +1092,7 @@ export function generatePlan(
       }
       const flags = [...new Set<DayFlag>(day.filtered.flags)];
       if (weak) flags.push("WEAK_DAY");
-      const wake = wakeOf(day.frame.cbtMin, phase);
+      const wake = night(day.frame.cbtMin, day.frame.index).end;
       return {
         date: wake.toZonedDateTimeISO(destinationTz).toPlainDate().toString(),
         localTzAtWake: zoneAt(wake),

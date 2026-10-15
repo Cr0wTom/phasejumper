@@ -28,7 +28,7 @@
         {
           "kind": "CAFFEINE_OK",
           "startUtc": "2027-01-18T06:00:00Z",
-          "endUtc": "2027-01-18T16:00:00Z",
+          "endUtc": "2027-01-18T19:00:00Z",
           "localTz": "Europe/Prague",
           "reasonCode": "CAFFEINE_OK",
           "reason": "Caffeine fits in this window.",
@@ -59,17 +59,6 @@
           "movable": false
         },
         {
-          "kind": "CAFFEINE_STOP",
-          "startUtc": "2027-01-18T16:00:00Z",
-          "endUtc": "2027-01-18T16:05:00Z",
-          "localTz": "Europe/Prague",
-          "reasonCode": "CAFFEINE_STOP",
-          "reason": "Last caffeine here, so it does not keep you awake tonight.",
-          "source": "R11",
-          "confidence": "B",
-          "movable": false
-        },
-        {
           "kind": "EXERCISE_OPTIONAL_WALK",
           "startUtc": "2027-01-18T18:00:00Z",
           "endUtc": "2027-01-18T18:30:00Z",
@@ -92,9 +81,20 @@
           "movable": true
         },
         {
+          "kind": "CAFFEINE_STOP",
+          "startUtc": "2027-01-18T19:00:00Z",
+          "endUtc": "2027-01-18T19:05:00Z",
+          "localTz": "America/New_York",
+          "reasonCode": "CAFFEINE_STOP",
+          "reason": "Last caffeine here, so it does not keep you awake tonight.",
+          "source": "R11",
+          "confidence": "B",
+          "movable": false
+        },
+        {
           "kind": "EXERCISE_AVOID",
-          "startUtc": "2027-01-18T21:00:00Z",
-          "endUtc": "2027-01-19T00:00:00Z",
+          "startUtc": "2027-01-19T00:00:00Z",
+          "endUtc": "2027-01-19T03:00:00Z",
           "localTz": "America/New_York",
           "reasonCode": "EXERCISE_AVOID_BEDTIME",
           "reason": "Exercise this close to bedtime can make it harder to fall asleep.",
@@ -104,8 +104,8 @@
         },
         {
           "kind": "SEEK_LIGHT_ARTIFICIAL",
-          "startUtc": "2027-01-18T23:00:00Z",
-          "endUtc": "2027-01-19T00:00:00Z",
+          "startUtc": "2027-01-19T02:00:00Z",
+          "endUtc": "2027-01-19T03:00:00Z",
           "localTz": "America/New_York",
           "reasonCode": "SEEK_LIGHT_ARTIFICIAL",
           "reason": "It's dark outside, so bright indoor light or a 10 000 lux lamp does the job now.",
@@ -115,8 +115,8 @@
         },
         {
           "kind": "WIND_DOWN",
-          "startUtc": "2027-01-18T23:45:00Z",
-          "endUtc": "2027-01-19T00:00:00Z",
+          "startUtc": "2027-01-19T02:45:00Z",
+          "endUtc": "2027-01-19T03:00:00Z",
           "localTz": "America/New_York",
           "reasonCode": "WIND_DOWN",
           "reason": "Wind down here: dim the lights and slow down before sleep.",
@@ -139,8 +139,8 @@
       "blocks": [
         {
           "kind": "SLEEP",
-          "startUtc": "2027-01-19T00:00:00Z",
-          "endUtc": "2027-01-19T08:00:00Z",
+          "startUtc": "2027-01-19T03:00:00Z",
+          "endUtc": "2027-01-19T11:00:00Z",
           "localTz": "America/New_York",
           "reasonCode": "SLEEP_SHIFTING",
           "reason": "Sleep in this window; it moves a little each day with your clock.",
@@ -149,30 +149,8 @@
           "movable": false
         },
         {
-          "kind": "EXERCISE_AVOID",
-          "startUtc": "2027-01-19T08:00:00Z",
-          "endUtc": "2027-01-19T08:30:00Z",
-          "localTz": "America/New_York",
-          "reasonCode": "EXERCISE_AVOID_DIRECTION",
-          "reason": "Exercise now would nudge your clock the wrong way.",
-          "source": "R9",
-          "confidence": "B",
-          "movable": false
-        },
-        {
-          "kind": "CAFFEINE_OK",
-          "startUtc": "2027-01-19T08:00:00Z",
-          "endUtc": "2027-01-19T18:00:00Z",
-          "localTz": "America/New_York",
-          "reasonCode": "CAFFEINE_OK",
-          "reason": "Caffeine fits in this window.",
-          "source": "R10",
-          "confidence": "B",
-          "movable": false
-        },
-        {
           "kind": "EXERCISE_OK",
-          "startUtc": "2027-01-19T08:30:00Z",
+          "startUtc": "2027-01-19T11:00:00Z",
           "endUtc": "2027-01-19T14:00:00Z",
           "localTz": "America/New_York",
           "reasonCode": "EXERCISE_OK",
@@ -180,6 +158,17 @@
           "source": "R9",
           "confidence": "B",
           "movable": true
+        },
+        {
+          "kind": "CAFFEINE_OK",
+          "startUtc": "2027-01-19T11:00:00Z",
+          "endUtc": "2027-01-19T19:00:00Z",
+          "localTz": "America/New_York",
+          "reasonCode": "CAFFEINE_OK",
+          "reason": "Caffeine fits in this window.",
+          "source": "R10",
+          "confidence": "B",
+          "movable": false
         },
         {
           "kind": "EXERCISE_AVOID",
@@ -205,8 +194,8 @@
         },
         {
           "kind": "CAFFEINE_STOP",
-          "startUtc": "2027-01-19T18:00:00Z",
-          "endUtc": "2027-01-19T18:05:00Z",
+          "startUtc": "2027-01-19T19:00:00Z",
+          "endUtc": "2027-01-19T19:05:00Z",
           "localTz": "America/New_York",
           "reasonCode": "CAFFEINE_STOP",
           "reason": "Last caffeine here, so it does not keep you awake tonight.",
@@ -228,7 +217,7 @@
         {
           "kind": "EXERCISE_OK",
           "startUtc": "2027-01-19T21:00:00Z",
-          "endUtc": "2027-01-19T23:00:00Z",
+          "endUtc": "2027-01-20T00:00:00Z",
           "localTz": "America/New_York",
           "reasonCode": "EXERCISE_OK",
           "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
@@ -238,8 +227,8 @@
         },
         {
           "kind": "EXERCISE_AVOID",
-          "startUtc": "2027-01-19T23:00:00Z",
-          "endUtc": "2027-01-20T02:00:00Z",
+          "startUtc": "2027-01-20T00:00:00Z",
+          "endUtc": "2027-01-20T03:00:00Z",
           "localTz": "America/New_York",
           "reasonCode": "EXERCISE_AVOID_BEDTIME",
           "reason": "Exercise this close to bedtime can make it harder to fall asleep.",
@@ -249,8 +238,8 @@
         },
         {
           "kind": "SEEK_LIGHT_ARTIFICIAL",
-          "startUtc": "2027-01-20T01:00:00Z",
-          "endUtc": "2027-01-20T02:00:00Z",
+          "startUtc": "2027-01-20T02:00:00Z",
+          "endUtc": "2027-01-20T03:00:00Z",
           "localTz": "America/New_York",
           "reasonCode": "SEEK_LIGHT_ARTIFICIAL",
           "reason": "It's dark outside, so bright indoor light or a 10 000 lux lamp does the job now.",
@@ -260,8 +249,8 @@
         },
         {
           "kind": "WIND_DOWN",
-          "startUtc": "2027-01-20T01:45:00Z",
-          "endUtc": "2027-01-20T02:00:00Z",
+          "startUtc": "2027-01-20T02:45:00Z",
+          "endUtc": "2027-01-20T03:00:00Z",
           "localTz": "America/New_York",
           "reasonCode": "WIND_DOWN",
           "reason": "Wind down here: dim the lights and slow down before sleep.",
@@ -283,7 +272,7 @@
         {
           "kind": "SLEEP",
           "startUtc": "2027-01-20T05:30:00Z",
-          "endUtc": "2027-01-20T10:00:00Z",
+          "endUtc": "2027-01-20T11:00:00Z",
           "localTz": "America/New_York",
           "reasonCode": "SLEEP_SHIFTING",
           "reason": "Sleep in this window; it moves a little each day with your clock.",
@@ -292,30 +281,8 @@
           "movable": false
         },
         {
-          "kind": "NAP",
-          "startUtc": "2027-01-20T10:00:00Z",
-          "endUtc": "2027-01-20T10:20:00Z",
-          "localTz": "America/New_York",
-          "reasonCode": "NAP_SHORT_SLEEP",
-          "reason": "A short nap here makes up for a short night.",
-          "source": "R12",
-          "confidence": "B",
-          "movable": true
-        },
-        {
-          "kind": "CAFFEINE_OK",
-          "startUtc": "2027-01-20T10:20:00Z",
-          "endUtc": "2027-01-20T20:00:00Z",
-          "localTz": "America/New_York",
-          "reasonCode": "CAFFEINE_OK",
-          "reason": "Caffeine fits in this window.",
-          "source": "R10",
-          "confidence": "B",
-          "movable": false
-        },
-        {
           "kind": "EXERCISE_OK",
-          "startUtc": "2027-01-20T10:30:00Z",
+          "startUtc": "2027-01-20T11:00:00Z",
           "endUtc": "2027-01-20T12:15:00Z",
           "localTz": "America/New_York",
           "reasonCode": "EXERCISE_OK",
@@ -323,6 +290,17 @@
           "source": "R9",
           "confidence": "B",
           "movable": true
+        },
+        {
+          "kind": "CAFFEINE_OK",
+          "startUtc": "2027-01-20T11:00:00Z",
+          "endUtc": "2027-01-20T20:00:00Z",
+          "localTz": "America/New_York",
+          "reasonCode": "CAFFEINE_OK",
+          "reason": "Caffeine fits in this window.",
+          "source": "R10",
+          "confidence": "B",
+          "movable": false
         },
         {
           "kind": "AVOID_LIGHT",
@@ -438,9 +416,7 @@
       "misalignmentBefore": 1.7,
       "misalignmentAfter": 0,
       "effectiveShiftHours": 1.7,
-      "flags": [
-        "SHORT_SLEEP_DAY"
-      ]
+      "flags": []
     },
     {
       "date": "2027-01-21",
@@ -566,19 +542,8 @@
     {
       "code": "LIGHT_BLOCK_SHIFTED",
       "message": "The best light time falls while you sleep, so light windows sit just before your sleep instead."
-    },
-    {
-      "code": "SHORT_SLEEP_DAY",
-      "message": "Your sleep window is short today, so the plan adds a nap.",
-      "dayIndex": 2
     }
   ],
-  "droppedBlocks": [
-    {
-      "dayIndex": 2,
-      "kind": "EXERCISE_AVOID",
-      "reason": "It overlapped a more important window and was too short to keep."
-    }
-  ],
-  "engineVersion": "0.8.0"
+  "droppedBlocks": [],
+  "engineVersion": "0.9.0"
 }

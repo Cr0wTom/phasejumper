@@ -74,7 +74,8 @@ export function createDefaultForm(): TripFormValues {
     exerciseEnabled: false,
     meditationEnabled: false,
     mealTimingEnabled: false,
-    preAdjustDays: 0,
+    // Arrive as ready as possible: the plan uses only the days it needs.
+    preAdjustDays: 3,
     arrivalStyle: "body-clock",
     legs: [emptyLeg()],
     returnLegs: [],

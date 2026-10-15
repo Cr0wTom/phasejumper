@@ -128,8 +128,22 @@ describe("fixture coverage", () => {
   it("prg-jfk-meetings: must-be-awake blocks clip sleep", () => {
     const p = plan("prg-jfk-meetings");
     expect(p.decision).toMatchObject({ direction: "delay", deltaHours: -6 });
-    expect(p.days.some((d) => d.flags.includes("SHORT_SLEEP_DAY"))).toBe(true);
-    expect(kinds("prg-jfk-meetings")).toContain("NAP");
+    const sleeps = p.days
+      .flatMap((d) => d.blocks)
+      .filter((b) => b.kind === "SLEEP");
+    // The client dinner runs to 00:30 New York (05:30Z): that night starts
+    // when it ends, inside the local night.
+    expect(sleeps.map((b) => b.startUtc)).toContain("2027-01-20T05:30:00Z");
+    // No sleep overlaps either meeting.
+    const meetings = [
+      ["2027-01-20T00:00:00Z", "2027-01-20T05:30:00Z"],
+      ["2027-01-21T11:00:00Z", "2027-01-21T13:00:00Z"],
+    ] as const;
+    for (const b of sleeps) {
+      for (const [from, to] of meetings) {
+        expect(b.endUtc <= from || b.startUtc >= to).toBe(true);
+      }
+    }
   });
 
   it("prg-lhr-light-touch: no shifting plan", () => {
