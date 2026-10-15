@@ -639,10 +639,18 @@ input[type="file"]::file-selector-button {
   max-height: 86vh;
   margin-top: auto;
   padding: 0 0 env(safe-area-inset-bottom);
+  border: 1px solid var(--line-strong);
+  border-bottom: 0;
+  border-radius: 22px 22px 0 0;
   background: var(--surface-2);
-  /* The top fades into the frosted backdrop instead of a hard edge. */
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 28px);
-  mask-image: linear-gradient(to bottom, transparent 0, #000 28px);
+  /* Rounded top, softened into the frosted backdrop: it starts faint and
+     is solid a little below the corners. */
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgb(0 0 0 / 0.35) 0,
+    #000 32px
+  );
+  mask-image: linear-gradient(to bottom, rgb(0 0 0 / 0.35) 0, #000 32px);
   animation: pj-sheet-up 220ms ease-out both;
 }
 
