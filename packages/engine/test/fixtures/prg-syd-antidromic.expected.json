@@ -128,53 +128,9 @@
           "movable": false
         },
         {
-          "kind": "CAFFEINE_OK",
-          "startUtc": "2026-10-11T06:00:00Z",
-          "endUtc": "2026-10-11T16:00:00Z",
-          "localTz": "Asia/Dubai",
-          "reasonCode": "CAFFEINE_OK",
-          "reason": "Caffeine fits in this window.",
-          "source": "R10",
-          "confidence": "B",
-          "movable": false
-        },
-        {
-          "kind": "EXERCISE_OPTIONAL_WALK",
-          "startUtc": "2026-10-11T11:00:00Z",
-          "endUtc": "2026-10-11T11:30:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "EXERCISE_OPTIONAL_WALK",
-          "reason": "An easy walk after landing, if you feel like it.",
-          "source": "R9",
-          "confidence": "C",
-          "movable": true
-        },
-        {
-          "kind": "CAFFEINE_LATE_OK",
-          "startUtc": "2026-10-11T16:00:00Z",
-          "endUtc": "2026-10-11T18:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "CAFFEINE_LATE_OK",
-          "reason": "Caffeine still fits here today while your clock catches up.",
-          "source": "R10",
-          "confidence": "B",
-          "movable": false
-        },
-        {
-          "kind": "CAFFEINE_STOP",
-          "startUtc": "2026-10-11T18:00:00Z",
-          "endUtc": "2026-10-11T18:05:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "CAFFEINE_STOP",
-          "reason": "Last caffeine here, so it does not keep you awake tonight.",
-          "source": "R11",
-          "confidence": "B",
-          "movable": false
-        },
-        {
           "kind": "EXERCISE_AVOID",
-          "startUtc": "2026-10-11T21:00:00Z",
-          "endUtc": "2026-10-12T00:00:00Z",
+          "startUtc": "2026-10-11T11:00:00Z",
+          "endUtc": "2026-10-11T14:00:00Z",
           "localTz": "Australia/Sydney",
           "reasonCode": "EXERCISE_AVOID_BEDTIME",
           "reason": "Exercise this close to bedtime can make it harder to fall asleep.",
@@ -183,26 +139,26 @@
           "movable": false
         },
         {
-          "kind": "SEEK_LIGHT",
-          "startUtc": "2026-10-11T23:00:00Z",
-          "endUtc": "2026-10-12T00:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "SEEK_LIGHT_DELAY",
-          "reason": "Bright light now pushes your clock later.",
-          "source": "R2",
-          "confidence": "A",
-          "movable": false
-        },
-        {
           "kind": "WIND_DOWN",
-          "startUtc": "2026-10-11T23:45:00Z",
-          "endUtc": "2026-10-12T00:00:00Z",
+          "startUtc": "2026-10-11T13:45:00Z",
+          "endUtc": "2026-10-11T14:00:00Z",
           "localTz": "Australia/Sydney",
           "reasonCode": "WIND_DOWN",
           "reason": "Wind down here: dim the lights and slow down before sleep.",
           "source": "none",
           "confidence": "C",
           "movable": true
+        },
+        {
+          "kind": "SEEK_LIGHT",
+          "startUtc": "2026-10-12T03:30:00Z",
+          "endUtc": "2026-10-12T04:30:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "SEEK_LIGHT_DELAY",
+          "reason": "Bright light now pushes your clock later.",
+          "source": "R2",
+          "confidence": "A",
+          "movable": false
         }
       ],
       "misalignmentBefore": 10,
@@ -219,8 +175,8 @@
       "blocks": [
         {
           "kind": "SLEEP",
-          "startUtc": "2026-10-12T00:00:00Z",
-          "endUtc": "2026-10-12T08:00:00Z",
+          "startUtc": "2026-10-11T14:00:00Z",
+          "endUtc": "2026-10-11T22:00:00Z",
           "localTz": "Australia/Sydney",
           "reasonCode": "SLEEP_SHIFTING",
           "reason": "Sleep in this window; it moves a little each day with your clock.",
@@ -229,8 +185,52 @@
           "movable": false
         },
         {
+          "kind": "EXERCISE_OK",
+          "startUtc": "2026-10-11T22:00:00Z",
+          "endUtc": "2026-10-12T04:30:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "EXERCISE_OK",
+          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": true
+        },
+        {
+          "kind": "CAFFEINE_OK",
+          "startUtc": "2026-10-11T22:00:00Z",
+          "endUtc": "2026-10-12T06:00:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "CAFFEINE_OK",
+          "reason": "Caffeine fits in this window.",
+          "source": "R10",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "AVOID_LIGHT",
+          "startUtc": "2026-10-12T04:30:00Z",
+          "endUtc": "2026-10-12T08:05:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "AVOID_LIGHT_DELAY",
+          "reason": "Light now would pull your clock earlier, so keep it dim or wear sunglasses.",
+          "source": "R2",
+          "confidence": "A",
+          "movable": false
+        },
+        {
+          "kind": "CAFFEINE_LATE_OK",
+          "startUtc": "2026-10-12T06:00:00Z",
+          "endUtc": "2026-10-12T08:00:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "CAFFEINE_LATE_OK",
+          "reason": "Caffeine still fits here today while your clock catches up.",
+          "source": "R10",
+          "confidence": "B",
+          "movable": false
+        },
+        {
           "kind": "EXERCISE_AVOID",
-          "startUtc": "2026-10-12T08:00:00Z",
+          "startUtc": "2026-10-12T07:30:00Z",
           "endUtc": "2026-10-12T08:30:00Z",
           "localTz": "Australia/Sydney",
           "reasonCode": "EXERCISE_AVOID_DIRECTION",
@@ -240,75 +240,9 @@
           "movable": false
         },
         {
-          "kind": "CAFFEINE_OK",
-          "startUtc": "2026-10-12T08:00:00Z",
-          "endUtc": "2026-10-12T18:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "CAFFEINE_OK",
-          "reason": "Caffeine fits in this window.",
-          "source": "R10",
-          "confidence": "B",
-          "movable": false
-        },
-        {
-          "kind": "EXERCISE_OK",
-          "startUtc": "2026-10-12T08:30:00Z",
-          "endUtc": "2026-10-12T14:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "EXERCISE_OK",
-          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
-          "source": "R9",
-          "confidence": "B",
-          "movable": true
-        },
-        {
-          "kind": "EXERCISE_AVOID",
-          "startUtc": "2026-10-12T14:00:00Z",
-          "endUtc": "2026-10-12T17:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "EXERCISE_AVOID_DIRECTION",
-          "reason": "Exercise now would nudge your clock the wrong way.",
-          "source": "R9",
-          "confidence": "B",
-          "movable": false
-        },
-        {
-          "kind": "EXERCISE_OK",
-          "startUtc": "2026-10-12T17:00:00Z",
-          "endUtc": "2026-10-12T20:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "EXERCISE_OK",
-          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
-          "source": "R9",
-          "confidence": "B",
-          "movable": true
-        },
-        {
-          "kind": "CAFFEINE_LATE_OK",
-          "startUtc": "2026-10-12T18:00:00Z",
-          "endUtc": "2026-10-12T20:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "CAFFEINE_LATE_OK",
-          "reason": "Caffeine still fits here today while your clock catches up.",
-          "source": "R10",
-          "confidence": "B",
-          "movable": false
-        },
-        {
-          "kind": "EXERCISE_GOOD",
-          "startUtc": "2026-10-12T20:00:00Z",
-          "endUtc": "2026-10-12T21:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "EXERCISE_GOOD_DELAY",
-          "reason": "Exercise in this window can help move your clock later.",
-          "source": "R9",
-          "confidence": "B",
-          "movable": true
-        },
-        {
           "kind": "CAFFEINE_STOP",
-          "startUtc": "2026-10-12T20:00:00Z",
-          "endUtc": "2026-10-12T20:05:00Z",
+          "startUtc": "2026-10-12T08:00:00Z",
+          "endUtc": "2026-10-12T08:05:00Z",
           "localTz": "Australia/Sydney",
           "reasonCode": "CAFFEINE_STOP",
           "reason": "Last caffeine here, so it does not keep you awake tonight.",
@@ -318,8 +252,8 @@
         },
         {
           "kind": "EXERCISE_OK",
-          "startUtc": "2026-10-12T21:00:00Z",
-          "endUtc": "2026-10-12T23:00:00Z",
+          "startUtc": "2026-10-12T08:30:00Z",
+          "endUtc": "2026-10-12T11:00:00Z",
           "localTz": "Australia/Sydney",
           "reasonCode": "EXERCISE_OK",
           "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
@@ -329,8 +263,8 @@
         },
         {
           "kind": "EXERCISE_AVOID",
-          "startUtc": "2026-10-12T23:00:00Z",
-          "endUtc": "2026-10-13T02:00:00Z",
+          "startUtc": "2026-10-12T11:00:00Z",
+          "endUtc": "2026-10-12T14:00:00Z",
           "localTz": "Australia/Sydney",
           "reasonCode": "EXERCISE_AVOID_BEDTIME",
           "reason": "Exercise this close to bedtime can make it harder to fall asleep.",
@@ -339,31 +273,31 @@
           "movable": false
         },
         {
-          "kind": "SEEK_LIGHT",
-          "startUtc": "2026-10-13T01:00:00Z",
-          "endUtc": "2026-10-13T02:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "SEEK_LIGHT_DELAY",
-          "reason": "Bright light now pushes your clock later.",
-          "source": "R2",
-          "confidence": "A",
-          "movable": false
-        },
-        {
           "kind": "WIND_DOWN",
-          "startUtc": "2026-10-13T01:45:00Z",
-          "endUtc": "2026-10-13T02:00:00Z",
+          "startUtc": "2026-10-12T13:45:00Z",
+          "endUtc": "2026-10-12T14:00:00Z",
           "localTz": "Australia/Sydney",
           "reasonCode": "WIND_DOWN",
           "reason": "Wind down here: dim the lights and slow down before sleep.",
           "source": "none",
           "confidence": "C",
           "movable": true
+        },
+        {
+          "kind": "SEEK_LIGHT",
+          "startUtc": "2026-10-13T05:30:00Z",
+          "endUtc": "2026-10-13T06:30:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "SEEK_LIGHT_DELAY",
+          "reason": "Bright light now pushes your clock later.",
+          "source": "R2",
+          "confidence": "A",
+          "movable": false
         }
       ],
       "misalignmentBefore": 12,
-      "misalignmentAfter": 9.7,
-      "effectiveShiftHours": 2.3,
+      "misalignmentAfter": 10,
+      "effectiveShiftHours": 2,
       "flags": []
     },
     {
@@ -373,8 +307,8 @@
       "blocks": [
         {
           "kind": "SLEEP",
-          "startUtc": "2026-10-13T02:00:00Z",
-          "endUtc": "2026-10-13T10:00:00Z",
+          "startUtc": "2026-10-12T14:00:00Z",
+          "endUtc": "2026-10-12T22:00:00Z",
           "localTz": "Australia/Sydney",
           "reasonCode": "SLEEP_SHIFTING",
           "reason": "Sleep in this window; it moves a little each day with your clock.",
@@ -383,8 +317,74 @@
           "movable": false
         },
         {
+          "kind": "EXERCISE_OK",
+          "startUtc": "2026-10-12T22:00:00Z",
+          "endUtc": "2026-10-13T06:30:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "EXERCISE_OK",
+          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": true
+        },
+        {
+          "kind": "CAFFEINE_OK",
+          "startUtc": "2026-10-12T22:00:00Z",
+          "endUtc": "2026-10-13T06:00:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "CAFFEINE_OK",
+          "reason": "Caffeine fits in this window.",
+          "source": "R10",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "CAFFEINE_LATE_OK",
+          "startUtc": "2026-10-13T06:00:00Z",
+          "endUtc": "2026-10-13T08:00:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "CAFFEINE_LATE_OK",
+          "reason": "Caffeine still fits here today while your clock catches up.",
+          "source": "R10",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "AVOID_LIGHT",
+          "startUtc": "2026-10-13T06:30:00Z",
+          "endUtc": "2026-10-13T08:05:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "AVOID_LIGHT_DELAY",
+          "reason": "Light now would pull your clock earlier, so keep it dim or wear sunglasses.",
+          "source": "R2",
+          "confidence": "A",
+          "movable": false
+        },
+        {
+          "kind": "CAFFEINE_STOP",
+          "startUtc": "2026-10-13T08:00:00Z",
+          "endUtc": "2026-10-13T08:05:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "CAFFEINE_STOP",
+          "reason": "Last caffeine here, so it does not keep you awake tonight.",
+          "source": "R11",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "EXERCISE_OK",
+          "startUtc": "2026-10-13T08:05:00Z",
+          "endUtc": "2026-10-13T09:30:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "EXERCISE_OK",
+          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": true
+        },
+        {
           "kind": "EXERCISE_AVOID",
-          "startUtc": "2026-10-13T10:00:00Z",
+          "startUtc": "2026-10-13T09:30:00Z",
           "endUtc": "2026-10-13T10:30:00Z",
           "localTz": "Australia/Sydney",
           "reasonCode": "EXERCISE_AVOID_DIRECTION",
@@ -394,20 +394,9 @@
           "movable": false
         },
         {
-          "kind": "CAFFEINE_OK",
-          "startUtc": "2026-10-13T10:00:00Z",
-          "endUtc": "2026-10-13T20:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "CAFFEINE_OK",
-          "reason": "Caffeine fits in this window.",
-          "source": "R10",
-          "confidence": "B",
-          "movable": false
-        },
-        {
           "kind": "EXERCISE_OK",
           "startUtc": "2026-10-13T10:30:00Z",
-          "endUtc": "2026-10-13T16:00:00Z",
+          "endUtc": "2026-10-13T11:00:00Z",
           "localTz": "Australia/Sydney",
           "reasonCode": "EXERCISE_OK",
           "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
@@ -417,74 +406,8 @@
         },
         {
           "kind": "EXERCISE_AVOID",
-          "startUtc": "2026-10-13T16:00:00Z",
-          "endUtc": "2026-10-13T19:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "EXERCISE_AVOID_DIRECTION",
-          "reason": "Exercise now would nudge your clock the wrong way.",
-          "source": "R9",
-          "confidence": "B",
-          "movable": false
-        },
-        {
-          "kind": "EXERCISE_OK",
-          "startUtc": "2026-10-13T19:00:00Z",
-          "endUtc": "2026-10-13T22:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "EXERCISE_OK",
-          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
-          "source": "R9",
-          "confidence": "B",
-          "movable": true
-        },
-        {
-          "kind": "CAFFEINE_LATE_OK",
-          "startUtc": "2026-10-13T20:00:00Z",
-          "endUtc": "2026-10-13T22:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "CAFFEINE_LATE_OK",
-          "reason": "Caffeine still fits here today while your clock catches up.",
-          "source": "R10",
-          "confidence": "B",
-          "movable": false
-        },
-        {
-          "kind": "EXERCISE_GOOD",
-          "startUtc": "2026-10-13T22:00:00Z",
-          "endUtc": "2026-10-13T23:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "EXERCISE_GOOD_DELAY",
-          "reason": "Exercise in this window can help move your clock later.",
-          "source": "R9",
-          "confidence": "B",
-          "movable": true
-        },
-        {
-          "kind": "CAFFEINE_STOP",
-          "startUtc": "2026-10-13T22:00:00Z",
-          "endUtc": "2026-10-13T22:05:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "CAFFEINE_STOP",
-          "reason": "Last caffeine here, so it does not keep you awake tonight.",
-          "source": "R11",
-          "confidence": "B",
-          "movable": false
-        },
-        {
-          "kind": "EXERCISE_OK",
-          "startUtc": "2026-10-13T23:00:00Z",
-          "endUtc": "2026-10-14T01:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "EXERCISE_OK",
-          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
-          "source": "R9",
-          "confidence": "B",
-          "movable": true
-        },
-        {
-          "kind": "EXERCISE_AVOID",
-          "startUtc": "2026-10-14T01:00:00Z",
-          "endUtc": "2026-10-14T04:00:00Z",
+          "startUtc": "2026-10-13T11:00:00Z",
+          "endUtc": "2026-10-13T14:00:00Z",
           "localTz": "Australia/Sydney",
           "reasonCode": "EXERCISE_AVOID_BEDTIME",
           "reason": "Exercise this close to bedtime can make it harder to fall asleep.",
@@ -493,31 +416,31 @@
           "movable": false
         },
         {
-          "kind": "SEEK_LIGHT",
-          "startUtc": "2026-10-14T03:00:00Z",
-          "endUtc": "2026-10-14T04:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "SEEK_LIGHT_DELAY",
-          "reason": "Bright light now pushes your clock later.",
-          "source": "R2",
-          "confidence": "A",
-          "movable": false
-        },
-        {
           "kind": "WIND_DOWN",
-          "startUtc": "2026-10-14T03:45:00Z",
-          "endUtc": "2026-10-14T04:00:00Z",
+          "startUtc": "2026-10-13T13:45:00Z",
+          "endUtc": "2026-10-13T14:00:00Z",
           "localTz": "Australia/Sydney",
           "reasonCode": "WIND_DOWN",
           "reason": "Wind down here: dim the lights and slow down before sleep.",
           "source": "none",
           "confidence": "C",
           "movable": true
+        },
+        {
+          "kind": "SEEK_LIGHT_ARTIFICIAL",
+          "startUtc": "2026-10-14T07:30:00Z",
+          "endUtc": "2026-10-14T08:30:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "SEEK_LIGHT_ARTIFICIAL",
+          "reason": "It's dark outside, so bright indoor light or a 10 000 lux lamp does the job now.",
+          "source": "R2",
+          "confidence": "A",
+          "movable": false
         }
       ],
-      "misalignmentBefore": 9.7,
-      "misalignmentAfter": 7.4,
-      "effectiveShiftHours": 2.3,
+      "misalignmentBefore": 10,
+      "misalignmentAfter": 8,
+      "effectiveShiftHours": 2,
       "flags": []
     },
     {
@@ -527,8 +450,8 @@
       "blocks": [
         {
           "kind": "SLEEP",
-          "startUtc": "2026-10-14T04:00:00Z",
-          "endUtc": "2026-10-14T12:00:00Z",
+          "startUtc": "2026-10-13T14:00:00Z",
+          "endUtc": "2026-10-13T22:00:00Z",
           "localTz": "Australia/Sydney",
           "reasonCode": "SLEEP_SHIFTING",
           "reason": "Sleep in this window; it moves a little each day with your clock.",
@@ -537,20 +460,20 @@
           "movable": false
         },
         {
-          "kind": "EXERCISE_AVOID",
-          "startUtc": "2026-10-14T12:00:00Z",
-          "endUtc": "2026-10-14T12:30:00Z",
+          "kind": "EXERCISE_OK",
+          "startUtc": "2026-10-13T22:00:00Z",
+          "endUtc": "2026-10-14T11:00:00Z",
           "localTz": "Australia/Sydney",
-          "reasonCode": "EXERCISE_AVOID_DIRECTION",
-          "reason": "Exercise now would nudge your clock the wrong way.",
+          "reasonCode": "EXERCISE_OK",
+          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
           "source": "R9",
           "confidence": "B",
-          "movable": false
+          "movable": true
         },
         {
           "kind": "CAFFEINE_OK",
-          "startUtc": "2026-10-14T12:00:00Z",
-          "endUtc": "2026-10-14T22:00:00Z",
+          "startUtc": "2026-10-13T22:00:00Z",
+          "endUtc": "2026-10-14T06:00:00Z",
           "localTz": "Australia/Sydney",
           "reasonCode": "CAFFEINE_OK",
           "reason": "Caffeine fits in this window.",
@@ -559,42 +482,9 @@
           "movable": false
         },
         {
-          "kind": "EXERCISE_OK",
-          "startUtc": "2026-10-14T12:30:00Z",
-          "endUtc": "2026-10-14T18:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "EXERCISE_OK",
-          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
-          "source": "R9",
-          "confidence": "B",
-          "movable": true
-        },
-        {
-          "kind": "EXERCISE_AVOID",
-          "startUtc": "2026-10-14T18:00:00Z",
-          "endUtc": "2026-10-14T21:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "EXERCISE_AVOID_DIRECTION",
-          "reason": "Exercise now would nudge your clock the wrong way.",
-          "source": "R9",
-          "confidence": "B",
-          "movable": false
-        },
-        {
-          "kind": "EXERCISE_OK",
-          "startUtc": "2026-10-14T21:00:00Z",
-          "endUtc": "2026-10-15T00:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "EXERCISE_OK",
-          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
-          "source": "R9",
-          "confidence": "B",
-          "movable": true
-        },
-        {
           "kind": "CAFFEINE_LATE_OK",
-          "startUtc": "2026-10-14T22:00:00Z",
-          "endUtc": "2026-10-15T00:00:00Z",
+          "startUtc": "2026-10-14T06:00:00Z",
+          "endUtc": "2026-10-14T08:00:00Z",
           "localTz": "Australia/Sydney",
           "reasonCode": "CAFFEINE_LATE_OK",
           "reason": "Caffeine still fits here today while your clock catches up.",
@@ -603,20 +493,9 @@
           "movable": false
         },
         {
-          "kind": "EXERCISE_GOOD",
-          "startUtc": "2026-10-15T00:00:00Z",
-          "endUtc": "2026-10-15T01:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "EXERCISE_GOOD_DELAY",
-          "reason": "Exercise in this window can help move your clock later.",
-          "source": "R9",
-          "confidence": "B",
-          "movable": true
-        },
-        {
           "kind": "CAFFEINE_STOP",
-          "startUtc": "2026-10-15T00:00:00Z",
-          "endUtc": "2026-10-15T00:05:00Z",
+          "startUtc": "2026-10-14T08:00:00Z",
+          "endUtc": "2026-10-14T08:05:00Z",
           "localTz": "Australia/Sydney",
           "reasonCode": "CAFFEINE_STOP",
           "reason": "Last caffeine here, so it does not keep you awake tonight.",
@@ -625,20 +504,9 @@
           "movable": false
         },
         {
-          "kind": "EXERCISE_OK",
-          "startUtc": "2026-10-15T01:00:00Z",
-          "endUtc": "2026-10-15T03:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "EXERCISE_OK",
-          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
-          "source": "R9",
-          "confidence": "B",
-          "movable": true
-        },
-        {
           "kind": "EXERCISE_AVOID",
-          "startUtc": "2026-10-15T03:00:00Z",
-          "endUtc": "2026-10-15T06:00:00Z",
+          "startUtc": "2026-10-14T11:00:00Z",
+          "endUtc": "2026-10-14T14:00:00Z",
           "localTz": "Australia/Sydney",
           "reasonCode": "EXERCISE_AVOID_BEDTIME",
           "reason": "Exercise this close to bedtime can make it harder to fall asleep.",
@@ -647,372 +515,42 @@
           "movable": false
         },
         {
-          "kind": "SEEK_LIGHT",
-          "startUtc": "2026-10-15T05:00:00Z",
-          "endUtc": "2026-10-15T06:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "SEEK_LIGHT_DELAY",
-          "reason": "Bright light now pushes your clock later.",
-          "source": "R2",
-          "confidence": "A",
-          "movable": false
-        },
-        {
           "kind": "WIND_DOWN",
-          "startUtc": "2026-10-15T05:45:00Z",
-          "endUtc": "2026-10-15T06:00:00Z",
+          "startUtc": "2026-10-14T13:45:00Z",
+          "endUtc": "2026-10-14T14:00:00Z",
           "localTz": "Australia/Sydney",
           "reasonCode": "WIND_DOWN",
           "reason": "Wind down here: dim the lights and slow down before sleep.",
           "source": "none",
           "confidence": "C",
           "movable": true
-        }
-      ],
-      "misalignmentBefore": 7.4,
-      "misalignmentAfter": 5.1,
-      "effectiveShiftHours": 2.3,
-      "flags": []
-    },
-    {
-      "date": "2026-10-16",
-      "localTzAtWake": "Australia/Sydney",
-      "cbtMinUtc": "2026-10-15T11:30:00Z",
-      "blocks": [
-        {
-          "kind": "SLEEP",
-          "startUtc": "2026-10-15T06:00:00Z",
-          "endUtc": "2026-10-15T14:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "SLEEP_SHIFTING",
-          "reason": "Sleep in this window; it moves a little each day with your clock.",
-          "source": "R1",
-          "confidence": "A",
-          "movable": false
-        },
-        {
-          "kind": "EXERCISE_AVOID",
-          "startUtc": "2026-10-15T14:00:00Z",
-          "endUtc": "2026-10-15T14:30:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "EXERCISE_AVOID_DIRECTION",
-          "reason": "Exercise now would nudge your clock the wrong way.",
-          "source": "R9",
-          "confidence": "B",
-          "movable": false
-        },
-        {
-          "kind": "CAFFEINE_OK",
-          "startUtc": "2026-10-15T14:00:00Z",
-          "endUtc": "2026-10-16T00:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "CAFFEINE_OK",
-          "reason": "Caffeine fits in this window.",
-          "source": "R10",
-          "confidence": "B",
-          "movable": false
-        },
-        {
-          "kind": "EXERCISE_OK",
-          "startUtc": "2026-10-15T14:30:00Z",
-          "endUtc": "2026-10-15T20:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "EXERCISE_OK",
-          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
-          "source": "R9",
-          "confidence": "B",
-          "movable": true
-        },
-        {
-          "kind": "EXERCISE_AVOID",
-          "startUtc": "2026-10-15T20:00:00Z",
-          "endUtc": "2026-10-15T23:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "EXERCISE_AVOID_DIRECTION",
-          "reason": "Exercise now would nudge your clock the wrong way.",
-          "source": "R9",
-          "confidence": "B",
-          "movable": false
-        },
-        {
-          "kind": "EXERCISE_OK",
-          "startUtc": "2026-10-15T23:00:00Z",
-          "endUtc": "2026-10-16T02:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "EXERCISE_OK",
-          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
-          "source": "R9",
-          "confidence": "B",
-          "movable": true
-        },
-        {
-          "kind": "CAFFEINE_LATE_OK",
-          "startUtc": "2026-10-16T00:00:00Z",
-          "endUtc": "2026-10-16T02:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "CAFFEINE_LATE_OK",
-          "reason": "Caffeine still fits here today while your clock catches up.",
-          "source": "R10",
-          "confidence": "B",
-          "movable": false
-        },
-        {
-          "kind": "EXERCISE_GOOD",
-          "startUtc": "2026-10-16T02:00:00Z",
-          "endUtc": "2026-10-16T03:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "EXERCISE_GOOD_DELAY",
-          "reason": "Exercise in this window can help move your clock later.",
-          "source": "R9",
-          "confidence": "B",
-          "movable": true
-        },
-        {
-          "kind": "CAFFEINE_STOP",
-          "startUtc": "2026-10-16T02:00:00Z",
-          "endUtc": "2026-10-16T02:05:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "CAFFEINE_STOP",
-          "reason": "Last caffeine here, so it does not keep you awake tonight.",
-          "source": "R11",
-          "confidence": "B",
-          "movable": false
-        },
-        {
-          "kind": "EXERCISE_OK",
-          "startUtc": "2026-10-16T03:00:00Z",
-          "endUtc": "2026-10-16T05:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "EXERCISE_OK",
-          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
-          "source": "R9",
-          "confidence": "B",
-          "movable": true
-        },
-        {
-          "kind": "EXERCISE_AVOID",
-          "startUtc": "2026-10-16T05:00:00Z",
-          "endUtc": "2026-10-16T08:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "EXERCISE_AVOID_BEDTIME",
-          "reason": "Exercise this close to bedtime can make it harder to fall asleep.",
-          "source": "R9",
-          "confidence": "B",
-          "movable": false
-        },
-        {
-          "kind": "SEEK_LIGHT",
-          "startUtc": "2026-10-16T07:00:00Z",
-          "endUtc": "2026-10-16T08:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "SEEK_LIGHT_DELAY",
-          "reason": "Bright light now pushes your clock later.",
-          "source": "R2",
-          "confidence": "A",
-          "movable": false
-        },
-        {
-          "kind": "WIND_DOWN",
-          "startUtc": "2026-10-16T07:45:00Z",
-          "endUtc": "2026-10-16T08:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "WIND_DOWN",
-          "reason": "Wind down here: dim the lights and slow down before sleep.",
-          "source": "none",
-          "confidence": "C",
-          "movable": true
-        }
-      ],
-      "misalignmentBefore": 5.1,
-      "misalignmentAfter": 2.8,
-      "effectiveShiftHours": 2.3,
-      "flags": []
-    },
-    {
-      "date": "2026-10-17",
-      "localTzAtWake": "Australia/Sydney",
-      "cbtMinUtc": "2026-10-16T13:30:00Z",
-      "blocks": [
-        {
-          "kind": "SLEEP",
-          "startUtc": "2026-10-16T08:00:00Z",
-          "endUtc": "2026-10-16T16:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "SLEEP_SHIFTING",
-          "reason": "Sleep in this window; it moves a little each day with your clock.",
-          "source": "R1",
-          "confidence": "A",
-          "movable": false
-        },
-        {
-          "kind": "EXERCISE_AVOID",
-          "startUtc": "2026-10-16T16:00:00Z",
-          "endUtc": "2026-10-16T16:30:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "EXERCISE_AVOID_DIRECTION",
-          "reason": "Exercise now would nudge your clock the wrong way.",
-          "source": "R9",
-          "confidence": "B",
-          "movable": false
-        },
-        {
-          "kind": "CAFFEINE_OK",
-          "startUtc": "2026-10-16T16:00:00Z",
-          "endUtc": "2026-10-17T02:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "CAFFEINE_OK",
-          "reason": "Caffeine fits in this window.",
-          "source": "R10",
-          "confidence": "B",
-          "movable": false
-        },
-        {
-          "kind": "EXERCISE_OK",
-          "startUtc": "2026-10-16T16:30:00Z",
-          "endUtc": "2026-10-16T19:10:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "EXERCISE_OK",
-          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
-          "source": "R9",
-          "confidence": "B",
-          "movable": true
-        },
-        {
-          "kind": "AVOID_LIGHT",
-          "startUtc": "2026-10-16T19:10:00Z",
-          "endUtc": "2026-10-16T19:30:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "AVOID_LIGHT_DELAY",
-          "reason": "Light now would pull your clock earlier, so keep it dim or wear sunglasses.",
-          "source": "R2",
-          "confidence": "A",
-          "movable": false
-        },
-        {
-          "kind": "EXERCISE_OK",
-          "startUtc": "2026-10-16T19:30:00Z",
-          "endUtc": "2026-10-16T22:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "EXERCISE_OK",
-          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
-          "source": "R9",
-          "confidence": "B",
-          "movable": true
-        },
-        {
-          "kind": "EXERCISE_AVOID",
-          "startUtc": "2026-10-16T22:00:00Z",
-          "endUtc": "2026-10-17T01:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "EXERCISE_AVOID_DIRECTION",
-          "reason": "Exercise now would nudge your clock the wrong way.",
-          "source": "R9",
-          "confidence": "B",
-          "movable": false
-        },
-        {
-          "kind": "EXERCISE_OK",
-          "startUtc": "2026-10-17T01:00:00Z",
-          "endUtc": "2026-10-17T04:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "EXERCISE_OK",
-          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
-          "source": "R9",
-          "confidence": "B",
-          "movable": true
-        },
-        {
-          "kind": "CAFFEINE_LATE_OK",
-          "startUtc": "2026-10-17T02:00:00Z",
-          "endUtc": "2026-10-17T04:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "CAFFEINE_LATE_OK",
-          "reason": "Caffeine still fits here today while your clock catches up.",
-          "source": "R10",
-          "confidence": "B",
-          "movable": false
-        },
-        {
-          "kind": "EXERCISE_GOOD",
-          "startUtc": "2026-10-17T04:00:00Z",
-          "endUtc": "2026-10-17T05:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "EXERCISE_GOOD_DELAY",
-          "reason": "Exercise in this window can help move your clock later.",
-          "source": "R9",
-          "confidence": "B",
-          "movable": true
-        },
-        {
-          "kind": "CAFFEINE_STOP",
-          "startUtc": "2026-10-17T04:00:00Z",
-          "endUtc": "2026-10-17T04:05:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "CAFFEINE_STOP",
-          "reason": "Last caffeine here, so it does not keep you awake tonight.",
-          "source": "R11",
-          "confidence": "B",
-          "movable": false
-        },
-        {
-          "kind": "EXERCISE_OK",
-          "startUtc": "2026-10-17T05:00:00Z",
-          "endUtc": "2026-10-17T07:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "EXERCISE_OK",
-          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
-          "source": "R9",
-          "confidence": "B",
-          "movable": true
-        },
-        {
-          "kind": "EXERCISE_AVOID",
-          "startUtc": "2026-10-17T07:00:00Z",
-          "endUtc": "2026-10-17T10:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "EXERCISE_AVOID_BEDTIME",
-          "reason": "Exercise this close to bedtime can make it harder to fall asleep.",
-          "source": "R9",
-          "confidence": "B",
-          "movable": false
         },
         {
           "kind": "SEEK_LIGHT_ARTIFICIAL",
-          "startUtc": "2026-10-17T09:00:00Z",
-          "endUtc": "2026-10-17T10:00:00Z",
+          "startUtc": "2026-10-15T09:30:00Z",
+          "endUtc": "2026-10-15T10:30:00Z",
           "localTz": "Australia/Sydney",
           "reasonCode": "SEEK_LIGHT_ARTIFICIAL",
           "reason": "It's dark outside, so bright indoor light or a 10 000 lux lamp does the job now.",
           "source": "R2",
           "confidence": "A",
           "movable": false
-        },
-        {
-          "kind": "WIND_DOWN",
-          "startUtc": "2026-10-17T09:45:00Z",
-          "endUtc": "2026-10-17T10:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "WIND_DOWN",
-          "reason": "Wind down here: dim the lights and slow down before sleep.",
-          "source": "none",
-          "confidence": "C",
-          "movable": true
         }
       ],
-      "misalignmentBefore": 2.8,
-      "misalignmentAfter": 0.5,
-      "effectiveShiftHours": 2.3,
+      "misalignmentBefore": 8,
+      "misalignmentAfter": 6,
+      "effectiveShiftHours": 2,
       "flags": []
     },
     {
-      "date": "2026-10-18",
+      "date": "2026-10-15",
       "localTzAtWake": "Australia/Sydney",
-      "cbtMinUtc": "2026-10-17T15:30:00Z",
+      "cbtMinUtc": "2026-10-15T11:30:00Z",
       "blocks": [
         {
           "kind": "SLEEP",
-          "startUtc": "2026-10-17T10:00:00Z",
-          "endUtc": "2026-10-17T18:00:00Z",
+          "startUtc": "2026-10-14T14:00:00Z",
+          "endUtc": "2026-10-14T22:00:00Z",
           "localTz": "Australia/Sydney",
           "reasonCode": "SLEEP_SHIFTING",
           "reason": "Sleep in this window; it moves a little each day with your clock.",
@@ -1021,20 +559,20 @@
           "movable": false
         },
         {
-          "kind": "EXERCISE_AVOID",
-          "startUtc": "2026-10-17T18:00:00Z",
-          "endUtc": "2026-10-17T18:30:00Z",
+          "kind": "EXERCISE_OK",
+          "startUtc": "2026-10-14T22:00:00Z",
+          "endUtc": "2026-10-15T11:00:00Z",
           "localTz": "Australia/Sydney",
-          "reasonCode": "EXERCISE_AVOID_DIRECTION",
-          "reason": "Exercise now would nudge your clock the wrong way.",
+          "reasonCode": "EXERCISE_OK",
+          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
           "source": "R9",
           "confidence": "B",
-          "movable": false
+          "movable": true
         },
         {
           "kind": "CAFFEINE_OK",
-          "startUtc": "2026-10-17T18:00:00Z",
-          "endUtc": "2026-10-18T04:00:00Z",
+          "startUtc": "2026-10-14T22:00:00Z",
+          "endUtc": "2026-10-15T06:00:00Z",
           "localTz": "Australia/Sydney",
           "reasonCode": "CAFFEINE_OK",
           "reason": "Caffeine fits in this window.",
@@ -1043,64 +581,9 @@
           "movable": false
         },
         {
-          "kind": "EXERCISE_OK",
-          "startUtc": "2026-10-17T18:30:00Z",
-          "endUtc": "2026-10-17T19:10:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "EXERCISE_OK",
-          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
-          "source": "R9",
-          "confidence": "B",
-          "movable": true
-        },
-        {
-          "kind": "AVOID_LIGHT",
-          "startUtc": "2026-10-17T19:10:00Z",
-          "endUtc": "2026-10-17T21:30:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "AVOID_LIGHT_DELAY",
-          "reason": "Light now would pull your clock earlier, so keep it dim or wear sunglasses.",
-          "source": "R2",
-          "confidence": "A",
-          "movable": false
-        },
-        {
-          "kind": "EXERCISE_OK",
-          "startUtc": "2026-10-17T21:30:00Z",
-          "endUtc": "2026-10-18T00:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "EXERCISE_OK",
-          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
-          "source": "R9",
-          "confidence": "B",
-          "movable": true
-        },
-        {
-          "kind": "EXERCISE_AVOID",
-          "startUtc": "2026-10-18T00:00:00Z",
-          "endUtc": "2026-10-18T03:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "EXERCISE_AVOID_DIRECTION",
-          "reason": "Exercise now would nudge your clock the wrong way.",
-          "source": "R9",
-          "confidence": "B",
-          "movable": false
-        },
-        {
-          "kind": "EXERCISE_OK",
-          "startUtc": "2026-10-18T03:00:00Z",
-          "endUtc": "2026-10-18T06:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "EXERCISE_OK",
-          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
-          "source": "R9",
-          "confidence": "B",
-          "movable": true
-        },
-        {
           "kind": "CAFFEINE_LATE_OK",
-          "startUtc": "2026-10-18T04:00:00Z",
-          "endUtc": "2026-10-18T06:00:00Z",
+          "startUtc": "2026-10-15T06:00:00Z",
+          "endUtc": "2026-10-15T08:00:00Z",
           "localTz": "Australia/Sydney",
           "reasonCode": "CAFFEINE_LATE_OK",
           "reason": "Caffeine still fits here today while your clock catches up.",
@@ -1109,15 +592,290 @@
           "movable": false
         },
         {
-          "kind": "EXERCISE_GOOD",
-          "startUtc": "2026-10-18T06:00:00Z",
-          "endUtc": "2026-10-18T07:00:00Z",
+          "kind": "CAFFEINE_STOP",
+          "startUtc": "2026-10-15T08:00:00Z",
+          "endUtc": "2026-10-15T08:05:00Z",
           "localTz": "Australia/Sydney",
-          "reasonCode": "EXERCISE_GOOD_DELAY",
-          "reason": "Exercise in this window can help move your clock later.",
+          "reasonCode": "CAFFEINE_STOP",
+          "reason": "Last caffeine here, so it does not keep you awake tonight.",
+          "source": "R11",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "EXERCISE_AVOID",
+          "startUtc": "2026-10-15T11:00:00Z",
+          "endUtc": "2026-10-15T14:00:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "EXERCISE_AVOID_BEDTIME",
+          "reason": "Exercise this close to bedtime can make it harder to fall asleep.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "WIND_DOWN",
+          "startUtc": "2026-10-15T13:45:00Z",
+          "endUtc": "2026-10-15T14:00:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "WIND_DOWN",
+          "reason": "Wind down here: dim the lights and slow down before sleep.",
+          "source": "none",
+          "confidence": "C",
+          "movable": true
+        },
+        {
+          "kind": "SEEK_LIGHT_ARTIFICIAL",
+          "startUtc": "2026-10-16T11:30:00Z",
+          "endUtc": "2026-10-16T12:30:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "SEEK_LIGHT_ARTIFICIAL",
+          "reason": "It's dark outside, so bright indoor light or a 10 000 lux lamp does the job now.",
+          "source": "R2",
+          "confidence": "A",
+          "movable": false
+        }
+      ],
+      "misalignmentBefore": 6,
+      "misalignmentAfter": 4,
+      "effectiveShiftHours": 2,
+      "flags": []
+    },
+    {
+      "date": "2026-10-16",
+      "localTzAtWake": "Australia/Sydney",
+      "cbtMinUtc": "2026-10-16T13:30:00Z",
+      "blocks": [
+        {
+          "kind": "SLEEP",
+          "startUtc": "2026-10-15T14:00:00Z",
+          "endUtc": "2026-10-15T22:00:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "SLEEP_SHIFTING",
+          "reason": "Sleep in this window; it moves a little each day with your clock.",
+          "source": "R1",
+          "confidence": "A",
+          "movable": false
+        },
+        {
+          "kind": "EXERCISE_OK",
+          "startUtc": "2026-10-15T22:00:00Z",
+          "endUtc": "2026-10-16T11:00:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "EXERCISE_OK",
+          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
           "source": "R9",
           "confidence": "B",
           "movable": true
+        },
+        {
+          "kind": "CAFFEINE_OK",
+          "startUtc": "2026-10-15T22:00:00Z",
+          "endUtc": "2026-10-16T06:00:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "CAFFEINE_OK",
+          "reason": "Caffeine fits in this window.",
+          "source": "R10",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "CAFFEINE_LATE_OK",
+          "startUtc": "2026-10-16T06:00:00Z",
+          "endUtc": "2026-10-16T08:00:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "CAFFEINE_LATE_OK",
+          "reason": "Caffeine still fits here today while your clock catches up.",
+          "source": "R10",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "CAFFEINE_STOP",
+          "startUtc": "2026-10-16T08:00:00Z",
+          "endUtc": "2026-10-16T08:05:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "CAFFEINE_STOP",
+          "reason": "Last caffeine here, so it does not keep you awake tonight.",
+          "source": "R11",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "EXERCISE_AVOID",
+          "startUtc": "2026-10-16T11:00:00Z",
+          "endUtc": "2026-10-16T14:00:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "EXERCISE_AVOID_BEDTIME",
+          "reason": "Exercise this close to bedtime can make it harder to fall asleep.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "WIND_DOWN",
+          "startUtc": "2026-10-16T13:45:00Z",
+          "endUtc": "2026-10-16T14:00:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "WIND_DOWN",
+          "reason": "Wind down here: dim the lights and slow down before sleep.",
+          "source": "none",
+          "confidence": "C",
+          "movable": true
+        },
+        {
+          "kind": "SEEK_LIGHT_ARTIFICIAL",
+          "startUtc": "2026-10-17T13:30:00Z",
+          "endUtc": "2026-10-17T14:00:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "SEEK_LIGHT_ARTIFICIAL",
+          "reason": "It's dark outside, so bright indoor light or a 10 000 lux lamp does the job now.",
+          "source": "R2",
+          "confidence": "A",
+          "movable": false
+        }
+      ],
+      "misalignmentBefore": 4,
+      "misalignmentAfter": 2,
+      "effectiveShiftHours": 2,
+      "flags": []
+    },
+    {
+      "date": "2026-10-17",
+      "localTzAtWake": "Australia/Sydney",
+      "cbtMinUtc": "2026-10-17T15:30:00Z",
+      "blocks": [
+        {
+          "kind": "SLEEP",
+          "startUtc": "2026-10-16T14:00:00Z",
+          "endUtc": "2026-10-16T22:00:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "SLEEP_SHIFTING",
+          "reason": "Sleep in this window; it moves a little each day with your clock.",
+          "source": "R1",
+          "confidence": "A",
+          "movable": false
+        },
+        {
+          "kind": "EXERCISE_OK",
+          "startUtc": "2026-10-16T22:00:00Z",
+          "endUtc": "2026-10-17T11:00:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "EXERCISE_OK",
+          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": true
+        },
+        {
+          "kind": "CAFFEINE_OK",
+          "startUtc": "2026-10-16T22:00:00Z",
+          "endUtc": "2026-10-17T06:00:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "CAFFEINE_OK",
+          "reason": "Caffeine fits in this window.",
+          "source": "R10",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "CAFFEINE_LATE_OK",
+          "startUtc": "2026-10-17T06:00:00Z",
+          "endUtc": "2026-10-17T08:00:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "CAFFEINE_LATE_OK",
+          "reason": "Caffeine still fits here today while your clock catches up.",
+          "source": "R10",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "CAFFEINE_STOP",
+          "startUtc": "2026-10-17T08:00:00Z",
+          "endUtc": "2026-10-17T08:05:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "CAFFEINE_STOP",
+          "reason": "Last caffeine here, so it does not keep you awake tonight.",
+          "source": "R11",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "EXERCISE_AVOID",
+          "startUtc": "2026-10-17T11:00:00Z",
+          "endUtc": "2026-10-17T14:00:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "EXERCISE_AVOID_BEDTIME",
+          "reason": "Exercise this close to bedtime can make it harder to fall asleep.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": false
+        },
+        {
+          "kind": "WIND_DOWN",
+          "startUtc": "2026-10-17T13:45:00Z",
+          "endUtc": "2026-10-17T14:00:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "WIND_DOWN",
+          "reason": "Wind down here: dim the lights and slow down before sleep.",
+          "source": "none",
+          "confidence": "C",
+          "movable": true
+        },
+        {
+          "kind": "SEEK_LIGHT_ARTIFICIAL",
+          "startUtc": "2026-10-18T15:30:00Z",
+          "endUtc": "2026-10-18T16:30:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "SEEK_LIGHT_ARTIFICIAL",
+          "reason": "It's dark outside, so bright indoor light or a 10 000 lux lamp does the job now.",
+          "source": "R2",
+          "confidence": "A",
+          "movable": false
+        }
+      ],
+      "misalignmentBefore": 2,
+      "misalignmentAfter": 0,
+      "effectiveShiftHours": 2,
+      "flags": []
+    },
+    {
+      "date": "2026-10-18",
+      "localTzAtWake": "Australia/Sydney",
+      "cbtMinUtc": "2026-10-18T17:30:00Z",
+      "blocks": [
+        {
+          "kind": "SLEEP",
+          "startUtc": "2026-10-17T14:00:00Z",
+          "endUtc": "2026-10-17T22:00:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "SLEEP_SETTLED",
+          "reason": "Sleep in this window; your clock is now on destination time.",
+          "source": "R1",
+          "confidence": "A",
+          "movable": false
+        },
+        {
+          "kind": "EXERCISE_OK",
+          "startUtc": "2026-10-17T22:00:00Z",
+          "endUtc": "2026-10-18T11:00:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "EXERCISE_OK",
+          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
+          "source": "R9",
+          "confidence": "B",
+          "movable": true
+        },
+        {
+          "kind": "CAFFEINE_OK",
+          "startUtc": "2026-10-17T22:00:00Z",
+          "endUtc": "2026-10-18T06:00:00Z",
+          "localTz": "Australia/Sydney",
+          "reasonCode": "CAFFEINE_OK",
+          "reason": "Caffeine fits in this window.",
+          "source": "R10",
+          "confidence": "B",
+          "movable": false
         },
         {
           "kind": "CAFFEINE_STOP",
@@ -1131,108 +889,9 @@
           "movable": false
         },
         {
-          "kind": "EXERCISE_OK",
-          "startUtc": "2026-10-18T07:00:00Z",
-          "endUtc": "2026-10-18T09:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "EXERCISE_OK",
-          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
-          "source": "R9",
-          "confidence": "B",
-          "movable": true
-        },
-        {
           "kind": "EXERCISE_AVOID",
-          "startUtc": "2026-10-18T09:00:00Z",
-          "endUtc": "2026-10-18T12:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "EXERCISE_AVOID_BEDTIME",
-          "reason": "Exercise this close to bedtime can make it harder to fall asleep.",
-          "source": "R9",
-          "confidence": "B",
-          "movable": false
-        },
-        {
-          "kind": "SEEK_LIGHT_ARTIFICIAL",
           "startUtc": "2026-10-18T11:00:00Z",
-          "endUtc": "2026-10-18T12:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "SEEK_LIGHT_ARTIFICIAL",
-          "reason": "It's dark outside, so bright indoor light or a 10 000 lux lamp does the job now.",
-          "source": "R2",
-          "confidence": "A",
-          "movable": false
-        },
-        {
-          "kind": "WIND_DOWN",
-          "startUtc": "2026-10-18T11:45:00Z",
-          "endUtc": "2026-10-18T12:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "WIND_DOWN",
-          "reason": "Wind down here: dim the lights and slow down before sleep.",
-          "source": "none",
-          "confidence": "C",
-          "movable": true
-        }
-      ],
-      "misalignmentBefore": 0.5,
-      "misalignmentAfter": 0,
-      "effectiveShiftHours": 0.5,
-      "flags": []
-    },
-    {
-      "date": "2026-10-19",
-      "localTzAtWake": "Australia/Sydney",
-      "cbtMinUtc": "2026-10-18T17:30:00Z",
-      "blocks": [
-        {
-          "kind": "SLEEP",
-          "startUtc": "2026-10-18T12:00:00Z",
-          "endUtc": "2026-10-18T20:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "SLEEP_SETTLED",
-          "reason": "Sleep in this window; your clock is now on destination time.",
-          "source": "R1",
-          "confidence": "A",
-          "movable": false
-        },
-        {
-          "kind": "EXERCISE_OK",
-          "startUtc": "2026-10-18T20:00:00Z",
-          "endUtc": "2026-10-19T09:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "EXERCISE_OK",
-          "reason": "Exercise fits here if you want it; it neither helps nor works against the shift.",
-          "source": "R9",
-          "confidence": "B",
-          "movable": true
-        },
-        {
-          "kind": "CAFFEINE_OK",
-          "startUtc": "2026-10-18T20:00:00Z",
-          "endUtc": "2026-10-19T04:00:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "CAFFEINE_OK",
-          "reason": "Caffeine fits in this window.",
-          "source": "R10",
-          "confidence": "B",
-          "movable": false
-        },
-        {
-          "kind": "CAFFEINE_STOP",
-          "startUtc": "2026-10-19T04:00:00Z",
-          "endUtc": "2026-10-19T04:05:00Z",
-          "localTz": "Australia/Sydney",
-          "reasonCode": "CAFFEINE_STOP",
-          "reason": "Last caffeine here, so it does not keep you awake tonight.",
-          "source": "R11",
-          "confidence": "B",
-          "movable": false
-        },
-        {
-          "kind": "EXERCISE_AVOID",
-          "startUtc": "2026-10-19T09:00:00Z",
-          "endUtc": "2026-10-19T12:00:00Z",
+          "endUtc": "2026-10-18T14:00:00Z",
           "localTz": "Australia/Sydney",
           "reasonCode": "EXERCISE_AVOID_BEDTIME",
           "reason": "Exercise this close to bedtime can make it harder to fall asleep.",
@@ -1242,8 +901,8 @@
         },
         {
           "kind": "WIND_DOWN",
-          "startUtc": "2026-10-19T11:45:00Z",
-          "endUtc": "2026-10-19T12:00:00Z",
+          "startUtc": "2026-10-18T13:45:00Z",
+          "endUtc": "2026-10-18T14:00:00Z",
           "localTz": "Australia/Sydney",
           "reasonCode": "WIND_DOWN",
           "reason": "Wind down here: dim the lights and slow down before sleep.",
@@ -1338,11 +997,6 @@
       "dayIndex": 6,
       "text": "It's dark outside during part of your avoid-light time; keep indoor lights dim.",
       "source": "none"
-    },
-    {
-      "dayIndex": 7,
-      "text": "It's dark outside during part of your avoid-light time; keep indoor lights dim.",
-      "source": "none"
     }
   ],
   "warnings": [
@@ -1356,12 +1010,6 @@
       "dayIndex": 0
     }
   ],
-  "droppedBlocks": [
-    {
-      "dayIndex": 2,
-      "kind": "AVOID_LIGHT",
-      "reason": "It overlapped a more important window and was too short to keep."
-    }
-  ],
-  "engineVersion": "0.8.0"
+  "droppedBlocks": [],
+  "engineVersion": "0.9.0"
 }

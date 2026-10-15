@@ -113,16 +113,16 @@ describe("rule 1: flights", () => {
   });
 
   it("flight days swap exercise windows for an optional walk at arrival", () => {
-    // A 06:00 departure lands at 17:00Z, inside day 0's waking time and
-    // more than 3 h before sleep.
+    // Landing at 17:00 in Tokyo (08:00Z) falls in the traveler's waking
+    // time and more than 3 h before the first night there.
     const plan = generatePlan(
       trip(
         [
           leg(
             "PRG",
             "HND",
-            "2027-01-15T06:00",
-            "2027-01-16T02:00",
+            "2027-01-15T21:00",
+            "2027-01-16T17:00",
             "Europe/Prague",
             "Asia/Tokyo",
           ),
@@ -136,10 +136,10 @@ describe("rule 1: flights", () => {
       expect(kinds(d)).not.toContain("EXERCISE_GOOD");
       expect(kinds(d)).not.toContain("EXERCISE_OK");
     }
-    const walk = plan.days[0]?.blocks.find(
-      (b) => b.kind === "EXERCISE_OPTIONAL_WALK",
-    );
-    expect(walk?.startUtc).toBe("2027-01-15T17:00:00Z");
+    const walk = plan.days
+      .flatMap((d) => d.blocks)
+      .find((b) => b.kind === "EXERCISE_OPTIONAL_WALK");
+    expect(walk?.startUtc).toBe("2027-01-16T08:00:00Z");
     expect(walk !== undefined && minutes(walk)).toBe(30);
   });
 

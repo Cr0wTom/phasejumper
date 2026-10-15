@@ -43,6 +43,8 @@ export const messages = {
   windDown: "Wind-down",
   meals: "Meals",
   preAdjust: "Days to shift before you fly",
+  preAdjustHint:
+    "Moving your sleep and light an hour a day before you fly means less to adjust after you land. The plan uses only as many of these days as it needs.",
   arrivalStyle: "On arrival day",
   arrivalStyleBodyClock: "Follow my body clock (recommended)",
   arrivalStyleLocal: "Switch to local time faster",
@@ -182,7 +184,7 @@ export const phaseMapMessages = {
   stripRowLabel: (date: string): string =>
     `${date}. Press Enter to open the day.`,
   dayViewLabel:
-    "The whole day drawn: sleep, light, exercise, food and drink, the sky where you are and your body's night. Every item is listed below.",
+    "The whole day drawn: sleep, light, exercise, food and drink. Every item is listed below.",
   keyHeading: "How to read the phase map",
   keyIntro:
     "Each row is one day, midnight to midnight. Inside a row the bands run top to bottom: sleep and rest, light, exercise, then food and drink. On a phone each day is one line with sleep, light, meals and flights; tap a day to see all of it.",

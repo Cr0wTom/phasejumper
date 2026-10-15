@@ -29,7 +29,12 @@ describe("no-exercise windows", () => {
   it("never shows two touching no-exercise blocks on a day", () => {
     const plan = generatePlan({
       ...tyo,
-      traveler: { ...tyo.traveler, exercise: { enabled: true } },
+      // Three prep days: the shape in which the two windows meet.
+      traveler: {
+        ...tyo.traveler,
+        exercise: { enabled: true },
+        preAdjustDays: 3,
+      },
     });
     for (const day of plan.days) {
       const avoid = day.blocks.filter((b) => b.kind === "EXERCISE_AVOID");

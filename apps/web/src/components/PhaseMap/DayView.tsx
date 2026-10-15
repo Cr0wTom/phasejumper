@@ -14,17 +14,12 @@
  * limitations under the License.
  */
 
-// One day drawn in full, for phones: every band, the sky where the traveler
-// is at each moment, and the body's night around the body-clock low point.
-// Shapes only, no text: the day sheet below lists every item with its time.
+// One day drawn in full, for phones: every band and the body-clock low
+// point. Shapes only, no text: the day sheet below lists every item with its time.
 // Touching or dragging across it marks a moment and highlights what is going
 // on then in that list.
 
-import {
-  sunAltitudeAt,
-  type PlanInput,
-  type PlanResult,
-} from "@phasejumper/engine";
+import type { PlanInput, PlanResult } from "@phasejumper/engine";
 import {
   useEffect,
   useId,
@@ -46,28 +41,16 @@ import {
   SOFT_STROKE,
 } from "./legend";
 
-/** Same as the engine's daylight check: the sun's centre at sunrise. */
-const SUN_UP_DEG = -0.35;
-/** Civil twilight ends here. */
-const TWILIGHT_DEG = -6;
-const SKY_STEP_MIN = 15;
-/** The body's night: from this long before the low point... */
-const NIGHT_BEFORE_MIN = 6 * 60;
-/** ...to this long after it. */
-const NIGHT_AFTER_MIN = 2 * 60;
-
-type Sky = "day" | "twilight" | "night" | "air";
-
-/** Thin rails: daylight where you are along the top, your body's night along the bottom. */
-const SUN_RAIL = { y: 30, h: 4 };
+/** The drawing starts below the sheet's faded top edge. */
+const TOP = 30;
 const LANES = {
-  sleep: { y: 46, h: 22 },
-  light: { y: 76, h: 16 },
-  move: { y: 100, h: 10 },
-  intake: { y: 118, h: 12 },
+  sleep: { y: 34, h: 22 },
+  light: { y: 64, h: 16 },
+  move: { y: 88, h: 10 },
+  intake: { y: 106, h: 12 },
 } as const;
-const NIGHT_RAIL = { y: 142, h: 4 };
-const HEIGHT = 156;
+const BOTTOM = 122;
+const HEIGHT = 130;
 /** The day is inset by this much from the sheet's edges. */
 const PAD = 16;
 /** Meals are drawn this many minutes wide, so they read as a mark. */
@@ -81,12 +64,6 @@ const LINE_KINDS = new Set([
   "MELATONIN_OK",
 ]);
 const QUIET_KINDS = new Set(["WIND_DOWN", "NSDR"]);
-
-function skyOf(altitude: number | undefined): Sky {
-  if (altitude === undefined) return "air";
-  if (altitude > SUN_UP_DEG) return "day";
-  return altitude > TWILIGHT_DEG ? "twilight" : "night";
-}
 
 /** The row for a date, or the nearest one after it, or the last. */
 function rowFor(rows: readonly Row[], date: string): Row | undefined {
@@ -146,31 +123,6 @@ export function DayView({
         .toZonedDateTime(zone)
         .toInstant();
   }, [rowDate, zone]);
-  // Runs of daylight, twilight, darkness or flight across the day.
-  const sky = useMemo(() => {
-    const runs: Array<{ from: number; to: number; sky: Sky }> = [];
-    for (let min = 0; min < 1440; min += SKY_STEP_MIN) {
-      const mid = instantAt(min + Math.floor(SKY_STEP_MIN / 2)).toString();
-      const here = skyOf(sunAltitudeAt(input, mid));
-      const last = runs[runs.length - 1];
-      if (last !== undefined && last.sky === here) last.to = min + SKY_STEP_MIN;
-      else runs.push({ from: min, to: min + SKY_STEP_MIN, sky: here });
-    }
-    return runs;
-  }, [input, instantAt]);
-  const nights = useMemo(() => {
-    const start = instantAt(0).epochMilliseconds;
-    return result.days
-      .map(
-        (d) =>
-          (Temporal.Instant.from(d.cbtMinUtc).epochMilliseconds - start) /
-          60_000,
-      )
-      .filter(
-        (min) => min + NIGHT_AFTER_MIN > 0 && min - NIGHT_BEFORE_MIN < 1440,
-      );
-  }, [result, instantAt]);
-
   if (row === undefined) return null;
   const inner = Math.max(1, width - 2 * PAD);
   const x = (min: number): number => PAD + (min / 1440) * inner;
@@ -207,9 +159,9 @@ export function DayView({
             <rect
               key={f.id}
               x={x(f.startMin)}
-              y={SUN_RAIL.y - 6}
+              y={TOP - 4}
               width={x(f.endMin) - x(f.startMin)}
-              height={NIGHT_RAIL.y + NIGHT_RAIL.h + 6 - (SUN_RAIL.y - 6)}
+              height={BOTTOM - TOP + 8}
               rx={8}
               fill={`url(#${hatchId})`}
               fillOpacity={0.6}
@@ -220,58 +172,12 @@ export function DayView({
               key={min}
               x1={x(min)}
               x2={x(min)}
-              y1={SUN_RAIL.y + SUN_RAIL.h + 4}
-              y2={NIGHT_RAIL.y - 4}
+              y1={TOP}
+              y2={BOTTOM}
               stroke="var(--fg-muted)"
               strokeOpacity={0.12}
             />
           ))}
-          {/* Both rails sit on a faint track the width of the day. */}
-          {[SUN_RAIL, NIGHT_RAIL].map((rail) => (
-            <rect
-              key={rail.y}
-              x={x(0)}
-              y={rail.y}
-              width={x(1440) - x(0)}
-              height={rail.h}
-              rx={rail.h / 2}
-              fill="var(--fg-muted)"
-              fillOpacity={0.12}
-            />
-          ))}
-          {sky
-            .filter((r) => r.sky === "day" || r.sky === "twilight")
-            .map((r) => (
-              <rect
-                key={r.from}
-                x={x(r.from)}
-                y={SUN_RAIL.y}
-                width={x(r.to) - x(r.from)}
-                height={SUN_RAIL.h}
-                rx={SUN_RAIL.h / 2}
-                fill="var(--light)"
-                fillOpacity={r.sky === "day" ? 0.9 : 0.35}
-                data-testid="day-view-sun"
-              />
-            ))}
-          {nights.map((peak) => {
-            const from = Math.max(0, peak - NIGHT_BEFORE_MIN);
-            const to = Math.min(1440, peak + NIGHT_AFTER_MIN);
-            return (
-              <rect
-                key={peak}
-                x={x(from)}
-                y={NIGHT_RAIL.y}
-                width={x(to) - x(from)}
-                height={NIGHT_RAIL.h}
-                rx={NIGHT_RAIL.h / 2}
-                fill="var(--sleep)"
-                fillOpacity={0.8}
-                data-testid="day-view-night"
-              />
-            );
-          })}
-
           {row.segments.map((seg) => {
             const kind = seg.block.kind;
             const lane = LANES[seg.lane];
@@ -367,8 +273,8 @@ export function DayView({
           <line
             x1={x(cursor)}
             x2={x(cursor)}
-            y1={SUN_RAIL.y - 4}
-            y2={NIGHT_RAIL.y + NIGHT_RAIL.h + 4}
+            y1={TOP - 4}
+            y2={BOTTOM + 4}
             stroke="var(--accent)"
             strokeWidth={2}
             pointerEvents="none"

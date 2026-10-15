@@ -106,6 +106,7 @@ export function YouSection({
         <SelectField
           id={fieldDomId("preAdjustDays")}
           label={messages.preAdjust}
+          hint={messages.preAdjustHint}
           value={String(form.preAdjustDays)}
           required
           error={errors.preAdjustDays}

@@ -138,3 +138,13 @@ test("the full phase-map key is on the research page", async ({ page }) => {
     await expect(section.getByText(kind, { exact: true })).toBeVisible();
   }
 });
+
+test("the trip builder plans up to 3 days of shifting before the flight", async ({
+  page,
+}) => {
+  await page.goto("#/trip");
+  await expect(
+    page.getByLabel(messages.preAdjust, { exact: true }),
+  ).toHaveValue("3");
+  await expect(page.getByText(messages.preAdjustHint)).toBeVisible();
+});

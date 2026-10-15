@@ -192,18 +192,39 @@ export const OBSERVED_SLEEP = {
 } as const;
 
 /**
- * "Switch to local time faster" (traveler.arrivalStyle "local"): practical,
- * not from the cited studies. A daytime sleep after the final landing is cut
- * to a nap, and the next night starts by the local bedtime below.
+ * After the final landing (practical, not from the cited studies): a
+ * daytime sleep on the ground becomes a nap, and the first night is the
+ * first local night that starts a while after the night before. With
+ * "Switch to local time faster" (traveler.arrivalStyle "local") that first
+ * night starts at the beginning of the local-night window (LOCAL_NIGHT).
  */
 export const ARRIVAL_LOCAL = {
   napMaxMinutes: 90,
   /** A ground sleep whose middle falls between these local hours is "daytime". */
   daytimeFromHour: 8,
   daytimeToHour: 20,
-  localBedtimeHour: 22,
-  /** The local bedtime applies only if it is at least this long after landing + 2 h. */
+  /** That first night starts at least this long after landing + 2 h and after the night before ends. */
   minAwakeBeforeBedHours: 4,
+} as const;
+
+/**
+ * Sleep at the destination stays in the local night. Design rule, not from
+ * the cited studies: from the first night after the final landing, bedtime
+ * follows the body clock but stays within this window around the
+ * traveler's usual bedtime, in local time. Lopsided because staying up
+ * later is easier than going to bed earlier.
+ */
+export const LOCAL_NIGHT = {
+  earliestBeforeBedtimeMinutes: 60,
+  latestAfterBedtimeMinutes: 120,
+} as const;
+
+/**
+ * Days before the flight (R5): sleep and light move 1 h a day, and only as
+ * many days as the shift needs, up to the traveler's choice.
+ */
+export const PREP = {
+  shiftMinutesPerDay: 60,
 } as const;
 
 /** Daylight check (§2.7 rule 3), via suncalc. */

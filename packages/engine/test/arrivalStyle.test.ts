@@ -58,17 +58,16 @@ const onArrivalDay = (utc: string) =>
   local(utc).toPlainDate().toString() === "2027-03-11";
 
 describe("arrival style", () => {
-  it("default keeps the body-clock morning sleep after landing", () => {
+  it("by default a morning sleep after landing also becomes a nap, without the warning", () => {
     const plan = arriveMorning();
-    const morning = plan.days
-      .flatMap((d) => d.blocks)
-      .filter(
-        (b) =>
-          b.kind === "SLEEP" &&
-          onArrivalDay(b.startUtc) &&
-          local(b.startUtc).hour < 12,
-      );
-    expect(morning.length).toBeGreaterThan(0);
+    const blocks = plan.days.flatMap((d) => d.blocks);
+    const daytimeSleep = blocks.filter((b) => {
+      if (b.kind !== "SLEEP" || !onArrivalDay(b.startUtc)) return false;
+      const h = local(b.startUtc).hour;
+      return h >= 8 && h < 20;
+    });
+    expect(daytimeSleep).toEqual([]);
+    expect(blocks.some((b) => b.reasonCode === "NAP_ARRIVAL")).toBe(true);
     expect(plan.warnings.map((w) => w.code)).not.toContain(
       "ARRIVAL_LOCAL_TIME",
     );

@@ -18,6 +18,7 @@ import fc from "fast-check";
 import { Temporal } from "temporal-polyfill";
 import { expect, it } from "vitest";
 import { generatePlan } from "../src/index";
+import { PHASE } from "../src/prc";
 import type { Block, BlockKind, PlanInput } from "../src/types";
 import { inputs, multiLegInputs } from "./arbitraries";
 
@@ -128,6 +129,35 @@ function audit(trips: fc.Arbitrary<PlanInput>, seed: number): string[] {
           legs.some((f) => ov(i, { s: f.e, e: f.e + 2 * H }))
         )
           hit("R3b sleep within 2 h after landing", tag(b));
+        // R13: at the destination a shifting plan sleeps in the local night:
+        // bedtime from 1 h before to 2 h after the usual bedtime, local time.
+        // Nights shortened by an event or a landing are moved by that, not
+        // by the plan, so only full-length nights are checked.
+        const finalLanding = legs[legs.length - 1]?.e ?? Infinity;
+        if (
+          b.kind === "SLEEP" &&
+          (plan.decision.direction === "advance" ||
+            plan.decision.direction === "delay") &&
+          i.s >= finalLanding
+        ) {
+          const local = Temporal.Instant.fromEpochMilliseconds(
+            i.s,
+          ).toZonedDateTimeISO(input.itinerary.destinationTz);
+          const [bh = 0, bm = 0] = input.traveler.habitualBedtime
+            .split(":")
+            .map(Number);
+          const fromBed =
+            ((((local.hour * 60 + local.minute - (bh * 60 + bm)) % 1440) +
+              1440 +
+              720) %
+              1440) -
+            720;
+          const full =
+            i.e - i.s ===
+            (input.traveler.sleepNeedHours ?? PHASE.defaultSleepNeedHours) * H;
+          if (full && (fromBed < -60 || fromBed > 120))
+            hit("R13 destination sleep outside the local night", tag(b));
+        }
         if (
           b.kind === "NAP" &&
           !legs.some((f) => i.s >= f.s && i.e <= f.e) &&
